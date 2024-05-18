@@ -1,6 +1,4 @@
-<?php 
-require('connection.inc.php') 
-; ?>
+<?php require('connection.inc.php') ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

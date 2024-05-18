@@ -42,7 +42,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Execute the query
             if ($stmt->execute()) {
-                echo "New record created successfully";
+                // Redirect to show_key.php with the random_string as a URL parameter
+                header("Location: show_key.php?random_string=" . urlencode($randomString));
+                exit;
             } else {
                 echo "Error: " . $stmt->error;
             }
@@ -52,14 +54,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
     }
 }
-?>
 
+// Close the connection
+$conn->close();
+?>
 <style>
     body {
         background: #070F2B;
         color: white;
     }
-
     .centered-form {
         display: flex;
         flex-direction: column;
@@ -67,7 +70,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         align-items: center;
         height: 100vh;
     }
-
     .form-container {
         width: 100%;
         max-width: 400px;
@@ -77,7 +79,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         background: #141E46;
     }
-
     .error {
         color: red;
         margin-top: 5px;
