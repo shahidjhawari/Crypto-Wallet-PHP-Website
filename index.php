@@ -1,4 +1,4 @@
-<?php require('top.php') ?>;
+<?php require('top.php') ?>
 <style>
     body {
         background: #070F2B;
