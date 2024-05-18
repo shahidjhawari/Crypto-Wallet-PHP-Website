@@ -1,33 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: #070F2B;
-            color: white;
-        }
-        .centered-form {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .form-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            border: 1px solid #e3e3e3;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            background: #141E46;
-        }
-    </style>
+<?php require('top.php') ?>;
+<style>
+    body {
+        background: #070F2B;
+        color: white;
+    }
+
+    .centered-form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .form-container {
+        width: 100%;
+        max-width: 400px;
+        padding: 20px;
+        border: 1px solid #e3e3e3;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        background: #141E46;
+    }
+</style>
 </head>
+
 <body>
     <div class="container">
         <div class="centered-form">
@@ -55,8 +52,5 @@
             </div>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+
+<?php require('footer.php') ?>;
