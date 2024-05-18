@@ -1,57 +1,92 @@
-<?php require('top.php') ?>;
-    <style>
-        body {
-            background: #070F2B;
-            color: white;
-        }
-        .centered-form {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .form-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            border: 1px solid #e3e3e3;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            background: #141E46;
-        }
-    </style>
+<?php
+require('top.php');
+function test_input($data)
+{
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+}
 
-    <div class="container">
-        <div class="centered-form">
-            <div class="form-container">
-                <div class="text-center mb-4">
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = test_input($_POST["name"]);
+    $email = test_input($_POST["email"]);
+    $password = test_input($_POST["password"]);
+    $confirmPassword = test_input($_POST["confirmPassword"]);
+
+    if ($password != $confirmPassword) {
+        echo "Passwords do not match.";
+    } else {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $name, $email, $hashed_password);
+
+        if ($stmt->execute()) {
+            echo "New record created successfully";
+        } else {
+            echo "Error: " . $stmt->error;
+        }
+
+        $stmt->close();
+    }
+}
+?>
+<style>
+    body {
+        background: #070F2B;
+        color: white;
+    }
+
+    .centered-form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .form-container {
+        width: 100%;
+        max-width: 400px;
+        padding: 20px;
+        border: 1px solid #e3e3e3;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        background: #141E46;
+    }
+</style>
+
+<div class="container">
+    <div class="centered-form">
+        <div class="form-container">
+            <div class="text-center mb-4">
                 <img src="img/logo.png" alt="Logo" class="img-fluid" width="300">
+            </div>
+            <form action="signup.php" method="post">
+                <div class="form-group">
+                    <label for="name">Name *</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
                 </div>
-                <form>
-                    <div class="form-group">
-                        <label for="name">Name *</label>
-                        <input type="text" class="form-control" id="name" placeholder="Enter your name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email *</label>
-                        <input type="email" class="form-control" id="email" placeholder="Enter email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password *</label>
-                        <input type="password" class="form-control" id="password" placeholder="Enter password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirmPassword">Confirm Password *</label>
-                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
-                </form>
-                <div class="text-center mt-3">
-                    <p>Already have an account? <a href="index.php" class="text-decoration-none">Login</a></p>
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
                 </div>
+                <div class="form-group">
+                    <label for="password">Password *</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password *</label>
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+            </form>
+            <div class="text-center mt-3">
+                <p>Already have an account? <a href="index.php" class="text-decoration-none">Login</a></p>
             </div>
         </div>
     </div>
+</div>
 
 <?php require('footer.php') ?>;

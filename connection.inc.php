@@ -1,6 +1,6 @@
 <?php
 session_start();
-$con=mysqli_connect("localhost","root","","coin");
+$conn=mysqli_connect("localhost","root","","coin");
 define('SERVER_PATH',$_SERVER['DOCUMENT_ROOT'].'/coin');
 define('SITE_PATH','http://127.0.0.1/coin');
 
