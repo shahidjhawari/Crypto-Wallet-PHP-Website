@@ -30,12 +30,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->num_rows > 0) {
             $emailError = "Email already exists.";
         } else {
+            // Generate a random 100-character string
+            $randomString = bin2hex(random_bytes(50));
+
             // Hash the password
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
             // Prepare and bind
-            $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $name, $email, $hashed_password);
+            $stmt = $conn->prepare("INSERT INTO users (name, email, password, random_string) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("ssss", $name, $email, $hashed_password, $randomString);
 
             // Execute the query
             if ($stmt->execute()) {
@@ -58,7 +61,6 @@ $conn->close();
         background: #070F2B;
         color: white;
     }
-
     .centered-form {
         display: flex;
         flex-direction: column;
@@ -66,7 +68,6 @@ $conn->close();
         align-items: center;
         height: 100vh;
     }
-
     .form-container {
         width: 100%;
         max-width: 400px;
@@ -76,7 +77,6 @@ $conn->close();
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         background: #141E46;
     }
-
     .error {
         color: red;
         margin-top: 5px;
@@ -102,11 +102,11 @@ $conn->close();
                 <div class="form-group">
                     <label for="password">Password *</label>
                     <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                    <span class="error"><?php echo $passwordError; ?></span>
                 </div>
                 <div class="form-group">
                     <label for="confirmPassword">Confirm Password *</label>
                     <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
-                    <span class="error"><?php echo $passwordError; ?></span>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
             </form>
