@@ -6,6 +6,10 @@
     <title>Sign Up</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body {
+            background: #070F2B;
+            color: white;
+        }
         .centered-form {
             display: flex;
             flex-direction: column;
@@ -20,6 +24,7 @@
             border: 1px solid #e3e3e3;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: #141E46;
         }
     </style>
 </head>
@@ -28,7 +33,7 @@
         <div class="centered-form">
             <div class="form-container">
                 <div class="text-center mb-4">
-                    <img src="path/to/logo.png" alt="Logo" class="img-fluid" width="100">
+                <img src="img/logo.png" alt="Logo" class="img-fluid" width="300">
                 </div>
                 <form>
                     <div class="form-group">
@@ -50,7 +55,7 @@
                     <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
                 </form>
                 <div class="text-center mt-3">
-                    <p>Already have an account? <a href="index.html" class="text-decoration-none">Login</a></p>
+                    <p>Already have an account? <a href="index.php" class="text-decoration-none">Login</a></p>
                 </div>
             </div>
         </div>
