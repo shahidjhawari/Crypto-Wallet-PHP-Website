@@ -21,8 +21,7 @@
             background: #141E46;
         }
     </style>
-</head>
-<body>
+
     <div class="container">
         <div class="centered-form">
             <div class="form-container">
