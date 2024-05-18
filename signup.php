@@ -1,5 +1,6 @@
 <?php
 require('top.php');
+
 function test_input($data)
 {
     $data = trim($data);
@@ -8,6 +9,9 @@ function test_input($data)
     return $data;
 }
 
+$emailError = "";
+$passwordError = "";
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = test_input($_POST["name"]);
     $email = test_input($_POST["email"]);
@@ -15,22 +19,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $confirmPassword = test_input($_POST["confirmPassword"]);
 
     if ($password != $confirmPassword) {
-        echo "Passwords do not match.";
+        $passwordError = "Passwords do not match.";
     } else {
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        // Check if email already exists
+        $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
 
-        $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $name, $email, $hashed_password);
-
-        if ($stmt->execute()) {
-            echo "New record created successfully";
+        if ($stmt->num_rows > 0) {
+            $emailError = "Email already exists.";
         } else {
-            echo "Error: " . $stmt->error;
+            // Hash the password
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+            // Prepare and bind
+            $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+            $stmt->bind_param("sss", $name, $email, $hashed_password);
+
+            // Execute the query
+            if ($stmt->execute()) {
+                echo "New record created successfully";
+            } else {
+                echo "Error: " . $stmt->error;
+            }
         }
 
+        // Close the statement
         $stmt->close();
     }
 }
+
+// Close the connection
+$conn->close();
 ?>
 <style>
     body {
@@ -55,6 +76,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         background: #141E46;
     }
+
+    .error {
+        color: red;
+        margin-top: 5px;
+    }
 </style>
 
 <div class="container">
@@ -71,6 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="form-group">
                     <label for="email">Email *</label>
                     <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+                    <span class="error"><?php echo $emailError; ?></span>
                 </div>
                 <div class="form-group">
                     <label for="password">Password *</label>
@@ -79,6 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="form-group">
                     <label for="confirmPassword">Confirm Password *</label>
                     <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
+                    <span class="error"><?php echo $passwordError; ?></span>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
             </form>
@@ -89,4 +117,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </div>
 
-<?php require('footer.php') ?>;
+<?php require('footer.php'); ?>
