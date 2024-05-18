@@ -30,7 +30,7 @@
                 <div class="text-center mb-4">
                     <img src="img/logo.png" alt="Logo" class="img-fluid" width="300">
                 </div>
-                <form>
+                <form action="login_submit.php">
                     <div class="form-group">
                         <label for="email">Email *</label>
                         <input type="email" class="form-control" id="email" placeholder="Enter email" required>
