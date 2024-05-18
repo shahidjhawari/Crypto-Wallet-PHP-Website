@@ -52,10 +52,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
     }
 }
-
-// Close the connection
-$conn->close();
 ?>
+
 <style>
     body {
         background: #070F2B;
