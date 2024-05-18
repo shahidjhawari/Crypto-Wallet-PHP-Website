@@ -59,6 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         background: #070F2B;
         color: white;
     }
+
     .centered-form {
         display: flex;
         flex-direction: column;
@@ -66,6 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         align-items: center;
         height: 100vh;
     }
+
     .form-container {
         width: 100%;
         max-width: 400px;
@@ -75,6 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         background: #141E46;
     }
+
     .error {
         color: red;
         margin-top: 5px;
