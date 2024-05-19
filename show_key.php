@@ -55,7 +55,6 @@
     <button class="btn btn-warning copy-button" onclick="copyRandomString()"><b>Copy Private Key</b></button><br><br>
     <span class="copy-message" id="copyMessage">Your Key has been copied</span>
 
-    <!-- Back Button and Login Button -->
     <div class="mt-4">
         <button class="btn btn-secondary mr-2" onclick="goBack()"><b>Back</b></button>
         <button class="btn btn-primary" onclick="goToLogin()"><b>Login</b></button>
@@ -72,23 +71,19 @@
         document.execCommand("copy");
         window.getSelection().removeAllRanges();
         var copyMessage = document.getElementById('copyMessage');
-        copyMessage.style.display = 'inline'; // Show the copy message
+        copyMessage.style.display = 'inline';
         setTimeout(function() {
-            copyMessage.style.display = 'none'; // Hide the copy message after some time
-        }, 2000); // Adjust the time as needed
+            copyMessage.style.display = 'none';
+        }, 2000);
     }
 
-    // Function to go back
     function goBack() {
         window.location.href = "signup.php";
     }
 
-    // Function to redirect to login page
     function goToLogin() {
-        window.location.href = "index.php"; // Change 'login.php' to your actual login page URL
+        window.location.href = "index.php";
     }
 </script>
-
-
 
 <?php require('footer.php') ?>

@@ -21,7 +21,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($password != $confirmPassword) {
         $passwordError = "Passwords do not match.";
     } else {
-        // Check if email already exists
         $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -30,39 +29,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->num_rows > 0) {
             $emailError = "Email already exists.";
         } else {
-            // Generate a random 100-character string
             $randomString = bin2hex(random_bytes(50));
 
-            // Hash the password
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-            // Prepare and bind
             $stmt = $conn->prepare("INSERT INTO users (name, email, password, random_string) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("ssss", $name, $email, $hashed_password, $randomString);
 
-            // Execute the query
             if ($stmt->execute()) {
-                // Redirect to show_key.php with the random_string as a URL parameter
                 header("Location: show_key.php?random_string=" . urlencode($randomString));
                 exit;
             } else {
                 echo "Error: " . $stmt->error;
             }
         }
-
-        // Close the statement
-        $stmt->close();
     }
 }
-
-// Close the connection
-$conn->close();
 ?>
+
 <style>
     body {
         background: #070F2B;
         color: white;
     }
+
     .centered-form {
         display: flex;
         flex-direction: column;
@@ -70,6 +60,7 @@ $conn->close();
         align-items: center;
         height: 100vh;
     }
+
     .form-container {
         width: 100%;
         max-width: 400px;
@@ -79,6 +70,7 @@ $conn->close();
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         background: #141E46;
     }
+
     .error {
         color: red;
         margin-top: 5px;
