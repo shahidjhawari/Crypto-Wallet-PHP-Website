@@ -1,7 +1,8 @@
 <?php
 require('top.php');
 
-function test_input($data) {
+function test_input($data)
+{
     $data = trim($data);
     $data = stripslashes($data);
     $data = htmlspecialchars($data);
@@ -77,7 +78,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-function rewardReferrer($referrer_id, $points, $level) {
+function rewardReferrer($referrer_id, $points, $level)
+{
     global $conn;
     if ($level > 3) {
         return;
