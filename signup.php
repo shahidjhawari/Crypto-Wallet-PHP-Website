@@ -78,7 +78,7 @@ function rewardReferrer($referrer_id, $points, $level)
         return;
     }
 
-    $stmt = $conn->prepare("UPDATE rewards SET reward_points = reward_points + ? WHERE user_id = ?");
+    $stmt = $conn->prepare("UPDATE rewards SET reward_points = reward_points + ?, referral_count = referral_count + 1 WHERE user_id = ?");
     $stmt->bind_param("ii", $points, $referrer_id);
     $stmt->execute();
 
