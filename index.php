@@ -1,48 +1,51 @@
 <?php
 require('top.php');
 
-function test_input($data)
-{
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
+$showRandomKeyField = !(isset($_SESSION['viewed_key']) && $_SESSION['viewed_key']);
 
-$email_error = "";
-$password_error = "";
-$random_string_error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    function test_input($data)
+    {
+        $data = trim($data);
+        $data = stripslashes($data);
+        $data = htmlspecialchars($data);
+        return $data;
+    }
+
     $email = test_input($_POST["email"]);
     $password = test_input($_POST["password"]);
-    $random_string = test_input($_POST["random_string"]);
+    $random_string = $showRandomKeyField ? test_input($_POST["random_string"]) : null;
 
     $stmt = $conn->prepare("SELECT id, password, random_string FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
 
+    $emailError = "";
+    $passwordError = "";
+    $randomStringError = "";
+
     if ($stmt->num_rows > 0) {
         $stmt->bind_result($id, $hashed_password, $stored_random_string);
         $stmt->fetch();
 
         if (!password_verify($password, $hashed_password)) {
-            $password_error = "Invalid password.";
+            $passwordError = "Invalid password.";
         }
 
-        if ($random_string !== $stored_random_string) {
-            $random_string_error = "Invalid random key.";
+        if ($showRandomKeyField && $random_string !== $stored_random_string) {
+            $randomStringError = "Invalid random key.";
         }
 
-        if (empty($password_error) && empty($random_string_error)) {
+        if (empty($passwordError) && empty($randomStringError)) {
             $_SESSION['user_id'] = $id;
             $_SESSION['random_string'] = $stored_random_string;
-            header("Location: show_key.php");
+            header("Location: dashboard.php");
             exit();
         }
     } else {
-        $email_error = "Invalid email.";
+        $emailError = "Invalid email.";
     }
     $stmt->close();
 }
@@ -85,29 +88,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <img src="img/logo.png" alt="Logo" class="img-fluid" width="300">
             </div>
             <?php
-            if (!empty($email_error)) {
-                echo '<p class="error-message">' . $email_error . '</p>';
+            if (!empty($emailError)) {
+                echo '<p class="error-message">' . $emailError . '</p>';
             }
-            if (!empty($password_error)) {
-                echo '<p class="error-message">' . $password_error . '</p>';
+            if (!empty($passwordError)) {
+                echo '<p class="error-message">' . $passwordError . '</p>';
             }
-            if (!empty($random_string_error)) {
-                echo '<p class="error-message">' . $random_string_error . '</p>';
+            if (!empty($randomStringError)) {
+                echo '<p class="error-message">' . $randomStringError . '</p>';
             }
             ?>
             <form method="post" autocomplete="off">
                 <div class="form-group">
                     <label for="email">Email *</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" autocomplete="new-email" required>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
                 </div>
                 <div class="form-group">
                     <label for="password">Password *</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" autocomplete="new-password" required>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
                 </div>
-                <div class="form-group">
-                    <label for="random_string">Private Key *</label>
-                    <input type="text" class="form-control" id="random_string" name="random_string" placeholder="Enter private key" autocomplete="new-password" required>
-                </div>
+                <?php if ($showRandomKeyField) : ?>
+                    <div class="form-group">
+                        <label for="random_string">Random Key *</label>
+                        <input type="text" class="form-control" id="random_string" name="random_string" placeholder="Enter random key" required>
+                    </div>
+                <?php endif; ?>
                 <div class="form-group text-right">
                     <a href="#" class="text-decoration-none">Forgot password?</a>
                 </div>
@@ -119,3 +124,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 </div>
+
+<?php require('footer.php') ?>

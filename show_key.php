@@ -1,4 +1,15 @@
-<?php require('top.php') ?>
+<?php
+require('top.php');
+$_SESSION['viewed_key'] = true;
+
+function test_input($data)
+{
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+}
+?>
 <style>
     body {
         background: #070F2B;
