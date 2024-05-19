@@ -17,6 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = test_input($_POST["email"]);
     $password = test_input($_POST["password"]);
     $confirmPassword = test_input($_POST["confirmPassword"]);
+    $referral = test_input($_POST["referral"]);
 
     if ($password != $confirmPassword) {
         $passwordError = "Passwords do not match.";
@@ -29,19 +30,67 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->num_rows > 0) {
             $emailError = "Email already exists.";
         } else {
-            $randomString = bin2hex(random_bytes(50));
+            $referrer_id = null;
 
+            if (!empty($referral)) {
+                $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+                $stmt->bind_param("s", $referral);
+                $stmt->execute();
+                $stmt->store_result();
+
+                if ($stmt->num_rows > 0) {
+                    $stmt->bind_result($referrer_id);
+                    $stmt->fetch();
+                }
+            }
+
+            $randomString = bin2hex(random_bytes(50));
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-            $stmt = $conn->prepare("INSERT INTO users (name, email, password, random_string) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("ssss", $name, $email, $hashed_password, $randomString);
+            $stmt = $conn->prepare("INSERT INTO users (name, email, password, random_string, referrer_id) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssi", $name, $email, $hashed_password, $randomString, $referrer_id);
 
             if ($stmt->execute()) {
+                $user_id = $stmt->insert_id;
+
+                $stmt = $conn->prepare("INSERT INTO rewards (user_id, reward_points) VALUES (?, 0)");
+                $stmt->bind_param("i", $user_id);
+                $stmt->execute();
+
+                // Reward the referrer
+                if ($referrer_id !== null) {
+                    rewardReferrer($referrer_id, 10, 1);
+                }
+
                 header("Location: show_key.php?random_string=" . urlencode($randomString));
                 exit;
             } else {
                 echo "Error: " . $stmt->error;
             }
+        }
+    }
+}
+
+function rewardReferrer($referrer_id, $points, $level)
+{
+    global $conn;
+    if ($level > 3) {
+        return;
+    }
+
+    $stmt = $conn->prepare("UPDATE rewards SET reward_points = reward_points + ? WHERE user_id = ?");
+    $stmt->bind_param("ii", $points, $referrer_id);
+    $stmt->execute();
+
+    if ($level < 3) {
+        $stmt = $conn->prepare("SELECT referrer_id FROM users WHERE id = ?");
+        $stmt->bind_param("i", $referrer_id);
+        $stmt->execute();
+        $stmt->bind_result($next_referrer_id);
+        $stmt->fetch();
+
+        if ($next_referrer_id !== null) {
+            rewardReferrer($next_referrer_id, $points, $level + 1);
         }
     }
 }
@@ -101,6 +150,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="form-group">
                     <label for="confirmPassword">Confirm Password *</label>
                     <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="referral">Referral (optional)</label>
+                    <input type="email" class="form-control" id="referral" name="referral" placeholder="Enter referrer's email">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
             </form>
