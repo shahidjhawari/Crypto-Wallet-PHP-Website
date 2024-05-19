@@ -59,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt->close();
 
                 // Initialize rewards for the new user
-                $stmt = $conn->prepare("INSERT INTO rewards (user_id, reward_points, referral_count) VALUES (?, 0, 0)");
+                $stmt = $conn->prepare("INSERT INTO rewards (user_id, reward_points, referral_count, level_one_count, level_two_count, level_three_count) VALUES (?, 0, 0, 0, 0, 0)");
                 $stmt->bind_param("i", $user_id);
                 $stmt->execute();
                 $stmt->close();
@@ -85,8 +85,14 @@ function rewardReferrer($referrer_id, $points, $level)
         return;
     }
 
-    // Update rewards for the current referrer
-    $stmt = $conn->prepare("UPDATE rewards SET reward_points = reward_points + ?, referral_count = referral_count + 1 WHERE user_id = ?");
+    // Update rewards and level count for the current referrer
+    if ($level == 1) {
+        $stmt = $conn->prepare("UPDATE rewards SET reward_points = reward_points + ?, referral_count = referral_count + 1, level_one_count = level_one_count + 1 WHERE user_id = ?");
+    } elseif ($level == 2) {
+        $stmt = $conn->prepare("UPDATE rewards SET reward_points = reward_points + ?, level_two_count = level_two_count + 1 WHERE user_id = ?");
+    } else {
+        $stmt = $conn->prepare("UPDATE rewards SET reward_points = reward_points + ?, level_three_count = level_three_count + 1 WHERE user_id = ?");
+    }
     $stmt->bind_param("ii", $points, $referrer_id);
     $stmt->execute();
     $stmt->close();
@@ -101,7 +107,9 @@ function rewardReferrer($referrer_id, $points, $level)
         $stmt->close();
 
         if ($next_referrer_id !== null) {
-            rewardReferrer($next_referrer_id, $points, $level + 1);
+            // Determine points for the next level
+            $next_points = ($level == 1) ? 5 : 2;
+            rewardReferrer($next_referrer_id, $next_points, $level + 1);
         }
     }
 }
