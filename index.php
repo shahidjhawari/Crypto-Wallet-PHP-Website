@@ -9,7 +9,9 @@ function test_input($data)
     return $data;
 }
 
-$error_message = "";
+$email_error = "";
+$password_error = "";
+$random_string_error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = test_input($_POST["email"]);
@@ -25,19 +27,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_result($id, $hashed_password, $stored_random_string);
         $stmt->fetch();
 
-        if (password_verify($password, $hashed_password) && $random_string === $stored_random_string) {
+        if (!password_verify($password, $hashed_password)) {
+            $password_error = "Invalid password.";
+        }
+
+        if ($random_string !== $stored_random_string) {
+            $random_string_error = "Invalid random key.";
+        }
+
+        if (empty($password_error) && empty($random_string_error)) {
             $_SESSION['user_id'] = $id;
             $_SESSION['random_string'] = $stored_random_string;
-            // header("Location: show_key.php");
+            header("Location: show_key.php");
             exit();
-        } else {
-            $error_message = "Invalid email, password, or random key.";
         }
     } else {
-        $error_message = "Invalid email, password, or random key.";
+        $email_error = "Invalid email.";
     }
+    $stmt->close();
 }
 ?>
+
 <style>
     body {
         background: #070F2B;
@@ -75,22 +85,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <img src="img/logo.png" alt="Logo" class="img-fluid" width="300">
             </div>
             <?php
-            if (!empty($error_message)) {
-                echo '<p class="error-message">' . $error_message . '</p>';
+            if (!empty($email_error)) {
+                echo '<p class="error-message">' . $email_error . '</p>';
+            }
+            if (!empty($password_error)) {
+                echo '<p class="error-message">' . $password_error . '</p>';
+            }
+            if (!empty($random_string_error)) {
+                echo '<p class="error-message">' . $random_string_error . '</p>';
             }
             ?>
-            <form action="login_submit.php" method="post">
+            <form method="post" autocomplete="off">
                 <div class="form-group">
                     <label for="email">Email *</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" autocomplete="new-email" required>
                 </div>
                 <div class="form-group">
                     <label for="password">Password *</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" autocomplete="new-password" required>
                 </div>
                 <div class="form-group">
-                    <label for="random_string">Random Key *</label>
-                    <input type="text" class="form-control" id="random_string" name="random_string" placeholder="Enter random key" required>
+                    <label for="random_string">Private Key *</label>
+                    <input type="text" class="form-control" id="random_string" name="random_string" placeholder="Enter private key" autocomplete="new-password" required>
                 </div>
                 <div class="form-group text-right">
                     <a href="#" class="text-decoration-none">Forgot password?</a>
@@ -103,6 +119,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 </div>
-</body>
-
-</html>
