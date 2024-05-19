@@ -1,8 +1,7 @@
 <?php
 require('top.php');
 
-function test_input($data)
-{
+function test_input($data) {
     $data = trim($data);
     $data = stripslashes($data);
     $data = htmlspecialchars($data);
@@ -22,6 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($password != $confirmPassword) {
         $passwordError = "Passwords do not match.";
     } else {
+        // Check if the email already exists
         $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -29,7 +29,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($stmt->num_rows > 0) {
             $emailError = "Email already exists.";
+            $stmt->close();
         } else {
+            $stmt->close();
             $referrer_id = null;
 
             if (!empty($referral)) {
@@ -42,20 +44,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $stmt->bind_result($referrer_id);
                     $stmt->fetch();
                 }
+                $stmt->close();
             }
 
             $randomString = bin2hex(random_bytes(50));
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
+            // Insert new user
             $stmt = $conn->prepare("INSERT INTO users (name, email, password, random_string, referrer_id) VALUES (?, ?, ?, ?, ?)");
             $stmt->bind_param("ssssi", $name, $email, $hashed_password, $randomString, $referrer_id);
-
             if ($stmt->execute()) {
                 $user_id = $stmt->insert_id;
+                $stmt->close();
 
-                $stmt = $conn->prepare("INSERT INTO rewards (user_id, reward_points) VALUES (?, 0)");
+                // Initialize rewards for the new user
+                $stmt = $conn->prepare("INSERT INTO rewards (user_id, reward_points, referral_count) VALUES (?, 0, 0)");
                 $stmt->bind_param("i", $user_id);
                 $stmt->execute();
+                $stmt->close();
 
                 // Reward the referrer
                 if ($referrer_id !== null) {
@@ -63,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
 
                 header("Location: show_key.php?random_string=" . urlencode($randomString));
-                exit;
+                exit();
             } else {
                 echo "Error: " . $stmt->error;
             }
@@ -71,23 +77,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-function rewardReferrer($referrer_id, $points, $level)
-{
+function rewardReferrer($referrer_id, $points, $level) {
     global $conn;
     if ($level > 3) {
         return;
     }
 
+    // Update rewards for the current referrer
     $stmt = $conn->prepare("UPDATE rewards SET reward_points = reward_points + ?, referral_count = referral_count + 1 WHERE user_id = ?");
     $stmt->bind_param("ii", $points, $referrer_id);
     $stmt->execute();
+    $stmt->close();
 
     if ($level < 3) {
+        // Get the next level referrer
         $stmt = $conn->prepare("SELECT referrer_id FROM users WHERE id = ?");
         $stmt->bind_param("i", $referrer_id);
         $stmt->execute();
         $stmt->bind_result($next_referrer_id);
         $stmt->fetch();
+        $stmt->close();
 
         if ($next_referrer_id !== null) {
             rewardReferrer($next_referrer_id, $points, $level + 1);
