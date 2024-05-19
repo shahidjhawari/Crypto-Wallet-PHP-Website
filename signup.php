@@ -91,24 +91,24 @@ $conn->close();
             <div class="text-center mb-4">
                 <img src="img/logo.png" alt="Logo" class="img-fluid" width="300">
             </div>
-            <form action="signup.php" method="post">
+            <form action="signup.php" method="post" autocomplete="off">
                 <div class="form-group">
                     <label for="name">Name *</label>
-                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required autocomplete="new-name">
                 </div>
                 <div class="form-group">
                     <label for="email">Email *</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required autocomplete="new-email">
                     <span class="error"><?php echo $emailError; ?></span>
                 </div>
                 <div class="form-group">
                     <label for="password">Password *</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required autocomplete="new-password">
                     <span class="error"><?php echo $passwordError; ?></span>
                 </div>
                 <div class="form-group">
                     <label for="confirmPassword">Confirm Password *</label>
-                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required autocomplete="new-password">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
             </form>
