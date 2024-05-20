@@ -2,7 +2,6 @@
 require('top.php');
 session_start();
 
-// Redirect to login page if not logged in
 if (!isset($_SESSION['user_id'])) {
   header("Location: index.php");
   exit();
@@ -11,7 +10,6 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $user_name = $_SESSION['user_name'];
 
-// Fetch user-specific data
 $stmt = $conn->prepare("SELECT * FROM rewards WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
