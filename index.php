@@ -1,12 +1,11 @@
 <?php
 require('top.php');
+session_start();
 
 $showRandomKeyField = !(isset($_SESSION['viewed_key']) && $_SESSION['viewed_key']);
 
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    function test_input($data)
-    {
+    function test_input($data) {
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
@@ -17,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = test_input($_POST["password"]);
     $random_string = $showRandomKeyField ? test_input($_POST["random_string"]) : null;
 
-    $stmt = $conn->prepare("SELECT id, password, random_string FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT id, password, random_string, name FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
@@ -27,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $randomStringError = "";
 
     if ($stmt->num_rows > 0) {
-        $stmt->bind_result($id, $hashed_password, $stored_random_string);
+        $stmt->bind_result($id, $hashed_password, $stored_random_string, $name);
         $stmt->fetch();
 
         if (!password_verify($password, $hashed_password)) {
@@ -40,7 +39,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (empty($passwordError) && empty($randomStringError)) {
             $_SESSION['user_id'] = $id;
+            $_SESSION['user_name'] = $name;
             $_SESSION['random_string'] = $stored_random_string;
+            $_SESSION['viewed_key'] = true;
+            $_SESSION['login_time'] = time(); // Store the login time
             header("Location: dashboard.php");
             exit();
         }
@@ -110,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <?php if ($showRandomKeyField) : ?>
                     <div class="form-group">
                         <label for="random_string">Random Key *</label>
-                        <input type="text" class="form-control" id="random_string" name="random_string" placeholder="Enter random key" required>
+                        <input type="text" class="form-control" id="random_string" name="random_string" placeholder="Enter random key">
                     </div>
                 <?php endif; ?>
                 <div class="form-group text-right">
@@ -125,4 +127,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </div>
 
-<?php require('footer.php') ?>
+<?php require('footer.php'); ?>
