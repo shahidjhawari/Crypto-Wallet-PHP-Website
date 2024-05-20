@@ -9,6 +9,11 @@ function test_input($data)
     return $data;
 }
 
+function generateReferralCode($length = 8)
+{
+    return substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
+}
+
 $emailError = "";
 $passwordError = "";
 
@@ -36,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $referrer_id = null;
 
             if (!empty($referral)) {
-                $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+                $stmt = $conn->prepare("SELECT id FROM users WHERE referral_code = ?");
                 $stmt->bind_param("s", $referral);
                 $stmt->execute();
                 $stmt->store_result();
@@ -50,10 +55,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $randomString = bin2hex(random_bytes(50));
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $referral_code = generateReferralCode();
 
             // Insert new user
-            $stmt = $conn->prepare("INSERT INTO users (name, email, password, random_string, referrer_id) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssi", $name, $email, $hashed_password, $randomString, $referrer_id);
+            $stmt = $conn->prepare("INSERT INTO users (name, email, password, random_string, referrer_id, referral_code) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssss", $name, $email, $hashed_password, $randomString, $referrer_id, $referral_code);
             if ($stmt->execute()) {
                 $user_id = $stmt->insert_id;
                 $stmt->close();
@@ -171,8 +177,8 @@ function rewardReferrer($referrer_id, $points, $level)
                     <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required autocomplete="new-password">
                 </div>
                 <div class="form-group">
-                    <label for="referral">Referral (optional)</label>
-                    <input type="email" class="form-control" id="referral" name="referral" placeholder="Enter referrer's email">
+                    <label for="referral">Referral Code (optional)</label>
+                    <input type="text" class="form-control" id="referral" name="referral" placeholder="Enter referral code">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
             </form>
