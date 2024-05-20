@@ -1,22 +1,23 @@
 <?php
 require('top.php');
 
-function test_input($data)
-{
+function test_input($data) {
     $data = trim($data);
     $data = stripslashes($data);
     $data = htmlspecialchars($data);
     return $data;
 }
 
-function generateReferralCode($length = 8)
-{
+function generateReferralCode($length = 8) {
     return substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
 }
 
 $emailError = "";
 $passwordError = "";
 $referralError = "";
+
+// Check for referral code in URL
+$referral_code = isset($_GET['referral']) ? test_input($_GET['referral']) : "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = test_input($_POST["name"]);
@@ -90,8 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-function rewardReferrer($referrer_id, $points, $level)
-{
+function rewardReferrer($referrer_id, $points, $level) {
     global $conn;
     if ($level > 3) {
         return;
@@ -184,7 +184,7 @@ function rewardReferrer($referrer_id, $points, $level)
                 </div>
                 <div class="form-group">
                     <label for="referral">Referral Code (optional)</label>
-                    <input type="text" class="form-control" id="referral" name="referral" placeholder="Enter referral code">
+                    <input type="text" class="form-control" id="referral" name="referral" placeholder="Enter referral code" value="<?php echo $referral_code; ?>">
                     <span class="error"><?php echo $referralError; ?></span>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
