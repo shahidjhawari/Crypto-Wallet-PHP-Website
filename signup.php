@@ -16,6 +16,7 @@ function generateReferralCode($length = 8)
 
 $emailError = "";
 $passwordError = "";
+$referralError = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = test_input($_POST["name"]);
@@ -49,36 +50,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($stmt->num_rows > 0) {
                     $stmt->bind_result($referrer_id);
                     $stmt->fetch();
+                    $stmt->close();
+                } else {
+                    $referralError = "Invalid referral code.";
+                    $stmt->close();
                 }
-                $stmt->close();
             }
 
-            $randomString = bin2hex(random_bytes(50));
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $referral_code = generateReferralCode();
+            if (empty($referralError)) {
+                $randomString = bin2hex(random_bytes(50));
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                $referral_code = generateReferralCode();
 
-            // Insert new user
-            $stmt = $conn->prepare("INSERT INTO users (name, email, password, random_string, referrer_id, referral_code) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssss", $name, $email, $hashed_password, $randomString, $referrer_id, $referral_code);
-            if ($stmt->execute()) {
-                $user_id = $stmt->insert_id;
-                $stmt->close();
+                // Insert new user
+                $stmt = $conn->prepare("INSERT INTO users (name, email, password, random_string, referrer_id, referral_code) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssssss", $name, $email, $hashed_password, $randomString, $referrer_id, $referral_code);
+                if ($stmt->execute()) {
+                    $user_id = $stmt->insert_id;
+                    $stmt->close();
 
-                // Initialize rewards for the new user
-                $stmt = $conn->prepare("INSERT INTO rewards (user_id, reward_points, referral_count, level_one_count, level_two_count, level_three_count) VALUES (?, 0, 0, 0, 0, 0)");
-                $stmt->bind_param("i", $user_id);
-                $stmt->execute();
-                $stmt->close();
+                    // Initialize rewards for the new user
+                    $stmt = $conn->prepare("INSERT INTO rewards (user_id, reward_points, referral_count, level_one_count, level_two_count, level_three_count) VALUES (?, 0, 0, 0, 0, 0)");
+                    $stmt->bind_param("i", $user_id);
+                    $stmt->execute();
+                    $stmt->close();
 
-                // Reward the referrer
-                if ($referrer_id !== null) {
-                    rewardReferrer($referrer_id, 10, 1);
+                    // Reward the referrer
+                    if ($referrer_id !== null) {
+                        rewardReferrer($referrer_id, 10, 1);
+                    }
+
+                    header("Location: show_key.php?random_string=" . urlencode($randomString));
+                    exit();
+                } else {
+                    echo "Error: " . $stmt->error;
                 }
-
-                header("Location: show_key.php?random_string=" . urlencode($randomString));
-                exit();
-            } else {
-                echo "Error: " . $stmt->error;
             }
         }
     }
@@ -179,6 +185,7 @@ function rewardReferrer($referrer_id, $points, $level)
                 <div class="form-group">
                     <label for="referral">Referral Code (optional)</label>
                     <input type="text" class="form-control" id="referral" name="referral" placeholder="Enter referral code">
+                    <span class="error"><?php echo $referralError; ?></span>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
             </form>
