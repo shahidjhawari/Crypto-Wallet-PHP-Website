@@ -1,33 +1,4 @@
-<?php
-require('top.php');
-session_start();
-
-// Redirect to login page if not logged in
-if (!isset($_SESSION['user_id'])) {
-  header("Location: index.php");
-  exit();
-}
-
-$user_id = $_SESSION['user_id'];
-$user_name = $_SESSION['user_name'];
-
-// Fetch user-specific data
-$stmt = $conn->prepare("SELECT * FROM rewards WHERE user_id = ?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$user_rewards = $stmt->get_result()->fetch_assoc();
-$stmt->close();
-
-// Fetch the user's referral code
-$stmt = $conn->prepare("SELECT referral_code FROM users WHERE id = ?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$user_referral = $stmt->get_result()->fetch_assoc();
-$stmt->close();
-
-$referral_code = $user_referral['referral_code'];
-$referral_link = SITE_PATH . "/signup.php?referral=" . $referral_code;
-?>
+<?php require('top.php');?>
 
 <head>
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -110,27 +81,7 @@ $referral_link = SITE_PATH . "/signup.php?referral=" . $referral_code;
     </nav>
     <!-- End Navbar -->
     <div class="container-fluid py-4">
-      <div class="row">
-        <div class="col-12 mb-4">
-          <div class="card">
-            <div class="card-body p-3">
-              <div class="row">
-                <div class="col-12">
-                  <h3>Welcome, <?php echo htmlspecialchars($user_name); ?>!</h3>
-                  <p>Your Reward Points: <?php echo htmlspecialchars($user_rewards['reward_points']); ?></p>
-                  <p>Referral Count: <?php echo htmlspecialchars($user_rewards['referral_count']); ?></p>
-                  <p>Level One Count: <?php echo htmlspecialchars($user_rewards['level_one_count']); ?></p>
-                  <p>Level Two Count: <?php echo htmlspecialchars($user_rewards['level_two_count']); ?></p>
-                  <p>Level Three Count: <?php echo htmlspecialchars($user_rewards['level_three_count']); ?></p>
-                  <p><?php echo $referral_link ?></p>
-                  <p><a href="activate.php">Activate Account</a></p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Other content rows -->
-      </div>
+      
     </div>
   </main>
 </div>
