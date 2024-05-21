@@ -1,21 +1,19 @@
 <?php
-require('connection.inc.php');
-session_start();
-
-// Check if admin is logged in
-if (!isset($_SESSION['admin_id'])) {
-//   header("Location: admin_login.php");
-//   exit();
-}
+require('top.inc.php');
 
 // Fetch all pending transactions
-$stmt = $conn->prepare("SELECT * FROM transactions WHERE status = 'pending'");
+$stmt = $con->prepare("SELECT * FROM transactions WHERE status = 'pending'");
 $stmt->execute();
 $transactions = $stmt->get_result();
 $stmt->close();
 ?>
 
-<table>
+<head>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <title>Transactions</title>
+</head>
+
+<table class="table">
   <thead>
     <tr>
       <th>ID</th>
@@ -47,3 +45,6 @@ $stmt->close();
     <?php endwhile; ?>
   </tbody>
 </table>
+
+
+<?php require('footer.inc.php');
