@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               <label for="screenshot">Screenshot</label>
               <input type="file" class="form-control-file" id="screenshot" name="screenshot" required>
             </div>
-            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+            <button type="submit" class="btn btn-info btn-block">Submit</button>
           </form>
         </div>
       </div>

@@ -60,8 +60,8 @@ $referral_link = SITE_PATH . "/signup.php?referral=" . $referral_code;
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="tables.php">
-            <span class="nav-link-text ms-1">Tables</span>
+          <a class="nav-link" href="activate.php">
+            <span class="nav-link-text ms-1">Activate Account</span>
           </a>
         </li>
         <!-- Other nav items -->
