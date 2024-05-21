@@ -10,6 +10,7 @@
     <link href="assets/css/nucleo-svg.css" rel="stylesheet" />
     <!-- CSS Files -->
     <link id="pagestyle" href="assets/css/soft-ui-dashboard.css?v=1.0.7" rel="stylesheet" />
+    <link href="css/own1.css" rel="stylesheet" />
 </head>
 
 <div class="g-sidenav-show bg-gray-100">
