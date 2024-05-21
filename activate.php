@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $amount = 10; // Fixed amount
   $transaction_id = $_POST['transaction_id'];
   $screenshot = $_FILES['screenshot']['name'];
-  $target_dir = UPLOAD_DIR;
+  $target_dir = PRODUCT_IMAGE_SERVER_PATH;
   $target_file = $target_dir . basename($_FILES["screenshot"]["name"]);
 
   // Move uploaded file to the target directory
