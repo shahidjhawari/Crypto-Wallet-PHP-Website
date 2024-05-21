@@ -26,7 +26,7 @@ $user_referral = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 $referral_code = $user_referral['referral_code'];
-$referral_link = "http://localhost/coin/signup.php?referral=" . $referral_code;
+$referral_link = SITE_PATH . "/signup.php?referral=" . $referral_code;
 ?>
 
 <head>
@@ -122,7 +122,7 @@ $referral_link = "http://localhost/coin/signup.php?referral=" . $referral_code;
                   <p>Level One Count: <?php echo htmlspecialchars($user_rewards['level_one_count']); ?></p>
                   <p>Level Two Count: <?php echo htmlspecialchars($user_rewards['level_two_count']); ?></p>
                   <p>Level Three Count: <?php echo htmlspecialchars($user_rewards['level_three_count']); ?></p>
-                  <p>this is refrel link</p>
+                  <p><?php echo $referral_link ?></p>
                 </div>
               </div>
             </div>
