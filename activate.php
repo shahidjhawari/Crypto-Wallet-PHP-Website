@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $transaction_id = $_POST['transaction_id'];
   $screenshot = $_FILES['screenshot']['name'];
   $target_dir = PRODUCT_IMAGE_SERVER_PATH;
-  $target_file = $target_dir . basename($_FILES["screenshot"]["name"]);
+  $target_file = basename($_FILES["screenshot"]["name"]);
 
   // Move uploaded file to the target directory
   if (move_uploaded_file($_FILES["screenshot"]["tmp_name"], $target_file)) {
