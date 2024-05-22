@@ -24,19 +24,7 @@
         </div>
         <hr class="horizontal dark mt-0">
         <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link active" href="dashboard.php">
-                        <span class="nav-link-text ms-1">Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="activate.php">
-                        <span class="nav-link-text ms-1">Activate Account</span>
-                    </a>
-                </li>
-                <!-- Other nav items -->
-            </ul>
+            <ul class="navbar-nav">           
         </div>
     </aside>
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
