@@ -152,7 +152,7 @@ $stmt->close();
                     <p><a href="activate.php" class="btn btn-info">Activate Account</a></p>
                   <?php elseif ($transaction_status === 'accepted') : ?>
                     <p>Transaction Status: <?php echo $transaction_status; ?></p>
-                    <p><a href="#" class="btn btn-info">Deposit</a></p>
+                    <p><a href="deposit.php" class="btn btn-info">Deposit</a></p>
                   <?php endif; ?>
                   <?php if ($transaction_status === 'rejected') : ?>
                     <p>Transaction Status: <?php echo $transaction_status; ?></p>
