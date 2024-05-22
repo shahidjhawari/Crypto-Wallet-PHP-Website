@@ -32,12 +32,14 @@ $referral_link = SITE_PATH . "/signup.php?referral=" . $referral_code;
 $stmt = $conn->prepare("SELECT status FROM transactions WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$transaction_status_result = $stmt->get_result();
-if ($transaction_status_result->num_rows > 0) {
-  $transaction_status = $transaction_status_result->fetch_assoc()['status'];
-} else {
-  $transaction_status = ''; // Set default value if no transaction status found
-}
+$transaction_status = $stmt->get_result()->fetch_assoc()['status'];
+$stmt->close();
+
+// Fetch the user's deposit status
+$stmt = $conn->prepare("SELECT status FROM deposits WHERE user_id = ? ORDER BY id DESC LIMIT 1");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$deposit_status = $stmt->get_result()->fetch_assoc()['status'] ?? 'No Deposits';
 $stmt->close();
 ?>
 
@@ -72,19 +74,10 @@ $stmt->close();
           </a>
         </li>
         <li class="nav-item">
-          <?php if ($transaction_status !== 'accepted' && $transaction_status !== 'pending') : ?>
-            <a class="nav-link" href="activate.php">
-              <span class="nav-link-text ms-1">Activate Account</span>
-            </a>
-          <?php endif; ?>
+          <a class="nav-link" href="activate.php">
+            <span class="nav-link-text ms-1">Activate Account</span>
+          </a>
         </li>
-        <?php if ($transaction_status === 'accepted') : ?>
-          <li class="nav-item">
-            <a class="nav-link active" href="dashboard.php">
-              <span class="nav-link-text ms-1">Deposit</span>
-            </a>
-          </li>
-        <?php endif; ?>
         <!-- Other nav items -->
       </ul>
     </div>
@@ -146,16 +139,19 @@ $stmt->close();
                   <p>Level Three Count: <?php echo htmlspecialchars($user_rewards['level_three_count']); ?></p>
                   <p><?php echo $referral_link ?></p>
                   <?php if ($transaction_status === 'pending') : ?>
-                    <p>Transaction Status: <?php echo $transaction_status; ?></p>
+                    <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
                   <?php endif; ?>
                   <?php if ($transaction_status !== 'accepted' && $transaction_status !== 'pending') : ?>
                     <p><a href="activate.php" class="btn btn-info">Activate Account</a></p>
                   <?php elseif ($transaction_status === 'accepted') : ?>
-                    <p>Transaction Status: <?php echo $transaction_status; ?></p>
+                    <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
                     <p><a href="deposit.php" class="btn btn-info">Deposit</a></p>
                   <?php endif; ?>
                   <?php if ($transaction_status === 'rejected') : ?>
-                    <p>Transaction Status: <?php echo $transaction_status; ?></p>
+                    <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
+                  <?php endif; ?>
+                  <?php if ($deposit_status) : ?>
+                    <p>Deposit Status: <?php echo htmlspecialchars($deposit_status); ?></p>
                   <?php endif; ?>
                 </div>
               </div>
@@ -166,6 +162,5 @@ $stmt->close();
       </div>
     </div>
   </main>
-
 
   <?php require('footer.php'); ?>

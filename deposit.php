@@ -19,9 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
   // Move uploaded file to the target directory
   if (move_uploaded_file($_FILES["screenshot"]["tmp_name"], $target_file)) {
-    // Insert deposit details into the database
-    $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, screenshot, transaction_id) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("idss", $user_id, $amount, $screenshot, $transaction_id); // Save just the file name in the database
+    // Insert deposit details into the database with status 'Pending'
+    $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, screenshot, transaction_id, status) VALUES (?, ?, ?, ?, 'Pending')");
+    $stmt->bind_param("iiss", $user_id, $amount, $screenshot, $transaction_id);
     $stmt->execute();
     $stmt->close();
     echo "Deposit submitted successfully.";
@@ -39,11 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           <h4>Make a Deposit</h4>
         </div>
         <div class="card-body">
-          <form method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+          <form method="post" enctype="multipart/form-data">
             <div class="form-group">
               <label for="amount">Amount</label>
-              <input type="number" class="form-control" id="amount" name="amount" required>
-              <span id="amountError" style="color: red;"></span>
+              <input type="text" class="form-control" id="amount" name="amount" value="$10" readonly>
             </div>
             <div class="form-group">
               <label for="transaction_id">Transaction ID</label>
@@ -60,17 +59,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
   </div>
 </div>
-
-
-<script>
-  function validateForm() {
-    var amount = document.getElementById("amount").value;
-    if (amount < 10) {
-      document.getElementById("amountError").innerHTML = "Amount should be at least $10.";
-      return false;
-    }
-    return true;
-  }
-</script>
 
 <?php require('footer.php'); ?>
