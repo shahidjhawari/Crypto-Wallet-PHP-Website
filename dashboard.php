@@ -73,6 +73,13 @@ $stmt->close();
             </a>
           <?php endif; ?>
         </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="dashboard.php">
+            <?php if ($transaction_status === 'accepted') : ?>
+              <span class="nav-link-text ms-1">Deposit</span>
+            <?php endif; ?>
+          </a>
+        </li>
         <!-- Other nav items -->
       </ul>
     </div>
@@ -134,9 +141,12 @@ $stmt->close();
                   <p>Level Three Count: <?php echo htmlspecialchars($user_rewards['level_three_count']); ?></p>
                   <p><?php echo $referral_link ?></p>
                   <?php if ($transaction_status !== 'accepted') : ?>
-                    <p><a href="activate.php">Activate Account</a></p>
+                    <p><a href="activate.php" class="btn btn-info">Activate Account</a></p>
                   <?php endif; ?>
                   <p>Transaction Status: <?php echo $transaction_status; ?></p>
+                  <?php if ($transaction_status === 'accepted') : ?>
+                    <p><a href="" class="btn btn-info">Deposit</a></p>
+                  <?php endif; ?>
                 </div>
               </div>
             </div>
