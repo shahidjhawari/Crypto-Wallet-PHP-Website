@@ -27,6 +27,13 @@ $stmt->close();
 
 $referral_code = $user_referral['referral_code'];
 $referral_link = SITE_PATH . "/signup.php?referral=" . $referral_code;
+
+// Fetch the user's transaction status
+$stmt = $conn->prepare("SELECT status FROM transactions WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$transaction_status = $stmt->get_result()->fetch_assoc()['status'];
+$stmt->close();
 ?>
 
 <head>
@@ -125,6 +132,7 @@ $referral_link = SITE_PATH . "/signup.php?referral=" . $referral_code;
                   <p>Level Three Count: <?php echo htmlspecialchars($user_rewards['level_three_count']); ?></p>
                   <p><?php echo $referral_link ?></p>
                   <p><a href="activate.php">Activate Account</a></p>
+                  <p>Account Activation Status: <?php echo $transaction_status; ?></p> <!-- Display transaction status -->
                 </div>
               </div>
             </div>
@@ -134,7 +142,6 @@ $referral_link = SITE_PATH . "/signup.php?referral=" . $referral_code;
       </div>
     </div>
   </main>
-</div>
 
 
-<?php require('footer.php'); ?>
+  <?php require('footer.php'); ?>

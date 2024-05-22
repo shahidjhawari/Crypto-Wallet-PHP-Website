@@ -10,23 +10,38 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+// Check if there is any pending transaction for the user
+$stmt = $conn->prepare("SELECT * FROM transactions WHERE user_id = ? AND status = 'pending'");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$pending_transaction = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+
+if ($pending_transaction) {
+  // If a pending transaction exists, display a message and exit
+  echo '<div class="container mt-5"><div class="alert alert-warning text-center" role="alert">You already have a pending transaction. Please wait for it to be processed.</div></div>';
+  require('footer.php');
+  exit();
+}
+
+// Handle form submission if POST request
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $amount = 10; // Fixed amount
   $transaction_id = $_POST['transaction_id'];
   $screenshot = $_FILES['screenshot']['name'];
-  $target_dir = PRODUCT_IMAGE_SERVER_PATH; // Use server path to store the file
+  $target_dir = PRODUCT_IMAGE_SERVER_PATH;
   $target_file = $target_dir . basename($screenshot);
 
   // Move uploaded file to the target directory
   if (move_uploaded_file($_FILES["screenshot"]["tmp_name"], $target_file)) {
     // Insert transaction details into the database
     $stmt = $conn->prepare("INSERT INTO transactions (user_id, amount, screenshot, transaction_id, status) VALUES (?, ?, ?, ?, 'pending')");
-    $stmt->bind_param("idss", $user_id, $amount, $screenshot, $transaction_id); // Save just the file name in the database
+    $stmt->bind_param("idss", $user_id, $amount, $screenshot, $transaction_id);
     $stmt->execute();
     $stmt->close();
-    echo "Transaction submitted successfully.";
+    echo '<div class="container mt-5"><div class="alert alert-success text-center" role="alert">Transaction submitted successfully. Please wait for it to be processed.</div></div>';
   } else {
-    echo "Sorry, there was an error uploading your file.";
+    echo '<div class="container mt-5"><div class="alert alert-danger text-center" role="alert">Sorry, there was an error uploading your file.</div></div>';
   }
 }
 ?>
@@ -39,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           <h4>Submit Transaction</h4>
         </div>
         <div class="card-body">
-          <form method="post" enctype="multipart/form-data" action="user_transactions.php">
+          <form method="post" enctype="multipart/form-data">
             <div class="form-group">
               <label for="amount">Amount</label>
               <input type="text" class="form-control" id="amount" name="amount" value="$10" readonly>
