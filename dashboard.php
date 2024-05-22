@@ -203,6 +203,3 @@ if (isset($_POST['amount'])) {
   </div>
 
   <?php require('footer.php'); ?>
-</body>
-
-</html>
