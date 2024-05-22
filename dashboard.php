@@ -67,9 +67,11 @@ $stmt->close();
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="activate.php">
-            <span class="nav-link-text ms-1">Activate Account</span>
-          </a>
+          <?php if ($transaction_status !== 'accepted') : ?>
+            <a class="nav-link" href="activate.php">
+              <span class="nav-link-text ms-1">Activate Account</span>
+            </a>
+          <?php endif; ?>
         </li>
         <!-- Other nav items -->
       </ul>
@@ -131,8 +133,10 @@ $stmt->close();
                   <p>Level Two Count: <?php echo htmlspecialchars($user_rewards['level_two_count']); ?></p>
                   <p>Level Three Count: <?php echo htmlspecialchars($user_rewards['level_three_count']); ?></p>
                   <p><?php echo $referral_link ?></p>
-                  <p><a href="activate.php">Activate Account</a></p>
-                  <p>Account Activation Status: <?php echo $transaction_status; ?></p> <!-- Display transaction status -->
+                  <?php if ($transaction_status !== 'accepted') : ?>
+                    <p><a href="activate.php">Activate Account</a></p>
+                  <?php endif; ?>
+                  <p>Transaction Status: <?php echo $transaction_status; ?></p>
                 </div>
               </div>
             </div>
