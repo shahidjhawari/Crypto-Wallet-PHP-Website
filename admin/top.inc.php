@@ -33,7 +33,7 @@ if(isset($_SESSION['ADMIN_LOGIN']) && $_SESSION['ADMIN_LOGIN']!=''){
                <ul class="nav navbar-nav">
                   <li class="menu-title">Menu</li>
                   <li class="menu-item-has-children dropdown">
-                     <a href="activate.php" > Activate </a>
+                     <a href="activate.php" > Activation Request </a>
                   </li>	
                   <li class="menu-item-has-children dropdown">
                      <a href="users.php" > User </a>
