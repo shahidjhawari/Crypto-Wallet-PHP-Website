@@ -28,12 +28,15 @@ $stmt->close();
 $referral_code = $user_referral['referral_code'];
 $referral_link = SITE_PATH . "/signup.php?referral=" . $referral_code;
 
+
 // Fetch the user's transaction status
 $stmt = $conn->prepare("SELECT status FROM transactions WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$transaction_status = $stmt->get_result()->fetch_assoc()['status'];
+$transaction_result = $stmt->get_result();
+$transaction_status = $transaction_result ? $transaction_result->fetch_assoc()['status'] : null;
 $stmt->close();
+
 
 // Fetch the latest deposit status
 $stmt = $conn->prepare("SELECT status FROM deposits WHERE user_id = ? ORDER BY id DESC LIMIT 1");
@@ -183,10 +186,11 @@ if (isset($_POST['amount'])) {
                     <?php if ($transaction_status === 'rejected') : ?>
                       <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
                     <?php endif; ?>
-                    <?php if ($deposit_status) : ?>
+                    <?php if ($transaction_status === 'accepted' && $deposit_status) : ?>
                       <p>Deposit Status: <?php echo htmlspecialchars($deposit_status); ?></p>
                     <?php endif; ?>
                     <p>Wallet Balance (Amount): $<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></p>
+
                   </div>
                 </div>
               </div>
