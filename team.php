@@ -11,33 +11,6 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $user_name = $_SESSION['user_name'];
 
-// Function to fetch the latest transaction status via AJAX
-function getTransactionStatus() {
-    global $conn, $user_id;
-    $stmt = $conn->prepare("SELECT status FROM transactions WHERE user_id = ?");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $stmt->close();
-    if ($result->num_rows > 0) {
-        return $result->fetch_assoc()['status'];
-    } else {
-        return null;
-    }
-}
-
-// Update transaction status if new deposit submitted
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['amount'])) {
-    $amount = $_POST['amount'];
-    $screenshot = $_FILES['screenshot']['name'];
-    move_uploaded_file($_FILES['screenshot']['tmp_name'], 'upload/' . $screenshot);
-    $deposit_status = 'pending';
-    $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, screenshot, status) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("idss", $user_id, $amount, $screenshot, $deposit_status);
-    $stmt->execute();
-    $stmt->close();
-}
-
 // Fetch user-specific data
 $stmt = $conn->prepare("SELECT * FROM rewards WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
@@ -58,19 +31,24 @@ $referral_code = isset($user_referral['referral_code']) ? $user_referral['referr
 $referral_link = SITE_PATH . "/signup.php?referral=" . $referral_code;
 
 // Fetch the user's transaction status
-$transaction_status = getTransactionStatus();
+$stmt = $conn->prepare("SELECT status FROM transactions WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$transaction_result = $stmt->get_result();
+$transaction_status = $transaction_result ? $transaction_result->fetch_assoc()['status'] : null;
+$stmt->close();
 
 // Fetch the latest deposit status
+$deposit_status = null;
 $stmt = $conn->prepare("SELECT status FROM deposits WHERE user_id = ? ORDER BY id DESC LIMIT 1");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $deposit_result = $stmt->get_result();
-$deposit_status = null;
 if ($deposit_result) {
-    $deposit_data = $deposit_result->fetch_assoc();
-    if ($deposit_data) {
-        $deposit_status = $deposit_data['status'];
-    }
+  $deposit_data = $deposit_result->fetch_assoc();
+  if ($deposit_data) {
+    $deposit_status = $deposit_data['status'];
+  }
 }
 $stmt->close();
 
@@ -84,13 +62,19 @@ $stmt->close();
 
 // Update the deposit status if there are no pending or rejected deposits and a new deposit is made
 if (isset($_POST['amount'])) {
-    $transaction_status = getTransactionStatus();
+  $amount = $_POST['amount'];
+  $screenshot = $_FILES['screenshot']['name'];
+  move_uploaded_file($_FILES['screenshot']['tmp_name'], 'upload/' . $screenshot);
+
+  $deposit_status = 'pending';
+
+  $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, screenshot, status) VALUES (?, ?, ?, ?)");
+  $stmt->bind_param("idss", $user_id, $amount, $screenshot, $deposit_status);
+  $stmt->execute();
+  $stmt->close();
 }
 
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
 
 <head>
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -135,6 +119,7 @@ if (isset($_POST['amount'])) {
         <div class="container-fluid py-1 px-3">
           <nav aria-label="breadcrumb">
             <h6 class="font-weight-bolder mb-0">Dashboard</h6>
+            <h6 class="font-weight-bolder mb-0">Welcome, <?php echo htmlspecialchars($user_name); ?>!</h6>
           </nav>
           <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
             <div class="ms-md-auto pe-md-3 d-flex align-items-center"></div>
@@ -175,33 +160,16 @@ if (isset($_POST['amount'])) {
       <div class="container-fluid py-4">
         <div class="row">
           <div class="col-12 mb-4">
-            <div class="card">
+            <div class="card shadow">
               <div class="card-body p-3">
                 <div class="row">
                   <div class="col-12">
-                    <h3>Welcome, <?php echo htmlspecialchars($user_name); ?>!</h3>
                     <p>Your Reward Points: <?php echo htmlspecialchars($user_rewards['reward_points'] ?? 'N/A'); ?></p>
                     <p>Referral Count: <?php echo htmlspecialchars($user_rewards['referral_count'] ?? 'N/A'); ?></p>
                     <p>Level One Count: <?php echo htmlspecialchars($user_rewards['level_one_count'] ?? 'N/A'); ?></p>
                     <p>Level Two Count: <?php echo htmlspecialchars($user_rewards['level_two_count'] ?? 'N/A'); ?></p>
                     <p>Level Three Count: <?php echo htmlspecialchars($user_rewards['level_three_count'] ?? 'N/A'); ?></p>
                     <p><?php echo $referral_link ?></p>
-                    <?php if ($transaction_status === 'pending') : ?>
-                      <p>Account Activation Status: <?php echo htmlspecialchars($transaction_status); ?></p>
-                    <?php endif; ?>
-                    <?php if ($transaction_status !== 'accepted' && $transaction_status !== 'pending') : ?>
-                      <p><a href="activate.php" class="btn btn-info">Activate Account</a></p>
-                    <?php elseif ($transaction_status === 'accepted') : ?>
-                      <p>Account Activation Status: <?php echo htmlspecialchars($transaction_status); ?></p>
-                      <p><a href="deposit.php" class="btn btn-info">Deposit</a></p>
-                      <?php if ($deposit_status !== null) : ?>
-                        <p>Deposit Status: <?php echo htmlspecialchars($deposit_status); ?></p>
-                      <?php endif; ?>
-                    <?php endif; ?>
-                    <?php if ($transaction_status === 'rejected') : ?>
-                      <p>Account Activation Status: <?php echo htmlspecialchars($transaction_status); ?></p>
-                    <?php endif; ?>
-                    <p>Wallet Balance (Amount): $<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></p>
                   </div>
                 </div>
               </div>
