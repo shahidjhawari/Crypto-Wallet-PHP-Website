@@ -41,6 +41,9 @@ if(isset($_SESSION['ADMIN_LOGIN']) && $_SESSION['ADMIN_LOGIN']!=''){
                   <li class="menu-item-has-children dropdown">
                      <a href="admin_deposits.php" > Deposit </a>
                   </li>			  
+                  <li class="menu-item-has-children dropdown">
+                     <a href="trans_rejected.php" > Rejected Activation </a>
+                  </li>			  
                </ul>
             </div>
          </nav>
