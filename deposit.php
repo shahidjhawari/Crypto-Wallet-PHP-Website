@@ -9,36 +9,24 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-$error_message = ''; // Initialize error message
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  $amount = $_POST['amount'];
+  $amount = 10; // Minimum amount
   $transaction_id = $_POST['transaction_id'];
   $screenshot = $_FILES['screenshot']['name'];
-  $target_dir = 'upload/'; // Use relative path to store the file
-
-  // Ensure the upload directory exists
-  if (!is_dir($target_dir)) {
-    mkdir($target_dir, 0777, true);
-  }
-
+  $target_dir = PRODUCT_IMAGE_SERVER_PATH; // Use server path to store the file
   $target_file = $target_dir . basename($screenshot);
 
-  // Check if the amount is at least 10
-  if ($amount >= 10) {
-    // Move uploaded file to the target directory
-    if (move_uploaded_file($_FILES["screenshot"]["tmp_name"], $target_file)) {
-      // Insert deposit details into the database with status 'Pending'
-      $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, screenshot, transaction_id, status) VALUES (?, ?, ?, ?, 'Pending')");
-      $stmt->bind_param("iiss", $user_id, $amount, $screenshot, $transaction_id);
-      $stmt->execute();
-      $stmt->close();
-      echo "Deposit submitted successfully.";
-    } else {
-      $error_message = "Sorry, there was an error uploading your file.";
-    }
+  // Move uploaded file to the target directory
+  if (move_uploaded_file($_FILES["screenshot"]["tmp_name"], $target_file)) {
+    // Insert deposit details into the database with status 'Pending'
+    $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, screenshot, transaction_id, status) VALUES (?, ?, ?, ?, 'Pending')");
+    $stmt->bind_param("iiss", $user_id, $amount, $screenshot, $transaction_id);
+    $stmt->execute();
+    $stmt->close();
+    echo "Deposit submitted successfully.";
   } else {
-    $error_message = "Amount must be at least $10.";
+    echo "Sorry, there was an error uploading your file.";
   }
 }
 ?>
@@ -51,13 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           <h4>Make a Deposit</h4>
         </div>
         <div class="card-body">
-          <form method="post" enctype="multipart/form-data" action="dashboard.php">
+          <form method="post" enctype="multipart/form-data">
             <div class="form-group">
               <label for="amount">Amount</label>
-              <input type="number" class="form-control" id="amount" name="amount" min="10" required>
-              <?php if ($error_message) : ?>
-                <small class="text-danger"><?php echo htmlspecialchars($error_message); ?></small>
-              <?php endif; ?>
+              <input type="text" class="form-control" id="amount" name="amount" value="$10" readonly>
             </div>
             <div class="form-group">
               <label for="transaction_id">Transaction ID</label>

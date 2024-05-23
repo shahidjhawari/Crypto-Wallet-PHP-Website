@@ -11,80 +11,70 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $user_name = $_SESSION['user_name'];
 
-// Function to fetch the latest transaction status via AJAX
-function getTransactionStatus() {
-    global $conn, $user_id;
-    $stmt = $conn->prepare("SELECT status FROM transactions WHERE user_id = ?");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $stmt->close();
-    if ($result->num_rows > 0) {
-        return $result->fetch_assoc()['status'];
-    } else {
-        return null;
-    }
-}
-
-// Update transaction status if new deposit submitted
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['amount'])) {
-    $amount = $_POST['amount'];
-    $screenshot = $_FILES['screenshot']['name'];
-    move_uploaded_file($_FILES['screenshot']['tmp_name'], 'upload/' . $screenshot);
-    $deposit_status = 'pending';
-    $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, screenshot, status) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("idss", $user_id, $amount, $screenshot, $deposit_status);
-    $stmt->execute();
-    $stmt->close();
-}
-
 // Fetch user-specific data
 $stmt = $conn->prepare("SELECT * FROM rewards WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$user_rewards_result = $stmt->get_result();
-$user_rewards = $user_rewards_result ? $user_rewards_result->fetch_assoc() : [];
+$user_rewards = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 // Fetch the user's referral code
 $stmt = $conn->prepare("SELECT referral_code FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$user_referral_result = $stmt->get_result();
-$user_referral = $user_referral_result ? $user_referral_result->fetch_assoc() : [];
+$user_referral = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-$referral_code = isset($user_referral['referral_code']) ? $user_referral['referral_code'] : '';
+$referral_code = $user_referral['referral_code'];
 $referral_link = SITE_PATH . "/signup.php?referral=" . $referral_code;
 
 // Fetch the user's transaction status
-$transaction_status = getTransactionStatus();
+$stmt = $conn->prepare("SELECT status FROM transactions WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$transaction_status = $stmt->get_result()->fetch_assoc()['status'];
+$stmt->close();
 
 // Fetch the latest deposit status
 $stmt = $conn->prepare("SELECT status FROM deposits WHERE user_id = ? ORDER BY id DESC LIMIT 1");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$deposit_result = $stmt->get_result();
-$deposit_status = null;
-if ($deposit_result) {
-    $deposit_data = $deposit_result->fetch_assoc();
-    if ($deposit_data) {
-        $deposit_status = $deposit_data['status'];
-    }
-}
+$deposit_status = $stmt->get_result()->fetch_assoc()['status'] ?? null;
 $stmt->close();
 
 // Calculate the wallet balance (sum of accepted deposits)
 $stmt = $conn->prepare("SELECT SUM(amount) AS wallet_balance FROM deposits WHERE user_id = ? AND status = 'accepted'");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$wallet_balance_result = $stmt->get_result();
-$wallet_balance = $wallet_balance_result ? $wallet_balance_result->fetch_assoc()['wallet_balance'] : 0;
+$wallet_balance = $stmt->get_result()->fetch_assoc()['wallet_balance'] ?? 0;
 $stmt->close();
+
+// Check if there are pending or rejected deposits
+$stmt = $conn->prepare("SELECT COUNT(*) AS num_pending_rejected FROM deposits WHERE user_id = ? AND status IN ('pending', 'rejected')");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$num_pending_rejected = $stmt->get_result()->fetch_assoc()['num_pending_rejected'] ?? 0;
+$stmt->close();
+
+// If there are no pending or rejected deposits, set deposit status to accepted
+if ($num_pending_rejected === 0) {
+  $deposit_status = 'accepted';
+}
 
 // Update the deposit status if there are no pending or rejected deposits and a new deposit is made
 if (isset($_POST['amount'])) {
-    $transaction_status = getTransactionStatus();
+  $amount = $_POST['amount'];
+  $screenshot = $_FILES['screenshot']['name'];
+  move_uploaded_file($_FILES['screenshot']['tmp_name'], 'upload/' . $screenshot);
+
+  if ($deposit_status !== 'pending' && $deposit_status !== 'rejected') {
+    $deposit_status = 'accepted';
+  }
+
+  $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, screenshot, status) VALUES (?, ?, ?, ?)");
+  $stmt->bind_param("ids", $user_id, $amount, $screenshot, $deposit_status);
+  $stmt->execute();
+  $stmt->close();
 }
 
 ?>
@@ -119,11 +109,6 @@ if (isset($_POST['amount'])) {
           <li class="nav-item">
             <a class="nav-link active" href="dashboard.php">
               <span class="nav-link-text ms-1">Dashboard</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="team.php">
-              <span class="nav-link-text ms-1">Team Building</span>
             </a>
           </li>
           <!-- Other nav items -->
@@ -180,26 +165,26 @@ if (isset($_POST['amount'])) {
                 <div class="row">
                   <div class="col-12">
                     <h3>Welcome, <?php echo htmlspecialchars($user_name); ?>!</h3>
-                    <p>Your Reward Points: <?php echo htmlspecialchars($user_rewards['reward_points'] ?? 'N/A'); ?></p>
-                    <p>Referral Count: <?php echo htmlspecialchars($user_rewards['referral_count'] ?? 'N/A'); ?></p>
-                    <p>Level One Count: <?php echo htmlspecialchars($user_rewards['level_one_count'] ?? 'N/A'); ?></p>
-                    <p>Level Two Count: <?php echo htmlspecialchars($user_rewards['level_two_count'] ?? 'N/A'); ?></p>
-                    <p>Level Three Count: <?php echo htmlspecialchars($user_rewards['level_three_count'] ?? 'N/A'); ?></p>
+                    <p>Your Reward Points: <?php echo htmlspecialchars($user_rewards['reward_points']); ?></p>
+                    <p>Referral Count: <?php echo htmlspecialchars($user_rewards['referral_count']); ?></p>
+                    <p>Level One Count: <?php echo htmlspecialchars($user_rewards['level_one_count']); ?></p>
+                    <p>Level Two Count: <?php echo htmlspecialchars($user_rewards['level_two_count']); ?></p>
+                    <p>Level Three Count: <?php echo htmlspecialchars($user_rewards['level_three_count']); ?></p>
                     <p><?php echo $referral_link ?></p>
                     <?php if ($transaction_status === 'pending') : ?>
-                      <p>Account Activation Status: <?php echo htmlspecialchars($transaction_status); ?></p>
+                      <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
                     <?php endif; ?>
                     <?php if ($transaction_status !== 'accepted' && $transaction_status !== 'pending') : ?>
                       <p><a href="activate.php" class="btn btn-info">Activate Account</a></p>
                     <?php elseif ($transaction_status === 'accepted') : ?>
-                      <p>Account Activation Status: <?php echo htmlspecialchars($transaction_status); ?></p>
+                      <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
                       <p><a href="deposit.php" class="btn btn-info">Deposit</a></p>
-                      <?php if ($deposit_status !== null) : ?>
-                        <p>Deposit Status: <?php echo htmlspecialchars($deposit_status); ?></p>
-                      <?php endif; ?>
                     <?php endif; ?>
                     <?php if ($transaction_status === 'rejected') : ?>
-                      <p>Account Activation Status: <?php echo htmlspecialchars($transaction_status); ?></p>
+                      <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
+                    <?php endif; ?>
+                    <?php if ($deposit_status) : ?>
+                      <p>Deposit Status: <?php echo htmlspecialchars($deposit_status); ?></p>
                     <?php endif; ?>
                     <p>Wallet Balance (Amount): $<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></p>
                   </div>
@@ -214,3 +199,6 @@ if (isset($_POST['amount'])) {
   </div>
 
   <?php require('footer.php'); ?>
+</body>
+
+</html>
