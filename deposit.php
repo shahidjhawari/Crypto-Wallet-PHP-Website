@@ -4,12 +4,14 @@ require('header.php');
 
 // Redirect to login page if not logged in
 if (!isset($_SESSION['user_id'])) {
-  header("Location: index.php");
+  echo "<script>window.location.href = 'index.php';</script>";
   exit();
 }
 
 $user_id = $_SESSION['user_id'];
 $min_amount = 10; // Minimum deposit amount
+
+$deposit_message = ""; // Variable to hold messages for the user
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $amount = $_POST['amount'];
@@ -20,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
   // Validate amount
   if ($amount < $min_amount) {
-    echo "The deposit amount should be at least $$min_amount.";
+    $deposit_message = "The deposit amount should be at least $$min_amount.";
   } else {
     // Check if transaction ID already exists
     $stmt = $conn->prepare("SELECT COUNT(*) FROM deposits WHERE transaction_id = ?");
@@ -31,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->close();
 
     if ($count > 0) {
-      echo "This transaction ID has already been used.";
+      $deposit_message = "This transaction ID has already been used.";
     } else {
       // Move uploaded file to the target directory
       if (move_uploaded_file($_FILES["screenshot"]["tmp_name"], $target_file)) {
@@ -40,9 +42,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param("iiss", $user_id, $amount, $screenshot, $transaction_id);
         $stmt->execute();
         $stmt->close();
-        echo "Deposit submitted successfully.";
+
+        // JavaScript redirect to dashboard page
+        echo "<script>alert('Deposit submitted successfully.'); window.location.href = 'dashboard.php';</script>";
+        exit();
       } else {
-        echo "Sorry, there was an error uploading your file.";
+        $deposit_message = "Sorry, there was an error uploading your file.";
       }
     }
   }
@@ -57,6 +62,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           <h4>Make a Deposit</h4>
         </div>
         <div class="card-body">
+          <?php if ($deposit_message) : ?>
+            <div class="alert alert-danger" style="color: white;">
+              <?php echo $deposit_message; ?>
+            </div>
+          <?php endif; ?>
           <form method="post" enctype="multipart/form-data">
             <div class="form-group">
               <label for="amount">Amount</label>
