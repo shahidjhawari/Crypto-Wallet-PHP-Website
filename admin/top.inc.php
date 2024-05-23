@@ -44,6 +44,9 @@ if(isset($_SESSION['ADMIN_LOGIN']) && $_SESSION['ADMIN_LOGIN']!=''){
                   <li class="menu-item-has-children dropdown">
                      <a href="trans_rejected.php" > Rejected Activation </a>
                   </li>			  
+                  <li class="menu-item-has-children dropdown">
+                     <a href="trans_accepted.php" > Accepted Activation </a>
+                  </li>			  
                </ul>
             </div>
          </nav>
