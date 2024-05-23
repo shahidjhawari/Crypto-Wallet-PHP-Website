@@ -87,6 +87,16 @@ if (isset($_POST['amount'])) {
   <title>Dashboard</title>
 </head>
 
+
+<style>
+  p {
+    background-color: #01204E;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 2px 2px 3px black;
+  }
+</style>
+
 <body>
   <div class="g-sidenav-show bg-gray-100">
     <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3" id="sidenav-main">
@@ -164,12 +174,20 @@ if (isset($_POST['amount'])) {
               <div class="card-body p-3">
                 <div class="row">
                   <div class="col-12">
-                    <p>Your Reward Points: <?php echo htmlspecialchars($user_rewards['reward_points'] ?? 'N/A'); ?></p>
-                    <p>Referral Count: <?php echo htmlspecialchars($user_rewards['referral_count'] ?? 'N/A'); ?></p>
-                    <p>Level One Count: <?php echo htmlspecialchars($user_rewards['level_one_count'] ?? 'N/A'); ?></p>
-                    <p>Level Two Count: <?php echo htmlspecialchars($user_rewards['level_two_count'] ?? 'N/A'); ?></p>
-                    <p>Level Three Count: <?php echo htmlspecialchars($user_rewards['level_three_count'] ?? 'N/A'); ?></p>
-                    <p><?php echo $referral_link ?></p>
+                    <p>Your Reward: <?php echo htmlspecialchars($user_rewards['reward_points'] ?? 'N/A'); ?></p>
+                    <p>Total Referral: <?php echo htmlspecialchars($user_rewards['referral_count'] ?? 'N/A'); ?></p>
+                    <p>Level One: <?php echo htmlspecialchars($user_rewards['level_one_count'] ?? 'N/A'); ?></p>
+                    <p>Level Two: <?php echo htmlspecialchars($user_rewards['level_two_count'] ?? 'N/A'); ?></p>
+                    <p>Level Three: <?php echo htmlspecialchars($user_rewards['level_three_count'] ?? 'N/A'); ?></p>
+                    <div class="d-flex flex-column flex-md-row align-items-md-center">
+                      <span class="mb-2 mb-md-0 mr-md-2">Your Referral Link:
+                        <span id="referralLink"><?php echo $referral_link ?></span>
+                      </span>
+                      <button class="btn btn-sm btn-light" onclick="copyToClipboard()">Copy Link</button>
+                      <span id="copyMessage" class="ml-2 text-success" style="display: none;">Link copied!</span>
+                    </div>
+                    <br>
+                    <i class="fas fa-lock"></i> <!-- Icon representing locked levels -->
                   </div>
                 </div>
               </div>
@@ -178,7 +196,26 @@ if (isset($_POST['amount'])) {
           <!-- Other content rows -->
         </div>
       </div>
-    </main>
-  </div>
 
-  <?php require('footer.php'); ?>
+      <script>
+        function copyToClipboard() {
+          var referralLink = document.getElementById("referralLink");
+          var tempInput = document.createElement("input");
+          tempInput.value = referralLink.textContent;
+          document.body.appendChild(tempInput);
+          tempInput.select();
+          document.execCommand("copy");
+          document.body.removeChild(tempInput);
+
+          var copyMessage = document.getElementById("copyMessage");
+          copyMessage.style.display = "inline"; // Display the message
+          setTimeout(function() {
+            copyMessage.style.display = "none"; // Hide the message after 2 seconds
+          }, 2000);
+        }
+      </script>
+
+
+
+
+      <?php require('footer.php'); ?>
