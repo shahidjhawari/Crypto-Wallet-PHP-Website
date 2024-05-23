@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           <h4>Make a Deposit</h4>
         </div>
         <div class="card-body">
-          <form method="post" enctype="multipart/form-data">
+          <form method="post" enctype="multipart/form-data" action="dashboard.php">
             <div class="form-group">
               <label for="amount">Amount</label>
               <input type="number" class="form-control" id="amount" name="amount" min="10" required>
