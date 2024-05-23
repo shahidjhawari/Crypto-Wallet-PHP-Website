@@ -39,11 +39,17 @@ $transaction_status = $transaction_result ? $transaction_result->fetch_assoc()['
 $stmt->close();
 
 // Fetch the latest deposit status
+$deposit_status = null;
 $stmt = $conn->prepare("SELECT status FROM deposits WHERE user_id = ? ORDER BY id DESC LIMIT 1");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $deposit_result = $stmt->get_result();
-$deposit_status = $deposit_result ? $deposit_result->fetch_assoc()['status'] : null;
+if ($deposit_result) {
+  $deposit_data = $deposit_result->fetch_assoc();
+  if ($deposit_data) {
+    $deposit_status = $deposit_data['status'];
+  }
+}
 $stmt->close();
 
 // Calculate the wallet balance (sum of accepted deposits)
@@ -170,12 +176,12 @@ if (isset($_POST['amount'])) {
                     <?php elseif ($transaction_status === 'accepted') : ?>
                       <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
                       <p><a href="deposit.php" class="btn btn-info">Deposit</a></p>
+                      <?php if ($deposit_status !== null) : ?>
+                        <p>Deposit Status: <?php echo htmlspecialchars($deposit_status); ?></p>
+                      <?php endif; ?>
                     <?php endif; ?>
                     <?php if ($transaction_status === 'rejected') : ?>
                       <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
-                    <?php endif; ?>
-                    <?php if ($deposit_status !== null) : ?>
-                      <p>Deposit Status: <?php echo htmlspecialchars($deposit_status); ?></p>
                     <?php endif; ?>
                     <p>Wallet Balance (Amount): $<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></p>
                   </div>
