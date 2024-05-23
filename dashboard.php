@@ -35,7 +35,8 @@ $stmt = $conn->prepare("SELECT status FROM transactions WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $transaction_result = $stmt->get_result();
-$transaction_status = $transaction_result ? $transaction_result->fetch_assoc()['status'] : null;
+$transaction_status_row = $transaction_result ? $transaction_result->fetch_assoc() : [];
+$transaction_status = isset($transaction_status_row['status']) ? $transaction_status_row['status'] : null;
 $stmt->close();
 
 // Fetch the latest deposit status
@@ -43,7 +44,8 @@ $stmt = $conn->prepare("SELECT status FROM deposits WHERE user_id = ? ORDER BY i
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $deposit_result = $stmt->get_result();
-$deposit_status = $deposit_result ? $deposit_result->fetch_assoc()['status'] : null;
+$deposit_status_row = $deposit_result ? $deposit_result->fetch_assoc() : [];
+$deposit_status = isset($deposit_status_row['status']) ? $deposit_status_row['status'] : null;
 $stmt->close();
 
 // Calculate the wallet balance (sum of accepted deposits)
@@ -51,7 +53,8 @@ $stmt = $conn->prepare("SELECT SUM(amount) AS wallet_balance FROM deposits WHERE
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $wallet_balance_result = $stmt->get_result();
-$wallet_balance = $wallet_balance_result ? $wallet_balance_result->fetch_assoc()['wallet_balance'] : 0;
+$wallet_balance_row = $wallet_balance_result ? $wallet_balance_result->fetch_assoc() : [];
+$wallet_balance = isset($wallet_balance_row['wallet_balance']) ? $wallet_balance_row['wallet_balance'] : 0;
 $stmt->close();
 
 // Update the deposit status if there are no pending or rejected deposits and a new deposit is made
@@ -161,7 +164,7 @@ if (isset($_POST['amount'])) {
                                         <p>Level One Count: <?php echo htmlspecialchars($user_rewards['level_one_count'] ?? 'N/A'); ?></p>
                                         <p>Level Two Count: <?php echo htmlspecialchars($user_rewards['level_two_count'] ?? 'N/A'); ?></p>
                                         <p>Level Three Count: <?php echo htmlspecialchars($user_rewards['level_three_count'] ?? 'N/A'); ?></p>
-                                        <p><?php echo $referral_link ?></p>
+                                        <p><?php echo htmlspecialchars($referral_link); ?></p>
                                         <?php if ($transaction_status === 'pending') : ?>
                                             <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
                                         <?php endif; ?>
@@ -170,12 +173,12 @@ if (isset($_POST['amount'])) {
                                         <?php elseif ($transaction_status === 'accepted') : ?>
                                             <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
                                             <p><a href="deposit.php" class="btn btn-info">Deposit</a></p>
+                                            <?php if ($deposit_status !== null) : ?>
+                                                <p>Deposit Status: <?php echo htmlspecialchars($deposit_status); ?></p>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                         <?php if ($transaction_status === 'rejected') : ?>
                                             <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
-                                        <?php endif; ?>
-                                        <?php if ($deposit_status !== null) : ?>
-                                            <p>Deposit Status: <?php echo htmlspecialchars($deposit_status); ?></p>
                                         <?php endif; ?>
                                         <p>Wallet Balance (Amount): $<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></p>
                                     </div>
@@ -190,4 +193,6 @@ if (isset($_POST['amount'])) {
     </div>
 
     <?php require('footer.php'); ?>
+</body>
 
+</html>
