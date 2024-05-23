@@ -9,12 +9,19 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
+$error_message = ''; // Initialize error message
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $amount = $_POST['amount'];
   $transaction_id = $_POST['transaction_id'];
   $screenshot = $_FILES['screenshot']['name'];
-  $target_dir = PRODUCT_IMAGE_SERVER_PATH; // Use server path to store the file
+  $target_dir = 'upload/'; // Use relative path to store the file
+
+  // Ensure the upload directory exists
+  if (!is_dir($target_dir)) {
+    mkdir($target_dir, 0777, true);
+  }
+
   $target_file = $target_dir . basename($screenshot);
 
   // Check if the amount is at least 10
@@ -28,10 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       $stmt->close();
       echo "Deposit submitted successfully.";
     } else {
-      echo "Sorry, there was an error uploading your file.";
+      $error_message = "Sorry, there was an error uploading your file.";
     }
   } else {
-    echo "Amount must be at least $10.";
+    $error_message = "Amount must be at least $10.";
   }
 }
 ?>
@@ -48,6 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="form-group">
               <label for="amount">Amount</label>
               <input type="number" class="form-control" id="amount" name="amount" min="10" required>
+              <?php if ($error_message) : ?>
+                <small class="text-danger"><?php echo htmlspecialchars($error_message); ?></small>
+              <?php endif; ?>
             </div>
             <div class="form-group">
               <label for="transaction_id">Transaction ID</label>
