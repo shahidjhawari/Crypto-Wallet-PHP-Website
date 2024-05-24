@@ -1,6 +1,6 @@
-<?php session_start();
+<?php
+session_start();
 require('header.php');
-
 
 // Redirect to login page if not logged in
 if (!isset($_SESSION['user_id'])) {
@@ -46,41 +46,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = "Invalid staking amount.";
     }
 }
+
+// Fetch staking records
+$staking_records = [];
+$stmt = $conn->prepare("SELECT * FROM stakings WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+while ($row = $result->fetch_assoc()) {
+    $staking_records[] = $row;
+}
+$stmt->close();
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
+<div class="container">
+    <h2>Staking</h2>
+    <p>Wallet Balance: $<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></p>
 
-<head>
-    <title>Staking</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
+    <?php if (!empty($success_message)) : ?>
+        <div class="alert alert-success">
+            <?php echo $success_message; ?>
+        </div>
+    <?php endif; ?>
 
-<body>
-    <div class="container">
-        <h2>Staking</h2>
-        <p>Wallet Balance: $<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></p>
+    <?php if (!empty($error_message)) : ?>
+        <div class="alert alert-danger">
+            <?php echo $error_message; ?>
+        </div>
+    <?php endif; ?>
 
-        <?php if (!empty($success_message)) : ?>
-            <div class="alert alert-success">
-                <?php echo $success_message; ?>
-            </div>
-        <?php endif; ?>
+    <form method="post" action="staking.php">
+        <div class="form-group">
+            <label for="stake_amount">Amount to Stake:</label>
+            <input type="number" class="form-control" id="stake_amount" name="stake_amount" step="0.01" min="5" max="<?php echo htmlspecialchars($wallet_balance); ?>" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Stake</button>
+    </form>
 
-        <?php if (!empty($error_message)) : ?>
-            <div class="alert alert-danger">
-                <?php echo $error_message; ?>
-            </div>
-        <?php endif; ?>
-
-        <form method="post" action="staking.php">
-            <div class="form-group">
-                <label for="stake_amount">Amount to Stake:</label>
-                <input type="number" class="form-control" id="stake_amount" name="stake_amount" step="0.01" min="5" max="<?php echo htmlspecialchars($wallet_balance); ?>" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Stake</button>
-        </form>
-    </div>
-</body>
-
-</html>
+    <h3>Staking Records</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Stake ID</th>
+                <th>Amount</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($staking_records as $record) : ?>
+                <tr>
+                    <td><?php echo $record['id']; ?></td>
+                    <td><?php echo htmlspecialchars(number_format($record['amount'], 2)); ?></td>
+                    <td><?php echo $record['created_at']; ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
