@@ -101,6 +101,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['amount'])) {
                             <span class="nav-link-text ms-1">Dashboard</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="staking.php">
+                            <span class="nav-link-text ms-1">Stacking</span>
+                        </a>
+                    </li>
                     <!-- Other nav items -->
                 </ul>
             </div>
