@@ -65,6 +65,12 @@ while ($row = $result->fetch_assoc()) {
     $staking_records[] = $row;
 }
 $stmt->close();
+
+// Calculate total staking amount
+$total_staking_amount = 0;
+foreach ($staking_records as $record) {
+    $total_staking_amount += $record['amount'];
+}
 ?>
 
 <div class="container">
@@ -110,4 +116,7 @@ $stmt->close();
             <?php endforeach; ?>
         </tbody>
     </table>
+
+    <h3>Total Staking Amount</h3>
+    <p>Total staking amount: $<?php echo htmlspecialchars(number_format($total_staking_amount, 2)); ?></p>
 </div>
