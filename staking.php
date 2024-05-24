@@ -1,4 +1,5 @@
 <?php
+ob_start();
 session_start();
 require('header.php');
 
@@ -16,6 +17,9 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $wallet_balance = $stmt->get_result()->fetch_assoc()['wallet_balance'] ?? 0;
 $stmt->close();
+
+// Initialize variables for success and error messages
+$success_message = $error_message = "";
 
 // Handle the staking form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -42,6 +46,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
 
         $success_message = "Successfully staked $" . htmlspecialchars(number_format($stake_amount, 2));
+
+        // Redirect to prevent form resubmission
+        header("Location: staking.php");
+        exit(); // Ensure script termination after redirection
     } else {
         $error_message = "Invalid staking amount.";
     }
