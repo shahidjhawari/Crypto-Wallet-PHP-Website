@@ -1,6 +1,6 @@
-<?php
-require('top.php');
-session_start();
+<?php session_start();
+require('header.php');
+
 
 // Redirect to login page if not logged in
 if (!isset($_SESSION['user_id'])) {
