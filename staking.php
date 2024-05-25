@@ -26,9 +26,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stake_amount = $_POST['stake_amount'];
 
     if ($stake_amount > 0 && $stake_amount <= $wallet_balance) {
+        // Calculate the new total staking amount
+        $stmt = $conn->prepare("SELECT SUM(amount) AS total_staking FROM stakings WHERE user_id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $total_staking_amount = $stmt->get_result()->fetch_assoc()['total_staking'] ?? 0;
+        $stmt->close();
+
+        $total_staking_amount += $stake_amount;
+
         // Insert staking record
-        $stmt = $conn->prepare("INSERT INTO stakings (user_id, amount) VALUES (?, ?)");
-        $stmt->bind_param("id", $user_id, $stake_amount);
+        $stmt = $conn->prepare("INSERT INTO stakings (user_id, amount, total_staking, status) VALUES (?, ?, ?, 'active')");
+        $stmt->bind_param("idd", $user_id, $stake_amount, $total_staking_amount);
         $stmt->execute();
         $stmt->close();
 
@@ -103,6 +112,8 @@ foreach ($staking_records as $record) {
             <tr>
                 <th>Stake ID</th>
                 <th>Amount</th>
+                <th>Total Staking</th>
+                <th>Status</th>
                 <th>Date</th>
             </tr>
         </thead>
@@ -111,6 +122,8 @@ foreach ($staking_records as $record) {
                 <tr>
                     <td><?php echo $record['id']; ?></td>
                     <td><?php echo htmlspecialchars(number_format($record['amount'], 2)); ?></td>
+                    <td><?php echo htmlspecialchars(number_format($record['total_staking'], 2)); ?></td>
+                    <td><?php echo htmlspecialchars($record['status']); ?></td>
                     <td><?php echo $record['created_at']; ?></td>
                 </tr>
             <?php endforeach; ?>
