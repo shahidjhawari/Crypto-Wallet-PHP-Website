@@ -36,11 +36,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['stake_amount'])) {
         $stmt = $conn->prepare("INSERT INTO stakings (user_id, amount, status) VALUES (?, ?, 'active')");
         $stmt->bind_param("id", $user_id, $stake_amount);
         $stmt->execute();
+        $staking_id = $stmt->insert_id; // Get the ID of the newly inserted staking record
         $stmt->close();
 
         // Deduct the staked amount from the user's balance
         $stmt = $conn->prepare("UPDATE deposits SET amount = amount - ? WHERE user_id = ? AND status = 'accepted' AND amount >= ?");
         $stmt->bind_param("dii", $stake_amount, $user_id, $stake_amount);
+        $stmt->execute();
+        $stmt->close();
+
+        // Calculate the first day's earnings and insert the record
+        $first_daily_earning = calculate_daily_earning(0, $stake_amount);
+        $stmt = $conn->prepare("INSERT INTO daily_earnings (user_id, staking_id, date, amount) VALUES (?, ?, CURDATE(), ?)");
+        $stmt->bind_param("iid", $user_id, $staking_id, $first_daily_earning);
+        $stmt->execute();
+        $stmt->close();
+
+        // Update total earned in stakings table
+        $stmt = $conn->prepare("UPDATE stakings SET total_earned = total_earned + ? WHERE id = ?");
+        $stmt->bind_param("di", $first_daily_earning, $staking_id);
         $stmt->execute();
         $stmt->close();
 
@@ -51,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['stake_amount'])) {
         $wallet_balance = $stmt->get_result()->fetch_assoc()['wallet_balance'] ?? 0;
         $stmt->close();
 
-        $success_message = "Successfully staked $" . htmlspecialchars(number_format($stake_amount, 2));
+        $success_message = "Successfully staked $" . htmlspecialchars(number_format($stake_amount, 2)) . " and earned $" . htmlspecialchars(number_format($first_daily_earning, 2)) . " on the first day.";
 
         // Redirect to prevent form resubmission
         header("Location: staking.php");
@@ -80,7 +94,7 @@ foreach ($staking_records as &$staking) {
         $interval = $start_date->diff($today)->days;
 
         // Skip Sundays
-        if ($today->format('N') != 7) {
+        if ($today->format('N') != 7 && $interval > 0) { // Ensure not to recalculate the first day's earnings
             $daily_earning = calculate_daily_earning($interval, $staking['amount']);
             $staking['total_earned'] += $daily_earning;
 
@@ -196,5 +210,5 @@ foreach ($staking_records as $record) {
     <h3>Total Earnings Summary</h3>
     <p>Estimated Total Earnings: $<?php echo htmlspecialchars(number_format(3 * $total_staking_amount, 2)); ?></p>
     <p>Total Earned: $<?php echo htmlspecialchars(number_format(array_sum(array_column($staking_records, 'total_earned')), 2)); ?></p>
-    <p>Remaining Earnings: $<?php echo htmlspecialchars(number_format((3 * $total_staking_amount) - array_sum(array_column($staking_records, 'total_earned')), 2)); ?></p>
+    <p>Total Earnings Remaining: $<?php echo htmlspecialchars(number_format((3 * $total_staking_amount) - array_sum(array_column($staking_records, 'total_earned')), 2)); ?></p>
 </div>
