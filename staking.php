@@ -32,9 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['stake_amount'])) {
     $stake_amount = $_POST['stake_amount'];
 
     if ($stake_amount > 0 && $stake_amount <= $wallet_balance) {
+        $estimated_earning = 3 * $stake_amount;
+        $remaining_earning = $estimated_earning;
+
         // Insert staking record
-        $stmt = $conn->prepare("INSERT INTO stakings (user_id, amount, status) VALUES (?, ?, 'active')");
-        $stmt->bind_param("id", $user_id, $stake_amount);
+        $stmt = $conn->prepare("INSERT INTO stakings (user_id, amount, estimated_earning, remaining_earning, status) VALUES (?, ?, ?, ?, 'active')");
+        $stmt->bind_param("iddd", $user_id, $stake_amount, $estimated_earning, $remaining_earning);
         $stmt->execute();
         $staking_id = $stmt->insert_id; // Get the ID of the newly inserted staking record
         $stmt->close();
@@ -52,9 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['stake_amount'])) {
         $stmt->execute();
         $stmt->close();
 
-        // Update total earned in stakings table
-        $stmt = $conn->prepare("UPDATE stakings SET total_earned = total_earned + ? WHERE id = ?");
-        $stmt->bind_param("di", $first_daily_earning, $staking_id);
+        // Update total earned and remaining earning in stakings table
+        $remaining_earning -= $first_daily_earning;
+        $stmt = $conn->prepare("UPDATE stakings SET total_earning = total_earning + ?, remaining_earning = ? WHERE id = ?");
+        $stmt->bind_param("dii", $first_daily_earning, $remaining_earning, $staking_id);
         $stmt->execute();
         $stmt->close();
 
@@ -96,7 +100,8 @@ foreach ($staking_records as &$staking) {
         // Skip Sundays
         if ($today->format('N') != 7 && $interval > 0) { // Ensure not to recalculate the first day's earnings
             $daily_earning = calculate_daily_earning($interval, $staking['amount']);
-            $staking['total_earned'] += $daily_earning;
+            $staking['total_earning'] += $daily_earning;
+            $staking['remaining_earning'] -= $daily_earning;
 
             // Insert daily earning record
             $stmt = $conn->prepare("INSERT INTO daily_earnings (user_id, staking_id, date, amount) VALUES (?, ?, CURDATE(), ?)");
@@ -105,9 +110,9 @@ foreach ($staking_records as &$staking) {
             $stmt->close();
 
             // Update total earned and check if tripled
-            $is_tripled = $staking['total_earned'] >= 3 * $staking['amount'];
-            $stmt = $conn->prepare("UPDATE stakings SET total_earned = ?, is_tripled = ? WHERE id = ?");
-            $stmt->bind_param("dii", $staking['total_earned'], $is_tripled, $staking['id']);
+            $is_tripled = $staking['total_earning'] >= 3 * $staking['amount'];
+            $stmt = $conn->prepare("UPDATE stakings SET total_earning = ?, remaining_earning = ?, is_tripled = ? WHERE id = ?");
+            $stmt->bind_param("ddii", $staking['total_earning'], $staking['remaining_earning'], $is_tripled, $staking['id']);
             $stmt->execute();
             $stmt->close();
         }
@@ -163,6 +168,8 @@ foreach ($staking_records as $record) {
                 <th>Stake ID</th>
                 <th>Amount</th>
                 <th>Total Earned</th>
+                <th>Estimated Earning</th>
+                <th>Remaining Earning</th>
                 <th>Status</th>
                 <th>Date</th>
                 <th>Action</th>
@@ -173,15 +180,19 @@ foreach ($staking_records as $record) {
                 <tr>
                     <td><?php echo $record['id']; ?></td>
                     <td><?php echo htmlspecialchars(number_format($record['amount'], 2)); ?></td>
-                    <td><?php echo htmlspecialchars(number_format($record['total_earned'], 2)); ?></td>
+                    <td><?php echo htmlspecialchars(number_format($record['total_earning'], 2)); ?></td>
+                    <td><?php echo htmlspecialchars(number_format($record['estimated_earning'], 2)); ?></td>
+                    <td><?php echo htmlspecialchars(number_format($record['remaining_earning'], 2)); ?></td>
                     <td><?php echo htmlspecialchars($record['status']); ?></td>
                     <td><?php echo $record['created_at']; ?></td>
                     <td>
-                        <?php if ($record['is_tripled'] && $record['status'] == 'active') : ?>
-                            <form method="post" action="staking.php">
-                                <input type="hidden" name="withdraw_staking_id" value="<?php echo $record['id']; ?>">
+                        <?php if ($record['is_tripled']) : ?>
+                            <form method="post" action="withdraw.php">
+                                <input type="hidden" name="withdraw_stake_id" value="<?php echo $record['id']; ?>">
                                 <button type="submit" class="btn btn-success">Withdraw</button>
                             </form>
+                        <?php else : ?>
+                            <button type="button" class="btn btn-secondary" disabled>Withdraw</button>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -189,7 +200,7 @@ foreach ($staking_records as $record) {
         </tbody>
     </table>
 
-    <h3>Daily Earnings</h3>
+    <h3>Daily Earnings Records</h3>
     <table class="table">
         <thead>
             <tr>
@@ -207,8 +218,8 @@ foreach ($staking_records as $record) {
         </tbody>
     </table>
 
-    <h3>Total Earnings Summary</h3>
-    <p>Estimated Total Earnings: $<?php echo htmlspecialchars(number_format(3 * $total_staking_amount, 2)); ?></p>
-    <p>Total Earned: $<?php echo htmlspecialchars(number_format(array_sum(array_column($staking_records, 'total_earned')), 2)); ?></p>
-    <p>Total Earnings Remaining: $<?php echo htmlspecialchars(number_format((3 * $total_staking_amount) - array_sum(array_column($staking_records, 'total_earned')), 2)); ?></p>
+    <h3>Summary</h3>
+    <p>Total Staking Amount: $<?php echo htmlspecialchars(number_format($total_staking_amount, 2)); ?></p>
+    <p>Total Earned: $<?php echo htmlspecialchars(number_format(array_sum(array_column($staking_records, 'total_earning')), 2)); ?></p>
+    <p>Total Earnings Remaining: $<?php echo htmlspecialchars(number_format((3 * $total_staking_amount) - array_sum(array_column($staking_records, 'total_earning')), 2)); ?></p>
 </div>
