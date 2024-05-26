@@ -11,27 +11,36 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch the user's current balance
-$stmt = $conn->prepare("SELECT SUM(amount) AS wallet_balance FROM deposits WHERE user_id = ? AND status = 'accepted'");
+// Fetch the user's current balance and random string
+$stmt = $conn->prepare("SELECT SUM(deposits.amount) AS wallet_balance, users.random_string 
+                        FROM deposits 
+                        JOIN users ON deposits.user_id = users.id 
+                        WHERE deposits.user_id = ? AND deposits.status = 'accepted'");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$wallet_balance = $stmt->get_result()->fetch_assoc()['wallet_balance'] ?? 0;
+$result = $stmt->get_result()->fetch_assoc();
+$wallet_balance = $result['wallet_balance'] ?? 0;
+$stored_random_string = $result['random_string'];
 $stmt->close();
 
 // Initialize variables for success and error messages
 $success_message = $error_message = "";
 
 // Function to calculate earnings based on the day number
-function calculate_daily_earning($day, $amount) {
+function calculate_daily_earning($day, $amount)
+{
     $percentages = [0.0045, 0.0055, 0.0065];
     return $amount * $percentages[$day % 3];
 }
 
 // Handle the staking form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['stake_amount'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['stake_amount'], $_POST['random_string'])) {
     $stake_amount = $_POST['stake_amount'];
+    $input_random_string = $_POST['random_string'];
 
-    if ($stake_amount > 0 && $stake_amount <= $wallet_balance) {
+    if ($input_random_string !== $stored_random_string) {
+        $error_message = "You have provided an incorrect random string.";
+    } elseif ($stake_amount > 0 && $stake_amount <= $wallet_balance) {
         $estimated_earning = 3 * $stake_amount;
         $remaining_earning = $estimated_earning;
 
@@ -158,6 +167,10 @@ foreach ($staking_records as $record) {
             <label for="stake_amount">Amount to Stake:</label>
             <input type="number" class="form-control" id="stake_amount" name="stake_amount" step="0.01" min="5" max="<?php echo htmlspecialchars($wallet_balance); ?>" required>
         </div>
+        <div class="form-group">
+            <label for="random_string">Random String:</label>
+            <input type="text" class="form-control" id="random_string" name="random_string" required>
+        </div>
         <button type="submit" class="btn btn-primary">Stake</button>
     </form>
 
@@ -183,12 +196,12 @@ foreach ($staking_records as $record) {
                     <td><?php echo htmlspecialchars(number_format($record['total_earning'], 2)); ?></td>
                     <td><?php echo htmlspecialchars(number_format($record['estimated_earning'], 2)); ?></td>
                     <td><?php echo htmlspecialchars(number_format($record['remaining_earning'], 2)); ?></td>
-                    <td><?php echo htmlspecialchars($record['status']); ?></td>
+                    <td><?php echo $record['is_tripled'] ? 'Completed' : 'Active'; ?></td>
                     <td><?php echo $record['created_at']; ?></td>
                     <td>
                         <?php if ($record['is_tripled']) : ?>
                             <form method="post" action="withdraw.php">
-                                <input type="hidden" name="withdraw_stake_id" value="<?php echo $record['id']; ?>">
+                                <input type="hidden" name="stake_id" value="<?php echo $record['id']; ?>">
                                 <button type="submit" class="btn btn-success">Withdraw</button>
                             </form>
                         <?php else : ?>
