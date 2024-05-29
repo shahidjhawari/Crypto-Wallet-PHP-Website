@@ -4,8 +4,11 @@ ob_start();
 session_start();
 require('top.inc.php');
 
-// Redirect to login page if not logged in
 
+// Clear the earnings processed flag
+if (isset($_SESSION['earnings_processed'])) {
+    unset($_SESSION['earnings_processed']);
+}
 ?>
 
 <div class="container">

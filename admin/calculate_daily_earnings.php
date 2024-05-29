@@ -4,10 +4,13 @@ ob_start();
 session_start();
 require('top.inc.php');
 
-
-
 if (!isset($_POST['percentage'])) {
     echo "No percentage specified.";
+    exit();
+}
+
+if (isset($_SESSION['earnings_processed']) && $_SESSION['earnings_processed']) {
+    header("Location: admin.php");
     exit();
 }
 
@@ -50,5 +53,10 @@ foreach ($staking_records as $staking) {
     }
 }
 
-echo "Daily earnings calculated successfully.";
+// Set session variable to indicate earnings have been processed
+$_SESSION['earnings_processed'] = true;
+
+// Redirect to prevent form resubmission
+header("Location: admin.php");
+exit();
 ?>
