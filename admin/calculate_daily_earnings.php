@@ -2,13 +2,9 @@
 // calculate_daily_earnings.php
 ob_start();
 session_start();
-require('header.php');
+require('top.inc.php');
 
-// Ensure only admin can access this script
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
-    header("Location: index.php");
-    exit();
-}
+
 
 if (!isset($_POST['percentage'])) {
     echo "No percentage specified.";
@@ -18,7 +14,7 @@ if (!isset($_POST['percentage'])) {
 $percentage = floatval($_POST['percentage']);
 
 // Fetch all active stakings
-$stmt = $conn->prepare("SELECT * FROM stakings WHERE status = 'active' AND is_tripled = 0");
+$stmt = $con->prepare("SELECT * FROM stakings WHERE status = 'active' AND is_tripled = 0");
 $stmt->execute();
 $staking_records = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
@@ -40,14 +36,14 @@ foreach ($staking_records as $staking) {
         $staking['remaining_earning'] -= $daily_earning;
 
         // Insert daily earning record
-        $stmt = $conn->prepare("INSERT INTO daily_earnings (user_id, staking_id, date, amount) VALUES (?, ?, ?, ?)");
+        $stmt = $con->prepare("INSERT INTO daily_earnings (user_id, staking_id, date, amount) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("iisd", $user_id, $staking_id, $today_str, $daily_earning);
         $stmt->execute();
         $stmt->close();
 
         // Update total earned, remaining earnings, and daily calculation count
         $is_tripled = (int)($staking['total_earning'] >= 3 * $staking['amount']);
-        $stmt = $conn->prepare("UPDATE stakings SET total_earning = ?, remaining_earning = ?, is_tripled = ?, daily_calculation_count = daily_calculation_count + 1 WHERE id = ?");
+        $stmt = $con->prepare("UPDATE stakings SET total_earning = ?, remaining_earning = ?, is_tripled = ?, daily_calculation_count = daily_calculation_count + 1 WHERE id = ?");
         $stmt->bind_param("ddii", $staking['total_earning'], $staking['remaining_earning'], $is_tripled, $staking_id);
         $stmt->execute();
         $stmt->close();
