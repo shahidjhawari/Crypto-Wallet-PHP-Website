@@ -53,10 +53,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->close();
 
             // Deduct the staked amount from the user's balance
-            $stmt = $conn->prepare("UPDATE deposits SET amount = amount - ? WHERE user_id = ? AND status = 'accepted' AND amount >= ?");
-            $stmt->bind_param("dii", $stake_amount, $user_id, $stake_amount);
-            $stmt->execute();
-            $stmt->close();
+            $remaining_to_deduct = $stake_amount;
+            while ($remaining_to_deduct > 0) {
+                $stmt = $conn->prepare("SELECT id, amount FROM deposits WHERE user_id = ? AND status = 'accepted' AND amount > 0 ORDER BY id ASC LIMIT 1");
+                $stmt->bind_param("i", $user_id);
+                $stmt->execute();
+                $deposit = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
+
+                if ($deposit) {
+                    $deposit_id = $deposit['id'];
+                    $deposit_amount = $deposit['amount'];
+
+                    if ($deposit_amount >= $remaining_to_deduct) {
+                        $stmt = $conn->prepare("UPDATE deposits SET amount = amount - ? WHERE id = ?");
+                        $stmt->bind_param("di", $remaining_to_deduct, $deposit_id);
+                        $stmt->execute();
+                        $stmt->close();
+                        $remaining_to_deduct = 0;
+                    } else {
+                        $stmt = $conn->prepare("UPDATE deposits SET amount = 0 WHERE id = ?");
+                        $stmt->bind_param("i", $deposit_id);
+                        $stmt->execute();
+                        $stmt->close();
+                        $remaining_to_deduct -= $deposit_amount;
+                    }
+                } else {
+                    break; // No more deposits to deduct from
+                }
+            }
 
             // Calculate the first day's earnings and insert the record
             $first_daily_earning = calculate_daily_earning(0, $stake_amount);
@@ -67,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Update total earned and remaining earning in stakings table
             $remaining_earning -= $first_daily_earning;
-            $stmt = $conn->prepare("UPDATE stakings SET total_earning = total_earning + ?, remaining_earning = ? WHERE id = ?");
+            $stmt = $conn->prepare("UPDATE stakings SET total_earning = ?, remaining_earning = ? WHERE id = ?");
             $stmt->bind_param("dii", $first_daily_earning, $remaining_earning, $staking_id);
             $stmt->execute();
             $stmt->close();
