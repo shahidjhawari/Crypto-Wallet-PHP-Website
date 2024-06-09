@@ -1,14 +1,13 @@
 <?php
 require('top.php');
 
-function test_input($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
+function test_input($data)
+{
+    return htmlspecialchars(stripslashes(trim($data)));
 }
 
-function generateReferralCode($length = 8) {
+function generateReferralCode($length = 8)
+{
     return substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
 }
 
@@ -65,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 // Insert new user
                 $stmt = $conn->prepare("INSERT INTO users (name, email, password, random_string, referrer_id, referral_code) VALUES (?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssssss", $name, $email, $hashed_password, $randomString, $referrer_id, $referral_code);
+                $stmt->bind_param("ssssis", $name, $email, $hashed_password, $randomString, $referrer_id, $referral_code);
                 if ($stmt->execute()) {
                     $user_id = $stmt->insert_id;
                     $stmt->close();
@@ -75,11 +74,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $stmt->bind_param("i", $user_id);
                     $stmt->execute();
                     $stmt->close();
-
-                    // Reward the referrer
-                    if ($referrer_id !== null) {
-                        rewardReferrer($referrer_id, 10, 1);
-                    }
 
                     header("Location: show_key.php?random_string=" . urlencode($randomString));
                     exit();
@@ -91,7 +85,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-function rewardReferrer($referrer_id, $points, $level) {
+function rewardReferrer($referrer_id, $points, $level)
+{
     global $conn;
     if ($level > 3) {
         return;
@@ -126,6 +121,8 @@ function rewardReferrer($referrer_id, $points, $level) {
     }
 }
 ?>
+
+
 
 <style>
     body {
