@@ -2,7 +2,11 @@
 session_start();
 require('top.inc.php');
 
-
+// Only admin users can access this page
+// if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
+//     header("Location: index.php");
+//     exit();
+// }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt = $con->prepare("SELECT id, referrer_id FROM users WHERE referrer_id IS NOT NULL");
@@ -13,20 +17,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $user_id = $user['id'];
         $referrer_id = $user['referrer_id'];
 
-        // Check transaction status
-        $stmt2 = $con->prepare("SELECT status FROM transactions WHERE user_id = ? AND status = 'accepted'");
+        // Check transaction status and if reward has already been given
+        $stmt2 = $con->prepare("SELECT id FROM transactions WHERE user_id = ? AND status = 'accepted' AND rewarded = FALSE");
         $stmt2->bind_param("i", $user_id);
         $stmt2->execute();
         $stmt2->store_result();
 
         if ($stmt2->num_rows > 0) {
-            $stmt2->close();
+            $stmt2->bind_result($transaction_id);
+            while ($stmt2->fetch()) {
+                // Reward referrer
+                rewardReferrer($referrer_id, 10, 1);
 
-            // Reward referrer
-            rewardReferrer($referrer_id, 10, 1);
-        } else {
-            $stmt2->close();
+                // Mark the transaction as rewarded
+                $stmt3 = $con->prepare("UPDATE transactions SET rewarded = TRUE WHERE id = ?");
+                $stmt3->bind_param("i", $transaction_id);
+                $stmt3->execute();
+                $stmt3->close();
+            }
         }
+        $stmt2->close();
     }
     $stmt->close();
 }
