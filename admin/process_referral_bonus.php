@@ -51,19 +51,7 @@ while ($earnings = $result->fetch_assoc()) {
             $referrer_id = $referrer_chain[$level];
             $referrer_bonus = $earning_amount * $reward_percentages[$level];
 
-            // Update referrer's wallet balance
-            $stmt_update_wallet = $con->prepare("
-                UPDATE deposits 
-                SET amount = amount + ? 
-                WHERE user_id = ? 
-                AND status = 'accepted'
-                ORDER BY id ASC LIMIT 1
-            ");
-            $stmt_update_wallet->bind_param("di", $referrer_bonus, $referrer_id);
-            $stmt_update_wallet->execute();
-            $stmt_update_wallet->close();
-
-            // Update referrer's reward points
+            // Update referrer's reward points in terms of dollars
             $stmt_update_rewards = $con->prepare("
                 UPDATE rewards 
                 SET reward_points = reward_points + ? 
