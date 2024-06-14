@@ -61,7 +61,7 @@ if (isset($_SESSION['ADMIN_LOGIN']) && $_SESSION['ADMIN_LOGIN'] != '') {
                   <a href="admin_refer_btn.php"> Refer </a>
                </li>
                <li class="menu-item-has-children dropdown">
-                  <a href="check_daily_earnings.php"> Refer2 </a>
+                  <a href="admin_panel.php"> Refer2 </a>
                </li>
             </ul>
          </div>
