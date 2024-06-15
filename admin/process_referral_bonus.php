@@ -50,6 +50,7 @@ while ($earnings = $result->fetch_assoc()) {
         if ($referrer_chain[$level]) {
             $referrer_id = $referrer_chain[$level];
             $referrer_bonus = $earning_amount * $reward_percentages[$level];
+            $reward_percentage = $reward_percentages[$level] * 100;
 
             // Update referrer's reward points in terms of dollars
             $stmt_update_rewards = $con->prepare("
@@ -60,6 +61,15 @@ while ($earnings = $result->fetch_assoc()) {
             $stmt_update_rewards->bind_param("di", $referrer_bonus, $referrer_id);
             $stmt_update_rewards->execute();
             $stmt_update_rewards->close();
+
+            // Insert record into referral_rewards table
+            $stmt_insert_referral_reward = $con->prepare("
+                INSERT INTO referral_rewards (referrer_id, referred_user_id, daily_earning_amount, reward_percentage, reward_amount)
+                VALUES (?, ?, ?, ?, ?)
+            ");
+            $stmt_insert_referral_reward->bind_param("iiddi", $referrer_id, $earnings['user_id'], $earning_amount, $reward_percentage, $referrer_bonus);
+            $stmt_insert_referral_reward->execute();
+            $stmt_insert_referral_reward->close();
         }
     }
 
