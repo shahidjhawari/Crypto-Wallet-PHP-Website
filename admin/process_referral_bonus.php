@@ -25,6 +25,7 @@ $result = $stmt->get_result();
 while ($earnings = $result->fetch_assoc()) {
     $daily_earning_id = $earnings['daily_earning_id'];
     $earning_amount = $earnings['amount'];
+    $user_10_percent_reward = $earning_amount * 0.1;
 
     // Fetch referrer chain (level 1, 2, 3)
     $stmt_referrer_chain = $con->prepare("
@@ -64,10 +65,10 @@ while ($earnings = $result->fetch_assoc()) {
 
             // Insert record into referral_rewards table
             $stmt_insert_referral_reward = $con->prepare("
-                INSERT INTO referral_rewards (referrer_id, referred_user_id, daily_earning_amount, reward_percentage, reward_amount)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO referral_rewards (referrer_id, referred_user_id, daily_earning_amount, reward_percentage, reward_amount, user_10_percent_reward)
+                VALUES (?, ?, ?, ?, ?, ?)
             ");
-            $stmt_insert_referral_reward->bind_param("iiddi", $referrer_id, $earnings['user_id'], $earning_amount, $reward_percentage, $referrer_bonus);
+            $stmt_insert_referral_reward->bind_param("iiddid", $referrer_id, $earnings['user_id'], $earning_amount, $reward_percentage, $referrer_bonus, $user_10_percent_reward);
             $stmt_insert_referral_reward->execute();
             $stmt_insert_referral_reward->close();
         }

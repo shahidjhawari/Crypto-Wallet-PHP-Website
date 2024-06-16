@@ -3,7 +3,7 @@ ob_start();
 session_start();
 require('header.php');
 
-// Ensure the user is logged in
+//  
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit();
@@ -39,6 +39,8 @@ $result = $stmt->get_result();
             <th>Daily Earning Amount ($)</th>
             <th>Reward Percentage (%)</th>
             <th>Reward Amount ($)</th>
+            <th>User 10% Reward ($)</th>
+            <th>User 10% Reward ($)</th>
             <th>Reward Date</th>
         </tr>
         <?php while ($row = $result->fetch_assoc()): ?>
@@ -47,6 +49,7 @@ $result = $stmt->get_result();
             <td><?php echo htmlspecialchars($row['daily_earning_amount']); ?></td>
             <td><?php echo htmlspecialchars($row['reward_percentage']); ?></td>
             <td><?php echo htmlspecialchars($row['reward_amount']); ?></td>
+            <td><?php echo htmlspecialchars($row['user_10_percent_reward']); ?></td>
             <td><?php echo htmlspecialchars($row['reward_date']); ?></td>
         </tr>
         <?php endwhile; ?>
