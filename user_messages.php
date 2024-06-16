@@ -1,0 +1,30 @@
+<?php
+ob_start();
+session_start();
+require('top.inc.php');
+
+// Fetch all messages from the database
+$stmt = $con->prepare("SELECT * FROM admin_messages ORDER BY created_at DESC");
+$stmt->execute();
+$result = $stmt->get_result();
+$stmt->close();
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Messages</title>
+    <!-- Add your CSS styling here -->
+</head>
+<body>
+    <h1>Messages from Admin</h1>
+    <ul>
+        <?php while ($row = $result->fetch_assoc()): ?>
+            <li>
+                <p><?php echo htmlspecialchars($row['message']); ?></p>
+                <p><small>Posted on: <?php echo htmlspecialchars($row['created_at']); ?></small></p>
+            </li>
+        <?php endwhile; ?>
+    </ul>
+</body>
+</html>

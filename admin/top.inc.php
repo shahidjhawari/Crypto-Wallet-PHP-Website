@@ -63,6 +63,9 @@ if (isset($_SESSION['ADMIN_LOGIN']) && $_SESSION['ADMIN_LOGIN'] != '') {
                <li class="menu-item-has-children dropdown">
                   <a href="process_referral_bonus.php"> Refer2 </a>
                </li>
+               <li class="menu-item-has-children dropdown">
+                  <a href="admin_add_message.php"> Dollar Rate </a>
+               </li>
             </ul>
          </div>
       </nav>
