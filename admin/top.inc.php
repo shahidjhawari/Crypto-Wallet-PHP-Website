@@ -66,6 +66,9 @@ if (isset($_SESSION['ADMIN_LOGIN']) && $_SESSION['ADMIN_LOGIN'] != '') {
                <li class="menu-item-has-children dropdown">
                   <a href="admin_add_message.php"> Dollar Rate </a>
                </li>
+               <li class="menu-item-has-children dropdown">
+                  <a href="#"> Widraw Request </a>
+               </li>
             </ul>
          </div>
       </nav>
