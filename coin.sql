@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 16, 2024 at 06:30 AM
+-- Generation Time: Jun 16, 2024 at 01:10 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,27 @@ SET time_zone = "+00:00";
 --
 -- Database: `coin`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin_messages`
+--
+
+CREATE TABLE `admin_messages` (
+  `id` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admin_messages`
+--
+
+INSERT INTO `admin_messages` (`id`, `message`, `created_at`) VALUES
+(1, '80', '2024-06-16 04:49:43'),
+(2, '80', '2024-06-16 04:58:15'),
+(3, '80', '2024-06-16 04:58:39');
 
 -- --------------------------------------------------------
 
@@ -68,7 +89,8 @@ CREATE TABLE `daily_earnings` (
 INSERT INTO `daily_earnings` (`id`, `user_id`, `staking_id`, `date`, `amount`, `rewarded`, `created_at`, `processed`, `is_rewarded`, `last_checked`, `reward_processed`) VALUES
 (1, 137, 83, '2024-06-16', 3.60, 0, '2024-06-16 04:23:15', 0, 0, NULL, 1),
 (2, 137, 83, '2024-06-16', 2.80, 0, '2024-06-16 04:24:33', 0, 0, NULL, 1),
-(3, 137, 83, '2024-06-16', 4.40, 0, '2024-06-16 04:26:12', 0, 0, NULL, 1);
+(3, 137, 83, '2024-06-16', 4.40, 0, '2024-06-16 04:26:12', 0, 0, NULL, 1),
+(4, 137, 83, '2024-06-16', 5.20, 0, '2024-06-16 04:39:00', 0, 0, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -107,17 +129,19 @@ CREATE TABLE `referral_rewards` (
   `reward_percentage` decimal(5,2) NOT NULL,
   `reward_amount` decimal(10,2) NOT NULL,
   `reward_date` datetime NOT NULL DEFAULT current_timestamp(),
-  `user_10_percent_reward` decimal(10,2) DEFAULT 0.00
+  `user_10_percent_reward` decimal(10,2) DEFAULT 0.00,
+  `is_claimed` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `referral_rewards`
 --
 
-INSERT INTO `referral_rewards` (`id`, `referrer_id`, `referred_user_id`, `daily_earning_amount`, `reward_percentage`, `reward_amount`, `reward_date`, `user_10_percent_reward`) VALUES
-(1, 136, 137, 3.60, 10.00, 0.00, '2024-06-16 09:24:37', 0.36),
-(2, 136, 137, 2.80, 10.00, 0.00, '2024-06-16 09:24:37', 0.28),
-(3, 136, 137, 4.40, 10.00, 0.00, '2024-06-16 09:26:13', 0.44);
+INSERT INTO `referral_rewards` (`id`, `referrer_id`, `referred_user_id`, `daily_earning_amount`, `reward_percentage`, `reward_amount`, `reward_date`, `user_10_percent_reward`, `is_claimed`) VALUES
+(1, 136, 137, 3.60, 10.00, 0.00, '2024-06-16 09:24:37', 0.36, 1),
+(2, 136, 137, 2.80, 10.00, 0.00, '2024-06-16 09:24:37', 0.28, 1),
+(3, 136, 137, 4.40, 10.00, 0.00, '2024-06-16 09:26:13', 0.44, 1),
+(4, 136, 137, 5.20, 10.00, 0.00, '2024-06-16 09:39:01', 0.52, 1);
 
 -- --------------------------------------------------------
 
@@ -140,7 +164,7 @@ CREATE TABLE `rewards` (
 --
 
 INSERT INTO `rewards` (`id`, `user_id`, `reward_points`, `referral_count`, `level_one_count`, `level_two_count`, `level_three_count`) VALUES
-(1, 136, 10, 1, 1, 0, 0),
+(1, 136, 12, 1, 1, 0, 0),
 (2, 137, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
@@ -191,7 +215,7 @@ CREATE TABLE `stakings` (
 --
 
 INSERT INTO `stakings` (`id`, `user_id`, `amount`, `created_at`, `total_staking`, `status`, `withdrawn`, `total_earning`, `is_tripled`, `estimated_earning`, `remaining_earning`, `start_date`, `is_verified`, `last_calculation_date`, `daily_calculation_count`, `first_run_earning`, `second_run_earning`, `third_run_earning`, `rewarded`, `commission_processed`) VALUES
-(83, 137, 800.00, '2024-06-16 04:23:15', 0.00, 'active', 0, 10.80, 0, 2400, 2388.7999999999997, NULL, 0, NULL, 2, 0.00, 0.00, 0.00, 0, 0);
+(83, 137, 800.00, '2024-06-16 04:23:15', 0.00, 'active', 0, 16.00, 0, 2400, 2383.6, NULL, 0, NULL, 3, 0.00, 0.00, 0.00, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -247,6 +271,12 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`, `random_string`, `referr
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `admin_messages`
+--
+ALTER TABLE `admin_messages`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `daily_earnings`
@@ -311,10 +341,16 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `admin_messages`
+--
+ALTER TABLE `admin_messages`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `daily_earnings`
 --
 ALTER TABLE `daily_earnings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `deposits`
@@ -326,7 +362,7 @@ ALTER TABLE `deposits`
 -- AUTO_INCREMENT for table `referral_rewards`
 --
 ALTER TABLE `referral_rewards`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `rewards`
