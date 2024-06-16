@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 
-<h1>Add Message</h1>
+<h1>Add Dollar Rate</h1>
 <?php if (isset($success_message)) : ?>
     <p style="color: green;"><?php echo $success_message; ?></p>
 <?php endif; ?>
