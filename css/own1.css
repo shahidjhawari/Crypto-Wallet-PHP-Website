@@ -7,9 +7,7 @@ body,
   color: #FFFFFF !important;
 }
 
-.nav-link.active,
-.nav-link:hover,
-.nav-link:focus {
+.nav-link.active {
   background-color: #141E46 !important;
   color: #FFFFFF !important;
 }
