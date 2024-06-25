@@ -88,16 +88,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['amount'])) {
                             <?php endif; ?>
                             <!-- Deposit Button -->
                             <?php if ($transaction_status === 'accepted') : ?>
-                                <p><a href="deposit.php" class="btn btn-info">Deposit</a></p>
+                                <!-- <p><a href="deposit.php" class="btn btn-info">Deposit</a></p> -->
                             <?php endif; ?>
                             <!-- Transaction Status and Resend Activation Request Button -->
                             <?php if ($transaction_status === 'rejected') : ?>
                                 <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
-                                <p><a href="activate.php" class="btn btn-info">Resend Activation Request</a></p>
+                                <!-- <p><a href="activate.php" class="btn btn-info">Resend Activation Request</a></p> -->
                             <?php elseif ($transaction_status === 'pending') : ?>
                                 <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
                             <?php elseif (!$transaction_status) : ?>
-                                <p><a href="activate.php" class="btn btn-info">Activate Account</a></p>
+                                <!-- <p><a href="activate.php" class="btn btn-info">Activate Account</a></p> -->
                             <?php elseif ($transaction_status === 'accepted' && $deposit_status) : ?>
                                 <p>Deposit Status: <?php echo htmlspecialchars($deposit_status); ?></p>
                             <?php endif; ?>
@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['amount'])) {
                         <div class="col-12">
                             <p class="fs-5 mb-3">On Stacking</p>
                             <h1 class="display-5 mb-4" style="margin-top: -15px;">$20.00</h1>
-                            <p><a href="#" class="btn btn-info">Stacking</a></p>
+                            <!-- <p><a href="#" class="btn btn-info">Stacking</a></p> -->
                         </div>
                     </div>
                 </div>
@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['amount'])) {
                         <div class="col-12">
                             <p class="fs-5 mb-3">Daily Earning</p>
                             <h1 class="display-5 mb-4" style="margin-top: -15px;">$20.00</h1>
-                            <p><a href="#" class="btn btn-info">Daily Earning Record</a></p>
+                            <!-- <p><a href="#" class="btn btn-info">Daily Earning Record</a></p> -->
                         </div>
                     </div>
                 </div>
@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['amount'])) {
                         <div class="col-12">
                             <p class="fs-5 mb-3">Team Reward</p>
                             <h1 class="display-5 mb-4" style="margin-top: -15px;">$00.00</h1>
-                            <p><a href="team.php" class="btn btn-info">Team Building</a></p>
+                            <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
                         </div>
                     </div>
                 </div>
