@@ -79,9 +79,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['amount'])) {
                     <div class="row">
                         <div class="col-12">
                             <!-- Wallet Balance -->
-                            <p class="fs-5 mb-3">Wallet Balance</p>
+                            <!-- <p class="fs-5 mb-3">Wallet Balance</p> -->
                             <!-- Wallet Balance Amount (in larger size) -->
-                            <h1 class="display-5 mb-4" style="margin-top: -15px;">$<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></h1>
+                            <!-- <h1 class="display-5 mb-4" style="margin-top: -15px;">$<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></h1> -->
                             <!-- Your Account Has Been Activated message -->
                             <?php if ($transaction_status === 'accepted') : ?>
                                 <p>Your account has been <span style="color: green;">Activated</span></p>
