@@ -41,7 +41,7 @@
                         <a class="nav-link" href="wallet_design.php">Wallet</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Stacking</a>
+                        <a class="nav-link" href="staking.php">Stacking</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="team.php">Team Building</a>

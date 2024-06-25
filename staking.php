@@ -187,6 +187,12 @@ foreach ($staking_records as $record) {
 }
 ?>
 
+<style>
+    th, td {
+        color: white;
+    }
+</style>
+
 <div class="container">
     <h2>Staking</h2>
     <p>Wallet Balance: $<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></p>
@@ -206,11 +212,11 @@ foreach ($staking_records as $record) {
     <form method="post" action="staking.php">
         <div class="form-group">
             <label for="stake_amount">Stake Amount</label>
-            <input type="number" class="form-control" id="stake_amount" name="stake_amount" min="0.01" step="0.01" required>
+            <input type="number" placeholder="Enter Stack Amount" class="form-control" id="stake_amount" name="stake_amount" min="0.01" step="0.01" required>
         </div>
         <div class="form-group">
-            <label for="random_string">Random String</label>
-            <input type="text" class="form-control" id="random_string" name="random_string" required>
+            <label for="random_string">Private Key</label>
+            <input type="text" placeholder="Enter Private Key" class="form-control" id="random_string" name="random_string" required>
         </div>
         <button type="submit" class="btn btn-primary">Stake</button>
     </form>
@@ -220,7 +226,7 @@ foreach ($staking_records as $record) {
     </form>
 
     <h3>Staking Records</h3>
-    <table class="table table-striped">
+    <table class="table table-responsive">
         <thead>
             <tr>
                 <th>Amount</th>
@@ -244,7 +250,7 @@ foreach ($staking_records as $record) {
     </table>
 
     <h3>Daily Earnings Records</h3>
-    <table class="table table-striped">
+    <table class="table table-responsive">
         <thead>
             <tr>
                 <th>Date</th>
