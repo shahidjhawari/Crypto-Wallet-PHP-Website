@@ -38,7 +38,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Wallet</a>
+                        <a class="nav-link" href="wallet_design.php">Wallet</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Stacking</a>
