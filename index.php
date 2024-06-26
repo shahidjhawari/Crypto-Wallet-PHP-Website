@@ -1,5 +1,5 @@
 <?php
-require('top.php');
+require('header.php');
 session_start();
 
 $showRandomKeyField = !(isset($_SESSION['viewed_key']) && $_SESSION['viewed_key']);
