@@ -268,16 +268,16 @@ foreach ($staking_records as $record) {
                             <?php endif; ?>
                             <!-- Deposit Button -->
                             <?php if ($transaction_status === 'accepted') : ?>
-                                <!-- <p><a href="deposit.php" class="btn btn-info">Deposit</a></p> -->
+                                <p><a href="deposit.php" class="btn btn-info">Deposit</a></p>
                             <?php endif; ?>
                             <!-- Transaction Status and Resend Activation Request Button -->
                             <?php if ($transaction_status === 'rejected') : ?>
                                 <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
-                                <!-- <p><a href="activate.php" class="btn btn-info">Resend Activation Request</a></p> -->
+                                <p><a href="activate.php" class="btn btn-info">Resend Activation Request</a></p>
                             <?php elseif ($transaction_status === 'pending') : ?>
                                 <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
                             <?php elseif (!$transaction_status) : ?>
-                                <!-- <p><a href="activate.php" class="btn btn-info">Activate Account</a></p> -->
+                                <p><a href="activate.php" class="btn btn-info">Activate Account</a></p>
                             <?php elseif ($transaction_status === 'accepted' && $deposit_status) : ?>
                                 <p>Deposit Status: <?php echo htmlspecialchars($deposit_status); ?></p>
                             <?php endif; ?>
