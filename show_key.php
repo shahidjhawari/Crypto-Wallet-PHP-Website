@@ -1,5 +1,5 @@
 <?php
-require('top.php');
+require('header.php');
 $_SESSION['viewed_key'] = true;
 
 function test_input($data)
