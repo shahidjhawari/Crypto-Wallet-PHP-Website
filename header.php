@@ -44,7 +44,7 @@
                         <a class="nav-link" href="staking.php">Stacking</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="team.php">Team Building</a>
+                        <a class="nav-link" href="team_design.php">Team Building</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="logout.php">Daily Earning</a>
