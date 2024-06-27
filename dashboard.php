@@ -385,7 +385,7 @@ $stmt->close();
                     <div class="row">
                         <div class="col-12">
                             <p class="fs-5 mb-3">Team Reward</p>
-                            <h1 class="display-5 mb-4" style="margin-top: -15px;">$00.00</h1>
+                            <h1 class="display-5 mb-4" style="margin-top: -15px;">$<?php echo htmlspecialchars($user_rewards['reward_points']); ?>.00</h1>
                             <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
                         </div>
                     </div>
