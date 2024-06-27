@@ -390,6 +390,7 @@ $stmt->close();
                             ?>
                             <h1 class="display-5 mb-4" style="margin-top: -15px;">$<?php echo htmlspecialchars(number_format($record['total_earning'], 2)); ?>
                             </h1>
+                            <p>Total Daily Earning</p>
                             <!-- Remove the loop as we are only showing the latest record -->
                             <!-- <p><a href="#" class="btn btn-info">Daily Earning Record</a></p> -->
                         </div>
@@ -420,7 +421,7 @@ $stmt->close();
                     <div class="row">
                         <div class="col-12">
                             <p class="fs-5 mb-3">Total Earning</p>
-                            <h1 class="display-5 mb-4" style="margin-top: -15px;"><?php echo $user_rewards['reward_points'] + htmlspecialchars(number_format($record['total_earning'], 2)); ?></h1>
+                            <h1 class="display-5 mb-4" style="margin-top: -15px;">$<?php echo $user_rewards['reward_points'] + htmlspecialchars(number_format($record['total_earning'], 2)); ?></h1>
                             <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
                              <p>Daily & Refer Total Earning</p>
                         </div>
