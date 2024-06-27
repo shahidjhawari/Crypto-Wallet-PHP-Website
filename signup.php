@@ -1,5 +1,5 @@
 <?php
-require('top.php');
+require('header.php');
 
 function test_input($data)
 {
