@@ -247,6 +247,50 @@ $total_earning_amount = 0;
 foreach ($staking_records as $record) {
     $total_earning_amount += $record['total_earning'];
 }
+
+
+
+
+
+// Display Refer Code Here
+
+
+
+// Fetch user-specific data
+$stmt = $conn->prepare("SELECT * FROM rewards WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$user_rewards = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+
+// Fetch the user's referral code
+$stmt = $conn->prepare("SELECT referral_code FROM users WHERE id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$user_referral = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+
+$referral_code = $user_referral['referral_code'];
+$referral_link = SITE_PATH . "/signup.php?referral=" . $referral_code;
+
+// Check if rewards have been claimed
+$stmt = $conn->prepare("SELECT SUM(amount) AS total_claimed FROM deposits WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$total_claimed = $stmt->get_result()->fetch_assoc()['total_claimed'] ?? 0;
+$stmt->close();
+
+// Calculate the claimable amount
+$claimable_amount = $user_rewards['reward_points'] - $total_claimed;
+
+
+// Fetch the user's transaction status
+$stmt = $conn->prepare("SELECT status FROM transactions WHERE user_id = ? ORDER BY id DESC LIMIT 1");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$transaction_status_row = $stmt->get_result()->fetch_assoc();
+$transaction_status = $transaction_status_row['status'] ?? null;
+$stmt->close();
 ?>
 
 
