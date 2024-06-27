@@ -392,6 +392,34 @@ $stmt->close();
                 </div>
             </div>
         </div>
+
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="fs-5 mb-3">Total Earning</p>
+                            <h1 class="display-5 mb-4" style="margin-top: -15px;"><?php echo $user_rewards['reward_points'] +  $latest_daily_earning_record['amount'] ?></h1>
+                            <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="fs-5 mb-3">Withdraw</p>
+                            <h1 class="display-5 mb-4" style="margin-top: -15px;">$0.00</h1>
+                            <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Other content rows -->
     </div>
 </div>
