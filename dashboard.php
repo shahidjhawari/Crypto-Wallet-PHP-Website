@@ -341,21 +341,27 @@ $record = isset($record) ? $record : ['total_earning' => 0];
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-12">
-                            <p class="fs-5 mb-3">On Stacking</p>
+                            <p class="fs-5 mb-3">Total On Stacking</p>
                             <?php
-                            // Check if there are any staking records and get the latest one, otherwise set to 0
-                            $latest_staking_record = !empty($staking_records) ? end($staking_records) : ['amount' => 0];
+                            // Check if there are any staking records and sum their amounts, otherwise set to 0
+                            $total_staking_amount = 0;
+                            if (!empty($staking_records)) {
+                                foreach ($staking_records as $record) {
+                                    $total_staking_amount += $record['amount'];
+                                }
+                            }
                             ?>
                             <h1 class="display-5 mb-4" style="margin-top: -15px;">
-                                <?php echo '$' . htmlspecialchars(number_format($latest_staking_record['amount'], 2)); ?>
+                                <?php echo '$' . htmlspecialchars(number_format($total_staking_amount, 2)); ?>
                             </h1>
-                            <!-- Remove the loop as we are only showing the latest record -->
+                            <!-- Remove the loop as we are only showing the total -->
                             <!-- <p><a href="#" class="btn btn-info">Stacking</a></p> -->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
 
         <div class="col-12 mb-4">
             <div class="card">
@@ -381,25 +387,34 @@ $record = isset($record) ? $record : ['total_earning' => 0];
 
 
         <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-12">
-                            <p class="fs-5 mb-3">Total Daily Earning</p>
-                            <?php
-                            // Check if there are any daily earnings records and get the latest one, otherwise set to 0
-                            $latest_daily_earning_record = !empty($daily_earnings_records) ? end($daily_earnings_records) : ['amount' => 0, 'date' => ''];
-                            ?>
-                            <h1 class="display-5 mb-4" style="margin-top: -15px;">$<?php echo htmlspecialchars(number_format($record['total_earning'], 2)); ?>
-                            </h1>
-                            <p>Total Daily Earning</p>
-                            <!-- Remove the loop as we are only showing the latest record -->
-                            <!-- <p><a href="#" class="btn btn-info">Daily Earning Record</a></p> -->
-                        </div>
-                    </div>
+    <div class="card">
+        <div class="card-body p-3">
+            <div class="row">
+                <div class="col-12">
+                    <p class="fs-5 mb-3">Total Daily Earning</p>
+                    <?php
+                    // Initialize the total earnings to 0
+                    $total_daily_earnings = 0;
+
+                    // Check if there are any daily earnings records and sum their amounts
+                    if (!empty($daily_earnings_records)) {
+                        foreach ($daily_earnings_records as $record) {
+                            $total_daily_earnings += $record['amount'];
+                        }
+                    }
+                    ?>
+                    <h1 class="display-5 mb-4" style="margin-top: -15px;">
+                        $<?php echo htmlspecialchars(number_format($total_daily_earnings, 2)); ?>
+                    </h1>
+                    <p>Total Daily Earning</p>
+                    <!-- Remove the loop as we are only showing the total -->
+                    <!-- <p><a href="#" class="btn btn-info">Daily Earning Record</a></p> -->
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
 
 
 
@@ -418,25 +433,25 @@ $record = isset($record) ? $record : ['total_earning' => 0];
         </div>
 
         <div class="col-12 mb-4">
-    <div class="card">
-        <div class="card-body p-3">
-            <div class="row">
-                <div class="col-12">
-                    <p class="fs-5 mb-3">Total Earning</p>
-                    <h1 class="display-5 mb-4" style="margin-top: -15px;">
-                        $<?php
-                            $reward_points = isset($user_rewards['reward_points']) ? $user_rewards['reward_points'] : 0;
-                            $total_earning = isset($record['total_earning']) ? $record['total_earning'] : 0;
-                            echo number_format($reward_points + $total_earning, 2);
-                        ?>
-                    </h1>
-                    <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
-                    <p>Daily & Refer Total Earning</p>
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="fs-5 mb-3">Total Earning</p>
+                            <h1 class="display-5 mb-4" style="margin-top: -15px;">
+                                $<?php
+                                    $reward_points = isset($user_rewards['reward_points']) ? $user_rewards['reward_points'] : 0;
+                                    $total_earning = isset($record['total_earning']) ? $record['total_earning'] : 0;
+                                    echo number_format($reward_points + $total_earning, 2);
+                                    ?>
+                            </h1>
+                            <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
+                            <p>Daily & Refer Total Earning</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
 
 
