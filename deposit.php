@@ -16,6 +16,7 @@ $deposit_message = ""; // Variable to hold messages for the user
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $amount = $_POST['amount'];
   $transaction_id = $_POST['transaction_id'];
+  $payment_method = $_POST['payment_method'];
   $screenshot = $_FILES['screenshot']['name'];
   $target_dir = PRODUCT_IMAGE_SERVER_PATH; // Use server path to store the file
   $target_file = $target_dir . basename($screenshot);
@@ -38,8 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       // Move uploaded file to the target directory
       if (move_uploaded_file($_FILES["screenshot"]["tmp_name"], $target_file)) {
         // Insert deposit details into the database with status 'Pending'
-        $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, screenshot, transaction_id, status) VALUES (?, ?, ?, ?, 'Pending')");
-        $stmt->bind_param("iiss", $user_id, $amount, $screenshot, $transaction_id);
+        $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, screenshot, transaction_id, status, payment_method) VALUES (?, ?, ?, ?, 'Pending', ?)");
+        $stmt->bind_param("iisss", $user_id, $amount, $screenshot, $transaction_id, $payment_method);
         $stmt->execute();
         $stmt->close();
 
@@ -52,6 +53,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
   }
 }
+
+// Fetch the latest exchange rate from the database
+$stmt = $conn->prepare("SELECT * FROM admin_messages ORDER BY created_at DESC LIMIT 1");
+$stmt->execute();
+$result = $stmt->get_result();
+$latestMessage = $result->fetch_assoc();
+$stmt->close();
+
+$exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['message']) : 0.0;
 ?>
 
 <div class="container mt-5">
@@ -60,6 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <div class="card">
         <div class="card-header text-center">
           <h4>Make a Deposit</h4>
+          <?php if ($latestMessage) : ?>
+            <?php echo "Dollar Rate in PKR " . htmlspecialchars($latestMessage['message']); ?>
+          <?php endif; ?>
         </div>
         <div class="card-body">
           <?php if ($deposit_message) : ?>
@@ -69,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           <?php endif; ?>
           <form method="post" enctype="multipart/form-data">
             <div class="form-group">
-              <label for="amount">Amount</label>
+              <label for="amount">Amount (USD)</label>
               <input type="number" class="form-control" id="amount" name="amount" required>
             </div>
             <div class="form-group">
@@ -77,15 +90,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               <input type="text" class="form-control" id="transaction_id" name="transaction_id" required>
             </div>
             <div class="form-group">
+              <label for="payment_method">Payment Method</label>
+              <select class="form-control" id="payment_method" name="payment_method" required>
+                <option value="Easy Paisa">Easy Paisa</option>
+                <option value="Valid Cash">Jazz Cash</option>
+                <option value="Simple PA">Sada Pay</option>
+                <option value="USDT">USDT</option>
+              </select>
+            </div>
+            <div class="form-group">
               <label for="screenshot">Screenshot</label>
               <input type="file" class="form-control-file" id="screenshot" name="screenshot" required>
             </div>
             <button type="submit" class="btn btn-info btn-block">Submit</button>
           </form>
+          <p id="converted-amount" class="mt-3"></p>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+document.getElementById('amount').addEventListener('input', function() {
+  const exchangeRate = <?php echo $exchange_rate; ?>;
+  const usdAmount = parseFloat(this.value);
+  if (!isNaN(usdAmount) && usdAmount > 0) {
+    const pkrAmount = usdAmount * exchangeRate;
+    document.getElementById('converted-amount').innerText = `Equivalent Amount in PKR: ${pkrAmount.toFixed(2)}`;
+  } else {
+    document.getElementById('converted-amount').innerText = '';
+  }
+});
+</script>
 
 <?php require('footer.php'); ?>
