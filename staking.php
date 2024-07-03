@@ -84,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Calculate the first day's earnings and insert the record
+            /*
             $first_daily_earning = calculate_daily_earning(0, $stake_amount);
             $stmt = $conn->prepare("INSERT INTO daily_earnings (user_id, staking_id, date, amount) VALUES (?, ?, CURDATE(), ?)");
             $stmt->bind_param("iid", $user_id, $staking_id, $first_daily_earning);
@@ -96,6 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param("dii", $first_daily_earning, $remaining_earning, $staking_id);
             $stmt->execute();
             $stmt->close();
+            */
 
             // Recalculate the wallet balance
             $stmt = $conn->prepare("SELECT SUM(amount) AS wallet_balance FROM deposits WHERE user_id = ? AND status = 'accepted'");
@@ -104,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $wallet_balance = $stmt->get_result()->fetch_assoc()['wallet_balance'] ?? 0;
             $stmt->close();
 
-            $success_message = "Successfully staked $" . htmlspecialchars(number_format($stake_amount, 2)) . " and earned $" . htmlspecialchars(number_format($first_daily_earning, 2)) . " on the first day.";
+            $success_message = "Successfully staked $" . htmlspecialchars(number_format($stake_amount, 2)) . ".";
 
             // Redirect to prevent form resubmission
             header("Location: staking.php");
@@ -188,7 +190,8 @@ foreach ($staking_records as $record) {
 ?>
 
 <style>
-    th, td {
+    th,
+    td {
         color: white;
     }
 </style>
