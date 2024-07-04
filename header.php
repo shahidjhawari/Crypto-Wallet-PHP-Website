@@ -17,12 +17,15 @@
     <!-- Custom CSS -->
     <style>
         .navbar-nav .nav-link {
-            text-decoration: none; /* Remove underline */
-            color: inherit; /* Inherit color */
+            text-decoration: none;
+            /* Remove underline */
+            color: inherit;
+            /* Inherit color */
         }
 
         .navbar-nav .nav-link:hover {
-            color: inherit; /* Inherit color on hover */
+            color: inherit;
+            /* Inherit color on hover */
         }
     </style>
 </head>
@@ -48,6 +51,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="logout.php">Daily Earning</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="bonus_rewards.php">Bonus Reward</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="logout.php">Logout</a>
