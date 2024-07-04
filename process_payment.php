@@ -1,6 +1,6 @@
 <?php
 session_start();
-require('connection.inc.php'); // Database connection
+require('header.php'); // Database connection
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id']; // Assuming the user is logged in and user_id is stored in the session
