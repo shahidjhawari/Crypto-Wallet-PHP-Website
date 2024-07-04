@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 16, 2024 at 01:10 PM
+-- Generation Time: Jul 04, 2024 at 06:15 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -33,15 +33,6 @@ CREATE TABLE `admin_messages` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `admin_messages`
---
-
-INSERT INTO `admin_messages` (`id`, `message`, `created_at`) VALUES
-(1, '80', '2024-06-16 04:49:43'),
-(2, '80', '2024-06-16 04:58:15'),
-(3, '80', '2024-06-16 04:58:39');
-
 -- --------------------------------------------------------
 
 --
@@ -59,8 +50,22 @@ CREATE TABLE `admin_users` (
 --
 
 INSERT INTO `admin_users` (`id`, `username`, `password`) VALUES
-(0, 'admin', 'admin'),
 (0, 'admin', 'admin');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bonus_rewards`
+--
+
+CREATE TABLE `bonus_rewards` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `transaction_id` varchar(255) NOT NULL,
+  `bonus_amount` decimal(10,2) NOT NULL,
+  `claimed` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -82,16 +87,6 @@ CREATE TABLE `daily_earnings` (
   `reward_processed` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `daily_earnings`
---
-
-INSERT INTO `daily_earnings` (`id`, `user_id`, `staking_id`, `date`, `amount`, `rewarded`, `created_at`, `processed`, `is_rewarded`, `last_checked`, `reward_processed`) VALUES
-(1, 137, 83, '2024-06-16', 3.60, 0, '2024-06-16 04:23:15', 0, 0, NULL, 1),
-(2, 137, 83, '2024-06-16', 2.80, 0, '2024-06-16 04:24:33', 0, 0, NULL, 1),
-(3, 137, 83, '2024-06-16', 4.40, 0, '2024-06-16 04:26:12', 0, 0, NULL, 1),
-(4, 137, 83, '2024-06-16', 5.20, 0, '2024-06-16 04:39:00', 0, 0, NULL, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -105,15 +100,10 @@ CREATE TABLE `deposits` (
   `screenshot` varchar(255) NOT NULL,
   `transaction_id` varchar(255) NOT NULL,
   `status` enum('Pending','Accepted','Rejected') DEFAULT 'Pending',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `payment_method` enum('Easy Paisa','Valid Cash','Simple PA','USDT') NOT NULL,
+  `bonus_claimed_amount` decimal(10,2) DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `deposits`
---
-
-INSERT INTO `deposits` (`id`, `user_id`, `amount`, `screenshot`, `transaction_id`, `status`, `created_at`) VALUES
-(1, 137, 100.00, '1714497546738.jpg', 'gfdgfdg', 'Accepted', '2024-06-16 04:23:02');
 
 -- --------------------------------------------------------
 
@@ -133,16 +123,6 @@ CREATE TABLE `referral_rewards` (
   `is_claimed` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `referral_rewards`
---
-
-INSERT INTO `referral_rewards` (`id`, `referrer_id`, `referred_user_id`, `daily_earning_amount`, `reward_percentage`, `reward_amount`, `reward_date`, `user_10_percent_reward`, `is_claimed`) VALUES
-(1, 136, 137, 3.60, 10.00, 0.00, '2024-06-16 09:24:37', 0.36, 1),
-(2, 136, 137, 2.80, 10.00, 0.00, '2024-06-16 09:24:37', 0.28, 1),
-(3, 136, 137, 4.40, 10.00, 0.00, '2024-06-16 09:26:13', 0.44, 1),
-(4, 136, 137, 5.20, 10.00, 0.00, '2024-06-16 09:39:01', 0.52, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -158,14 +138,6 @@ CREATE TABLE `rewards` (
   `level_two_count` int(11) DEFAULT 0,
   `level_three_count` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `rewards`
---
-
-INSERT INTO `rewards` (`id`, `user_id`, `reward_points`, `referral_count`, `level_one_count`, `level_two_count`, `level_three_count`) VALUES
-(1, 136, 12, 1, 1, 0, 0),
-(2, 137, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -210,13 +182,6 @@ CREATE TABLE `stakings` (
   `commission_processed` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `stakings`
---
-
-INSERT INTO `stakings` (`id`, `user_id`, `amount`, `created_at`, `total_staking`, `status`, `withdrawn`, `total_earning`, `is_tripled`, `estimated_earning`, `remaining_earning`, `start_date`, `is_verified`, `last_calculation_date`, `daily_calculation_count`, `first_run_earning`, `second_run_earning`, `third_run_earning`, `rewarded`, `commission_processed`) VALUES
-(83, 137, 800.00, '2024-06-16 04:23:15', 0.00, 'active', 0, 16.00, 0, 2400, 2383.6, NULL, 0, NULL, 3, 0.00, 0.00, 0.00, 0, 0);
-
 -- --------------------------------------------------------
 
 --
@@ -233,15 +198,9 @@ CREATE TABLE `transactions` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `referrer_rewarded` tinyint(1) DEFAULT 0,
-  `rewarded` tinyint(1) DEFAULT 0
+  `rewarded` tinyint(1) DEFAULT 0,
+  `payment_method` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `transactions`
---
-
-INSERT INTO `transactions` (`id`, `user_id`, `amount`, `screenshot`, `transaction_id`, `status`, `created_at`, `updated_at`, `referrer_rewarded`, `rewarded`) VALUES
-(1, 137, 10.00, '1714497546738.jpg', 'sdfdsfsdf', 'accepted', '2024-06-16 04:22:23', '2024-06-16 04:24:24', 0, 1);
 
 -- --------------------------------------------------------
 
@@ -260,13 +219,36 @@ CREATE TABLE `users` (
   `referred_bonus_received` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `users`
+-- Table structure for table `user_payments`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `random_string`, `referrer_id`, `referral_code`, `referred_bonus_received`) VALUES
-(136, 'NAWAB', 'shahidjhawari@gmail.com', '$2y$10$OPZYXCnHU9oPSORQ3Dy2X.CfDwJOwqGCiIhVK1GzDnTsd4cst7XVO', 'ebcb759d0791a37af27861f318b3999733ddbd17b4d5261f01ff8b8a647c95ba95187ecdf08139e4f431862b1bc007ff1d85', NULL, 'MjJ1uVat', 0),
-(137, 'NAWAB ACADEMY', 'shahidiqbaljhawari@gmail.com', '$2y$10$5U9.mV1Ig6cFvokPKjn2P.cmH9HB6VVarxlP5mQk.xWgq0/AfQgUm', '15e9add06c212e3f88c2e1ebc857c3a5d65ef425d0d521193377782e5907f6bcc6c477b069bc0705ec1174b7d1dfbc771d0b', 136, 'U3JuYR5F', 0);
+CREATE TABLE `user_payments` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `account_number` varchar(255) DEFAULT NULL,
+  `payment_method` enum('Easy Paisa','Jazz Cash','Simple Pay','Dollar') NOT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `status` enum('Pending','Accepted','Rejected') DEFAULT 'Pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_totals`
+--
+
+CREATE TABLE `user_totals` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `total_daily_earning` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `total_rewards_points` decimal(10,2) NOT NULL DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
@@ -277,6 +259,13 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`, `random_string`, `referr
 --
 ALTER TABLE `admin_messages`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `bonus_rewards`
+--
+ALTER TABLE `bonus_rewards`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `daily_earnings`
@@ -337,6 +326,18 @@ ALTER TABLE `users`
   ADD KEY `referrer_id` (`referrer_id`);
 
 --
+-- Indexes for table `user_payments`
+--
+ALTER TABLE `user_payments`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `user_totals`
+--
+ALTER TABLE `user_totals`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -344,31 +345,37 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `admin_messages`
 --
 ALTER TABLE `admin_messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `bonus_rewards`
+--
+ALTER TABLE `bonus_rewards`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `daily_earnings`
 --
 ALTER TABLE `daily_earnings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `deposits`
 --
 ALTER TABLE `deposits`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `referral_rewards`
 --
 ALTER TABLE `referral_rewards`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `rewards`
 --
 ALTER TABLE `rewards`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `reward_logs`
@@ -380,23 +387,41 @@ ALTER TABLE `reward_logs`
 -- AUTO_INCREMENT for table `stakings`
 --
 ALTER TABLE `stakings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
 
 --
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=138;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=144;
+
+--
+-- AUTO_INCREMENT for table `user_payments`
+--
+ALTER TABLE `user_payments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `user_totals`
+--
+ALTER TABLE `user_totals`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `bonus_rewards`
+--
+ALTER TABLE `bonus_rewards`
+  ADD CONSTRAINT `bonus_rewards_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `daily_earnings`
