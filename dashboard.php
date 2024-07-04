@@ -387,33 +387,33 @@ $record = isset($record) ? $record : ['total_earning' => 0];
 
 
         <div class="col-12 mb-4">
-    <div class="card">
-        <div class="card-body p-3">
-            <div class="row">
-                <div class="col-12">
-                    <p class="fs-5 mb-3">Total Daily Earning</p>
-                    <?php
-                    // Initialize the total earnings to 0
-                    $total_daily_earnings = 0;
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="fs-5 mb-3">Total Daily Earning</p>
+                            <?php
+                            // Initialize the total earnings to 0
+                            $total_daily_earnings = 0;
 
-                    // Check if there are any daily earnings records and sum their amounts
-                    if (!empty($daily_earnings_records)) {
-                        foreach ($daily_earnings_records as $record) {
-                            $total_daily_earnings += $record['amount'];
-                        }
-                    }
-                    ?>
-                    <h1 class="display-5 mb-4" style="margin-top: -15px;">
-                        $<?php echo htmlspecialchars(number_format($total_daily_earnings, 2)); ?>
-                    </h1>
-                    <p>Total Daily Earning</p>
-                    <!-- Remove the loop as we are only showing the total -->
-                    <!-- <p><a href="#" class="btn btn-info">Daily Earning Record</a></p> -->
+                            // Check if there are any daily earnings records and sum their amounts
+                            if (!empty($daily_earnings_records)) {
+                                foreach ($daily_earnings_records as $record) {
+                                    $total_daily_earnings += $record['amount'];
+                                }
+                            }
+                            ?>
+                            <h1 class="display-5 mb-4" style="margin-top: -15px;">
+                                $<?php echo htmlspecialchars(number_format($total_daily_earnings, 2)); ?>
+                            </h1>
+                            <p>Total Daily Earning</p>
+                            <!-- Remove the loop as we are only showing the total -->
+                            <!-- <p><a href="#" class="btn btn-info">Daily Earning Record</a></p> -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
 
 
