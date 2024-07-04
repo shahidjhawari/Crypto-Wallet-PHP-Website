@@ -24,9 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claim_bonus'])) {
   if ($bonus) {
     $bonus_amount = $bonus['bonus_amount'];
 
-    // Insert or update the amount in the deposits table
-    $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount) VALUES (?, ?) ON DUPLICATE KEY UPDATE amount = amount + ?");
-    $stmt->bind_param("idd", $user_id, $bonus_amount, $bonus_amount);
+    // Insert the amount into the deposits table with status 'accepted'
+    $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, status) VALUES (?, ?, 'accepted')");
+    $stmt->bind_param("id", $user_id, $bonus_amount);
     $stmt->execute();
     $stmt->close();
 
