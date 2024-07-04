@@ -293,8 +293,50 @@ $transaction_status = $transaction_status_row['status'] ?? null;
 $stmt->close();
 
 $record = isset($record) ? $record : ['total_earning' => 0];
-?>
 
+
+
+// Bonus Reward Here Code
+
+// Handle claim button click
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claim_bonus'])) {
+    $bonus_id = $_POST['bonus_id'];
+
+    // Fetch the bonus record
+    $stmt = $conn->prepare("SELECT * FROM bonus_rewards WHERE id = ? AND user_id = ? AND claimed = FALSE");
+    $stmt->bind_param("ii", $bonus_id, $user_id);
+    $stmt->execute();
+    $bonus = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if ($bonus) {
+        $bonus_amount = $bonus['bonus_amount'];
+
+        // Insert the amount into the deposits table with status 'accepted'
+        $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, status) VALUES (?, ?, 'accepted')");
+        $stmt->bind_param("id", $user_id, $bonus_amount);
+        $stmt->execute();
+        $stmt->close();
+
+        // Mark the bonus as claimed
+        $stmt = $conn->prepare("UPDATE bonus_rewards SET claimed = TRUE WHERE id = ?");
+        $stmt->bind_param("i", $bonus_id);
+        $stmt->execute();
+        $stmt->close();
+
+        echo "Bonus claimed successfully.";
+    } else {
+        echo "Invalid bonus or already claimed.";
+    }
+}
+
+// Fetch bonus rewards for the user
+$stmt = $conn->prepare("SELECT * FROM bonus_rewards WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$bonus_rewards = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
+?>
 
 <div class="container-fluid py-4">
     <div class="row">
@@ -453,6 +495,27 @@ $record = isset($record) ? $record : ['total_earning' => 0];
             </div>
         </div>
 
+
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="fs-5 mb-3">Bonus Reward</p>
+                            <?php if (empty($bonus_rewards)) : ?>
+                                <h1 class="display-5 mb-4" style="margin-top: -15px;">$0.00</h1>
+                            <?php else : ?>
+                                <?php foreach ($bonus_rewards as $bonus) : ?>
+                                    <h1 class="display-5 mb-4" style="margin-top: -15px;">$<?php echo htmlspecialchars(number_format($bonus['bonus_amount'], 2)); ?></h1>
+                                    <p><?php echo $bonus['claimed'] ? 'Claimed' : 'Unclaimed'; ?></p>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                            <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
 
