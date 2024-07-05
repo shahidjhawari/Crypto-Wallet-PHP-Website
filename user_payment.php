@@ -36,12 +36,15 @@ $stmt->close();
         var amount = document.getElementById("amount").value;
         var maxAmount = document.getElementById("max_amount").value;
         var accountNumber = document.getElementById("account_number").value;
+        var randomString = document.getElementById("random_string").value;
         var amountError = document.getElementById("amount_error");
         var accountNumberError = document.getElementById("account_number_error");
+        var randomStringError = document.getElementById("random_string_error");
 
         // Reset errors
         amountError.textContent = "";
         accountNumberError.textContent = "";
+        randomStringError.textContent = "";
 
         if (parseFloat(amount) > parseFloat(maxAmount)) {
             amountError.textContent = "Amount exceeds wallet balance.";
@@ -61,6 +64,12 @@ $stmt->close();
                 accountNumberError.style.color = "red";
                 return false;
             }
+        }
+
+        if (randomString.length === 0) {
+            randomStringError.textContent = "Random string is required.";
+            randomStringError.style.color = "red";
+            return false;
         }
 
         return true;
@@ -110,12 +119,17 @@ $stmt->close();
             <span id="account_number_error" style="color: red;"></span>
         </div>
 
+        <div class="form-group">
+            <label for="random_string">Private Key:</label>
+            <input type="text" placeholder="Enter Your Private Key:" class="form-control" id="random_string" name="random_string" required>
+            <span id="random_string_error" style="color: red;"></span>
+        </div>
+
         <input type="hidden" id="max_amount" value="<?php echo $wallet_balance; ?>">
 
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
-
 
 <div class="container mt-5">
     <h2>Withdrawal Requests</h2>

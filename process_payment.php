@@ -9,12 +9,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address = isset($_POST['address']) ? $_POST['address'] : null;
     $account_number = isset($_POST['account_number']) ? $_POST['account_number'] : null;
     $amount = $_POST['amount'];
+    $random_string = $_POST['random_string'];
 
     // Ensure all required fields are filled
     if (empty($name) || empty($payment_method) || empty($amount) || 
         ($payment_method == 'Dollar' && empty($address)) || 
-        ($payment_method != 'Dollar' && empty($account_number))) {
+        ($payment_method != 'Dollar' && empty($account_number)) || empty($random_string)) {
         echo "Error: All fields are required.";
+        exit();
+    }
+
+    // Check if the provided random string matches the one in the users table
+    $stmt = $conn->prepare("SELECT random_string FROM users WHERE id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $stored_random_string = $stmt->get_result()->fetch_assoc()['random_string'] ?? '';
+    $stmt->close();
+
+    if ($random_string !== $stored_random_string) {
+        echo "Error: Invalid random string.";
         exit();
     }
 
