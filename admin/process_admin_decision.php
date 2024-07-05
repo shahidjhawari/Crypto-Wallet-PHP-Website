@@ -4,6 +4,7 @@ session_start();
 require('top.inc.php');
 
 // Ensure only admin can access this script
+// Uncomment these lines if you have role-based access control in your application
 // if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
 //     header("Location: index.php");
 //     exit();
@@ -37,43 +38,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute();
         $stmt->close();
 
-        // If rejected, credit the exact amount back to the user's deposit
-        if ($status === 'Rejected') {
-            // Start a transaction
-            $con->begin_transaction();
-
-            try {
-                // Check the current deposit amount before updating
-                $stmt = $con->prepare("SELECT amount FROM deposits WHERE user_id = ?");
+        if ($status === 'Accepted') {
+            // Deduct the amount from the user's wallet
+            $remaining_to_deduct = $amount;
+            while ($remaining_to_deduct > 0) {
+                $stmt = $con->prepare("SELECT id, amount FROM deposits WHERE user_id = ? AND status = 'Accepted' AND amount > 0 ORDER BY id ASC LIMIT 1");
                 $stmt->bind_param("i", $user_id);
                 $stmt->execute();
-                $result = $stmt->get_result();
-                $deposit = $result->fetch_assoc();
+                $deposit = $stmt->get_result()->fetch_assoc();
                 $stmt->close();
 
                 if ($deposit) {
-                    // Update the deposit with the correct amount
-                    $stmt = $con->prepare("UPDATE deposits SET amount = ? WHERE user_id = ?");
-                    $new_amount = $deposit['amount'] + $amount;
-                    $stmt->bind_param("di", $new_amount, $user_id);
-                    $stmt->execute();
-                    $stmt->close();
-                } else {
-                    // If there's no deposit record, insert a new one
-                    $stmt = $con->prepare("INSERT INTO deposits (user_id, amount) VALUES (?, ?)");
-                    $stmt->bind_param("id", $user_id, $amount);
-                    $stmt->execute();
-                    $stmt->close();
-                }
+                    $deposit_id = $deposit['id'];
+                    $deposit_amount = $deposit['amount'];
 
-                // Commit the transaction
-                $con->commit();
-            } catch (Exception $e) {
-                // Rollback the transaction in case of error
-                $con->rollback();
-                echo "Error: " . $e->getMessage();
-                exit();
+                    if ($deposit_amount >= $remaining_to_deduct) {
+                        $stmt = $con->prepare("UPDATE deposits SET amount = amount - ? WHERE id = ?");
+                        $stmt->bind_param("di", $remaining_to_deduct, $deposit_id);
+                        $stmt->execute();
+                        $stmt->close();
+                        $remaining_to_deduct = 0;
+                    } else {
+                        $stmt = $con->prepare("UPDATE deposits SET amount = 0 WHERE id = ?");
+                        $stmt->bind_param("i", $deposit_id);
+                        $stmt->execute();
+                        $stmt->close();
+                        $remaining_to_deduct -= $deposit_amount;
+                    }
+                } else {
+                    break;
+                }
             }
+        } elseif ($status === 'Rejected') {
+            // No need to do anything if the request is rejected
         }
 
         header("Location: admin_manage_payments.php");
@@ -83,4 +80,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     echo "Invalid request.";
 }
-?>
