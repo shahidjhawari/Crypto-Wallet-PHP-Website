@@ -97,8 +97,8 @@ $stmt->close();
                 <option value="" disabled selected>Select a payment method</option>
                 <option value="Easy Paisa">Easy Paisa</option>
                 <option value="Jazz Cash">Jazz Cash</option>
-                <option value="Simple Pay">Simple Pay</option>
-                <option value="Dollar">Dollar</option>
+                <option value="Simple Pay">Sada Pay</option>
+                <option value="Dollar">USDT</option>
             </select>
         </div>
 
