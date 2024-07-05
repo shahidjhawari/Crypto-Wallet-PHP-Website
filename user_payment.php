@@ -22,14 +22,28 @@ $stmt->close();
         var paymentMethod = document.getElementById("payment_method").value;
         var addressField = document.getElementById("address_field");
         var accountNumberField = document.getElementById("account_number_field");
+        var feeInfo = document.getElementById("fee_info");
+        var amount = document.getElementById("amount").value;
+        var fee = 0;
 
         if (paymentMethod === "Dollar") {
             addressField.style.display = "block";
             accountNumberField.style.display = "none";
+            fee = 0.01 * amount;
+            feeInfo.textContent = "Note: A 1% fee will be deducted.";
+        } else if (paymentMethod === "USDTP") {
+            addressField.style.display = "none";
+            accountNumberField.style.display = "block";
+            fee = 0.01 * amount;
+            feeInfo.textContent = "Note: A 1% fee will be deducted.";
         } else {
             addressField.style.display = "none";
             accountNumberField.style.display = "block";
+            fee = 0.03 * amount;
+            feeInfo.textContent = "Note: A 3% fee will be deducted.";
         }
+
+        document.getElementById("fee_amount").textContent = fee.toFixed(2);
     }
 
     function validateForm() {
@@ -58,7 +72,7 @@ $stmt->close();
             return false;
         }
 
-        if (accountNumberField.style.display === "block") {
+        if (document.getElementById("account_number_field").style.display === "block") {
             if (accountNumber.length !== 11) {
                 accountNumberError.textContent = "Account number must be exactly 11 characters long.";
                 accountNumberError.style.color = "red";
@@ -97,9 +111,10 @@ $stmt->close();
                 <option value="" disabled selected>Select a payment method</option>
                 <option value="Easy Paisa">Easy Paisa</option>
                 <option value="Jazz Cash">Jazz Cash</option>
-                <option value="Simple Pay">Sada Pay</option>
+                <option value="Simple Pay">Simple Pay</option>
                 <option value="Dollar">USDT</option>
             </select>
+            <span id="fee_info" style="color: red;"></span>
         </div>
 
         <div id="address_field" class="form-group" style="display:none;">
@@ -109,7 +124,7 @@ $stmt->close();
 
         <div class="form-group">
             <label for="amount">Amount:</label>
-            <input type="number" class="form-control" id="amount" name="amount" step="0.01" required>
+            <input type="number" class="form-control" id="amount" name="amount" step="0.01" oninput="toggleFields()" required>
             <span id="amount_error" style="color: red;"></span>
         </div>
 
@@ -120,8 +135,8 @@ $stmt->close();
         </div>
 
         <div class="form-group">
-            <label for="random_string">Private Key:</label>
-            <input type="text" placeholder="Enter Your Private Key:" class="form-control" id="random_string" name="random_string" required>
+            <label for="random_string">Random String:</label>
+            <input type="text" class="form-control" id="random_string" name="random_string" required>
             <span id="random_string_error" style="color: red;"></span>
         </div>
 
@@ -129,6 +144,9 @@ $stmt->close();
 
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
+    <div class="mt-3">
+        <p>Estimated Fee: <span id="fee_amount">0.00</span></p>
+    </div>
 </div>
 
 <div class="container mt-5">

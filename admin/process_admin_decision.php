@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Get the payment request details
-    $stmt = $con->prepare("SELECT user_id, amount FROM user_payments WHERE id = ?");
+    $stmt = $con->prepare("SELECT user_id, amount, payment_method FROM user_payments WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -31,6 +31,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($payment) {
         $user_id = $payment['user_id'];
         $amount = $payment['amount'];
+        $payment_method = $payment['payment_method'];
+
+        // Calculate the fee based on the payment method
+        if ($payment_method === "USDTP" || $payment_method === "Dollar") {
+            $fee = 0.01 * $amount;
+        } else {
+            $fee = 0.03 * $amount;
+        }
+        $total_amount = $amount + $fee;
 
         // Update the status of the payment request
         $stmt = $con->prepare("UPDATE user_payments SET status = ? WHERE id = ?");
@@ -39,8 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
 
         if ($status === 'Accepted') {
-            // Deduct the amount from the user's wallet
-            $remaining_to_deduct = $amount;
+            // Deduct the total amount (amount + fee) from the user's wallet
+            $remaining_to_deduct = $total_amount;
             while ($remaining_to_deduct > 0) {
                 $stmt = $con->prepare("SELECT id, amount FROM deposits WHERE user_id = ? AND status = 'Accepted' AND amount > 0 ORDER BY id ASC LIMIT 1");
                 $stmt->bind_param("i", $user_id);

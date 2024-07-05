@@ -12,9 +12,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $random_string = $_POST['random_string'];
 
     // Ensure all required fields are filled
-    if (empty($name) || empty($payment_method) || empty($amount) || 
-        ($payment_method == 'Dollar' && empty($address)) || 
-        ($payment_method != 'Dollar' && empty($account_number)) || empty($random_string)) {
+    if (
+        empty($name) || empty($payment_method) || empty($amount) ||
+        ($payment_method == 'Dollar' && empty($address)) ||
+        ($payment_method != 'Dollar' && empty($account_number)) || empty($random_string)
+    ) {
         echo "Error: All fields are required.";
         exit();
     }
@@ -38,12 +40,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $wallet_balance = $stmt->get_result()->fetch_assoc()['wallet_balance'] ?? 0;
     $stmt->close();
 
-    if ($amount > $wallet_balance) {
+    // Calculate fee
+    if ($payment_method === "USDTP" || $payment_method === "Dollar") {
+        $fee = 0.01 * $amount;
+    } else {
+        $fee = 0.03 * $amount;
+    }
+    $total_amount = $amount + $fee;
+
+    if ($total_amount > $wallet_balance) {
         echo "Error: Insufficient balance.";
         exit();
     }
 
-    // Insert the payment request without deducting the amount
+    // Insert the payment request
     $stmt = $conn->prepare("INSERT INTO user_payments (user_id, name, account_number, payment_method, address, amount, status) VALUES (?, ?, ?, ?, ?, ?, 'Pending')");
     $stmt->bind_param("issssd", $user_id, $name, $account_number, $payment_method, $address, $amount);
     $stmt->execute();
@@ -53,4 +63,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     echo "Invalid request.";
 }
-?>
