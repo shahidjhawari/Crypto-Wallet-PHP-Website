@@ -91,13 +91,15 @@ $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['mes
             </div>
             <div class="form-group">
               <label for="payment_method">Payment Method</label>
-              <select class="form-control" id="payment_method" name="payment_method" required>
+              <select class="form-control" id="payment_method" name="payment_method" onchange="toggleFields()" required>
+                <option value="" disabled selected>Select a payment method</option>
                 <option value="Easy Paisa">Easy Paisa</option>
                 <option value="Valid Cash">Jazz Cash</option>
                 <option value="Simple PA">Sada Pay</option>
                 <option value="USDT">USDT</option>
               </select>
             </div>
+            <div id="additional_fields"></div>
             <div class="form-group">
               <label for="screenshot">Screenshot</label>
               <input type="file" class="form-control-file" id="screenshot" name="screenshot" required>
@@ -112,16 +114,64 @@ $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['mes
 </div>
 
 <script>
-document.getElementById('amount').addEventListener('input', function() {
-  const exchangeRate = <?php echo $exchange_rate; ?>;
-  const usdAmount = parseFloat(this.value);
-  if (!isNaN(usdAmount) && usdAmount > 0) {
-    const pkrAmount = usdAmount * exchangeRate;
-    document.getElementById('converted-amount').innerText = `Equivalent Amount in PKR: ${pkrAmount.toFixed(2)}`;
-  } else {
-    document.getElementById('converted-amount').innerText = '';
+  document.getElementById('amount').addEventListener('input', function() {
+    const exchangeRate = <?php echo $exchange_rate; ?>;
+    const usdAmount = parseFloat(this.value);
+    if (!isNaN(usdAmount) && usdAmount > 0) {
+      const pkrAmount = usdAmount * exchangeRate;
+      document.getElementById('converted-amount').innerText = `Equivalent Amount in PKR: ${pkrAmount.toFixed(2)}`;
+    } else {
+      document.getElementById('converted-amount').innerText = '';
+    }
+  });
+
+  function toggleFields() {
+    var paymentMethod = document.getElementById("payment_method").value;
+    var additionalFields = document.getElementById("additional_fields");
+    additionalFields.innerHTML = ""; // Clear existing fields
+
+    if (paymentMethod === "Easy Paisa") {
+      additionalFields.innerHTML = `
+      <div class="form-group">
+        <label for="account_number">Account Number</label>
+        <input type="text" class="form-control" id="account_number" name="account_number" value="03236645813" readonly>
+      </div>
+      <div class="form-group">
+        <label for="account_name">Account Name</label>
+        <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
+      </div>`;
+    } else if (paymentMethod === "Valid Cash") {
+      additionalFields.innerHTML = `
+      <div class="form-group">
+        <label for="account_number">Account Number</label>
+        <input type="text" class="form-control" id="account_number" name="account_number" value="03046978556" readonly>
+      </div>
+      <div class="form-group">
+        <label for="account_name">Account Name</label>
+        <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
+      </div>`;
+    } else if (paymentMethod === "USDT") {
+      additionalFields.innerHTML = `
+      <div class="form-group">
+        <label for="network">Network</label>
+        <input type="text" class="form-control" id="network" name="network" value="TRC 20" readonly>
+      </div>
+      <div class="form-group">
+        <label for="address">Address</label>
+        <input type="text" class="form-control" id="address" name="address" value="TChLhd7z7vPRT79dq1oCoiDPrWDG3tRA96" readonly>
+      </div>`;
+    } else if (paymentMethod === "Simple PA") {
+      additionalFields.innerHTML = `
+      <div class="form-group">
+        <label for="account_number">Account Number</label>
+        <input type="text" class="form-control" id="account_number" name="account_number" value="03046978556" readonly>
+      </div>
+      <div class="form-group">
+        <label for="account_name">Account Name</label>
+        <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
+      </div>`;
+    }
   }
-});
 </script>
 
 <?php require('footer.php'); ?>
