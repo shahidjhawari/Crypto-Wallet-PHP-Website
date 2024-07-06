@@ -197,6 +197,9 @@ foreach ($staking_records as $record) {
 </style>
 
 <div class="container">
+
+    <!-- Add this message here -->
+
     <h2>Staking</h2>
     <p>Wallet Balance: $<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></p>
 
@@ -269,6 +272,12 @@ foreach ($staking_records as $record) {
             <?php endforeach; ?>
         </tbody>
     </table>
+
+    <div class="alert alert-info">
+        ID to ID transfer is coming soon!
+    </div>
 </div>
+
+
 
 <?php require('footer.php'); ?>
