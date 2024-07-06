@@ -99,6 +99,9 @@ $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['mes
             <button type="submit" class="btn btn-info btn-block">Submit</button>
           </form>
           <p id="converted-amount" class="mt-3">Equivalent Amount in PKR: <?php echo number_format($fixed_amount_pkr, 2); ?></p>
+          <div class="alert alert-info mt-3">
+            By selecting USDT, you will receive a 5% bonus on your deposit!
+          </div>
         </div>
       </div>
     </div>
@@ -139,8 +142,7 @@ $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['mes
         </div>
         <div class="form-group">
           <label for="address">Address</label>
-          <input type="text" class="form-control" id="address" name="address" value="TChLhd7z7vPRT79dq1oCoiDPrWDG3tRA96
-" readonly>
+          <input type="text" class="form-control" id="address" name="address" value="TChLhd7z7vPRT79dq1oCoiDPrWDG3tRA96" readonly>
         </div>`;
     } else if (paymentMethod === "Simple PA") {
       additionalFields.innerHTML = `
