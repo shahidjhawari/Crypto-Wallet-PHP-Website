@@ -348,6 +348,33 @@ $stmt->execute();
 $result = $stmt->get_result();
 $announcements = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
+
+
+
+
+// Withdrawl Code Here
+
+
+// Fetch the user's withdrawal requests
+$stmt = $conn->prepare("SELECT id, amount, payment_method, status, created_at FROM user_payments WHERE user_id = ? ORDER BY created_at DESC");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$stmt->close();
+
+// Fetch accepted payments
+$stmt_accepted = $conn->prepare("SELECT id, amount, payment_method, created_at FROM user_payments WHERE user_id = ? AND status = 'Accepted' ORDER BY created_at DESC");
+$stmt_accepted->bind_param("i", $user_id);
+$stmt_accepted->execute();
+$result_accepted = $stmt_accepted->get_result();
+$stmt_accepted->close();
+
+// Calculate the total amount of accepted payments
+$total_accepted_amount = 0;
+while ($row_accepted = $result_accepted->fetch_assoc()) {
+    $total_accepted_amount += $row_accepted['amount'];
+    $accepted_payments[] = $row_accepted;
+}
 ?>
 
 <div class="container-fluid py-4">
@@ -537,13 +564,16 @@ $stmt->close();
                     <div class="row">
                         <div class="col-12">
                             <p class="fs-5 mb-3">Withdraw</p>
-                            <h1 class="display-5 mb-4" style="margin-top: -15px;">$0.00</h1>
+                            <h1 class="display-5 mb-4" style="margin-top: -15px;">
+                                $<?php echo number_format(isset($total_accepted_amount) ? $total_accepted_amount : 0, 2); ?>
+                            </h1>
                             <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
         <!-- Other content rows -->
 
         <div class="col-12 mb-4">
