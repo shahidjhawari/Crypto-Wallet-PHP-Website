@@ -147,6 +147,9 @@ $stmt->close();
     <div class="mt-3">
         <p>Estimated Fee: <span id="fee_amount">0.00</span></p>
     </div>
+    <div class="alert alert-info mt-3" role="alert">
+        Your withdrawal request will be reviewed on working days.
+    </div>
 </div>
 
 <div class="container mt-5">
