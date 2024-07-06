@@ -98,7 +98,7 @@ $stmt->close();
 </style>
 
 <div class="container">
-    <h2 class="mt-5">Payment Form</h2>
+    <h2 class="mt-5">Withdrawal Requests Form</h2>
     <form action="process_payment.php" method="post" onsubmit="return validateForm();">
         <div class="form-group">
             <label for="name">Name:</label>
