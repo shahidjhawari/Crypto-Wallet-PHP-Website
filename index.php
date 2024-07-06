@@ -111,8 +111,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 <?php if ($showRandomKeyField) : ?>
                     <div class="form-group">
-                        <label for="random_string">Random Key *</label>
-                        <input type="text" class="form-control" id="random_string" name="random_string" placeholder="Enter random key">
+                        <label for="random_string">Private Key *</label>
+                        <input type="text" class="form-control" id="random_string" name="random_string" placeholder="Private Key">
                     </div>
                 <?php endif; ?>
                 <div class="form-group text-right">

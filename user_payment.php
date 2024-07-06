@@ -135,8 +135,8 @@ $stmt->close();
         </div>
 
         <div class="form-group">
-            <label for="random_string">Random String:</label>
-            <input type="text" class="form-control" id="random_string" name="random_string" required>
+            <label for="random_string">Private Key:</label>
+            <input placeholder="Enter Private Key" type="text" class="form-control" id="random_string" name="random_string" required>
             <span id="random_string_error" style="color: red;"></span>
         </div>
 
