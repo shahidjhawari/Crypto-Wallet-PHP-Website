@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt2->bind_result($transaction_id);
             while ($stmt2->fetch()) {
                 // Reward referrer
-                rewardReferrer($referrer_id, 10, 1);
+                rewardReferrer($referrer_id, 5, 1);
 
                 // Mark the transaction as rewarded
                 $stmt3 = $con->prepare("UPDATE transactions SET rewarded = TRUE WHERE id = ?");
