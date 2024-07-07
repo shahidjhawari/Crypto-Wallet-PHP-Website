@@ -1,15 +1,15 @@
 <?php
 session_start();
-// $con=mysqli_connect("localhost","root","","coin");
-// define('SERVER_PATH',$_SERVER['DOCUMENT_ROOT'].'/coin/');
-// define('SITE_PATH','http://localhost/coin/');
+$con=mysqli_connect("localhost","root","","coin");
+define('SERVER_PATH',$_SERVER['DOCUMENT_ROOT'].'/coin/');
+define('SITE_PATH','http://localhost/coin/');
 
 
 // Online Code Here
 
-$con = mysqli_connect("sql206.infinityfree.com", "if0_36853949", "ZkQAKes45YF34", "if0_36853949_coin");
-define('SERVER_PATH', $_SERVER['DOCUMENT_ROOT'] . '/');
-define('SITE_PATH', 'http://stackinghub.rf.gd/');
+// $con = mysqli_connect("sql206.infinityfree.com", "if0_36853949", "ZkQAKes45YF34", "if0_36853949_coin");
+// define('SERVER_PATH', $_SERVER['DOCUMENT_ROOT'] . '/');
+// define('SITE_PATH', 'http://stackinghub.rf.gd/');
 
 define('PRODUCT_IMAGE_SERVER_PATH', SERVER_PATH . 'media/product/');
 define('PRODUCT_IMAGE_SITE_PATH', SITE_PATH . 'media/product/');
