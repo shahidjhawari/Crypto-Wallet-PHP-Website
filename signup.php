@@ -92,6 +92,20 @@ function rewardReferrer($referrer_id, $points, $level)
         return;
     }
 
+    // Check deposit amounts for levels
+    if ($level == 2 || $level == 3) {
+        $required_amount = ($level == 2) ? 30 : 50;
+        $stmt = $conn->prepare("SELECT SUM(amount) AS total_deposited FROM deposits WHERE user_id = ?");
+        $stmt->bind_param("i", $referrer_id);
+        $stmt->execute();
+        $total_deposited = $stmt->get_result()->fetch_assoc()['total_deposited'] ?? 0;
+        $stmt->close();
+
+        if ($total_deposited < $required_amount) {
+            return; // Do not add rewards if the required deposit amount is not met
+        }
+    }
+
     // Update rewards and level count for the current referrer
     if ($level == 1) {
         $stmt = $conn->prepare("UPDATE rewards SET reward_points = reward_points + ?, referral_count = referral_count + 1, level_one_count = level_one_count + 1 WHERE user_id = ?");
@@ -100,7 +114,11 @@ function rewardReferrer($referrer_id, $points, $level)
     } else {
         $stmt = $conn->prepare("UPDATE rewards SET reward_points = reward_points + ?, level_three_count = level_three_count + 1 WHERE user_id = ?");
     }
-    $stmt->bind_param("ii", $points, $referrer_id);
+
+    // Adjust the points here
+    $adjusted_points = ($points == 10) ? 5 : $points;
+    
+    $stmt->bind_param("ii", $adjusted_points, $referrer_id);
     $stmt->execute();
     $stmt->close();
 
@@ -120,6 +138,8 @@ function rewardReferrer($referrer_id, $points, $level)
         }
     }
 }
+
+
 ?>
 
 

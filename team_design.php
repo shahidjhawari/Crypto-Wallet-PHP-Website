@@ -28,7 +28,14 @@ $stmt->close();
 $referral_code = $user_referral['referral_code'];
 $referral_link = SITE_PATH . "/signup.php?referral=" . $referral_code;
 
-// Check if rewards have been claimed
+// Calculate the claimable amount from referral rewards
+$stmt = $conn->prepare("SELECT SUM(reward_amount) AS total_rewards FROM referral_rewards WHERE referrer_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$total_rewards = $stmt->get_result()->fetch_assoc()['total_rewards'] ?? 0;
+$stmt->close();
+
+// Fetch the total claimed rewards
 $stmt = $conn->prepare("SELECT SUM(amount) AS total_claimed FROM deposits WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -36,8 +43,8 @@ $total_claimed = $stmt->get_result()->fetch_assoc()['total_claimed'] ?? 0;
 $stmt->close();
 
 // Calculate the claimable amount
-$claimable_amount = $user_rewards['reward_points'] - $total_claimed;
-
+$claimable_amount = $total_rewards - $total_claimed;
+$claimable_amount = max(0, $claimable_amount);
 
 // Fetch the user's transaction status
 $stmt = $conn->prepare("SELECT status FROM transactions WHERE user_id = ? ORDER BY id DESC LIMIT 1");
@@ -46,6 +53,33 @@ $stmt->execute();
 $transaction_status_row = $stmt->get_result()->fetch_assoc();
 $transaction_status = $transaction_status_row['status'] ?? null;
 $stmt->close();
+
+// Check total deposits
+$stmt = $conn->prepare("SELECT SUM(amount) AS total_deposited FROM deposits WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$total_deposited = $stmt->get_result()->fetch_assoc()['total_deposited'] ?? 0;
+$stmt->close();
+
+$level_two_locked = $total_deposited < 30;
+$level_three_locked = $total_deposited < 50;
+
+
+
+
+
+// Fetch referral rewards for the logged-in user
+$stmt = $conn->prepare("
+    SELECT rr.*, u.name AS referred_user
+    FROM referral_rewards rr
+    JOIN users u ON rr.referred_user_id = u.id
+    WHERE rr.referrer_id = ?
+    ORDER BY rr.reward_date DESC
+");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
 ?>
 
 <style>
@@ -53,6 +87,19 @@ $stmt->close();
         padding: 15px;
         background: #070F2B;
         border-radius: 10px;
+    }
+
+    .locked {
+        color: #ccc;
+    }
+
+    .unlocked {
+        color: #28a745;
+    }
+
+    th,
+    td {
+        color: white;
     }
 </style>
 
@@ -62,11 +109,31 @@ $stmt->close();
         <div class="card-body p-3">
             <div class="row">
                 <div class="col-12">
-                    <p>Your Reward Points: <?php echo htmlspecialchars($user_rewards['reward_points']); ?></p>
+                    <p>Your Reward Points: $<?php echo htmlspecialchars($user_rewards['reward_points']) ?>.00</p>
                     <p>Referral Count: <?php echo htmlspecialchars($user_rewards['referral_count']); ?></p>
-                    <p>Level One Count: <?php echo htmlspecialchars($user_rewards['level_one_count']); ?></p>
-                    <p>Level Two Count: <?php echo htmlspecialchars($user_rewards['level_two_count']); ?></p>
-                    <p>Level Three Count: <?php echo htmlspecialchars($user_rewards['level_three_count']); ?></p>
+                    <p>
+                        Level One Count:
+                        <?php echo  htmlspecialchars($user_rewards['level_one_count']); ?>
+                        <i class="fa fa-unlock unlocked"></i>
+                    </p>
+                    <p>
+                        Level Two Count:
+                        <?php echo htmlspecialchars($user_rewards['level_two_count']); ?>
+                        <?php if ($level_two_locked) : ?>
+                            <i class="fa fa-lock locked"></i> <small>(Unlock with $30 deposit)</small>
+                        <?php else : ?>
+                            <i class="fa fa-unlock unlocked"></i>
+                        <?php endif; ?>
+                    </p>
+                    <p>
+                        Level Three Count:
+                        <?php echo htmlspecialchars($user_rewards['level_three_count']); ?>
+                        <?php if ($level_three_locked) : ?>
+                            <i class="fa fa-lock locked"></i> <small>(Unlock with $50 deposit)</small>
+                        <?php else : ?>
+                            <i class="fa fa-unlock unlocked"></i>
+                        <?php endif; ?>
+                    </p>
                     <p>Referral Link: <?php echo htmlspecialchars($referral_link); ?></p>
                     <p>Claimable Amount: $<?php echo htmlspecialchars(number_format($claimable_amount, 2)); ?></p>
                 </div>
@@ -83,11 +150,40 @@ $stmt->close();
             <button type="submit" class="btn btn-primary">Claim Rewards</button>
         <?php } else { ?>
             <button type="submit" class="btn btn-primary" disabled>Claim Rewards</button>
-            <span>please activate account to claim rewar</span>
+            <span>Please activate account to claim rewards.</span>
         <?php } ?>
     </form>
 <?php else : ?>
     <p>No rewards to claim.</p>
 <?php endif; ?>
+
+
+<div class="container mt-5">
+    <h1>Referral Rewards</h1>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th>Referred User</th>
+                <th>Daily Earning Amount ($)</th>
+                <th>Reward Percentage (%)</th>
+                <th>Reward Amount ($)</th>
+                <th>User 10% Reward ($)</th>
+                <th>User 10% Reward ($)</th>
+                <th>Reward Date</th>
+            </tr>
+            <?php while ($row = $result->fetch_assoc()) : ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($row['referred_user']); ?></td>
+                    <td><?php echo htmlspecialchars($row['daily_earning_amount']); ?></td>
+                    <td><?php echo htmlspecialchars($row['reward_percentage']); ?></td>
+                    <td><?php echo htmlspecialchars($row['reward_amount']); ?></td>
+                    <td><?php echo htmlspecialchars($row['user_10_percent_reward']); ?></td>
+                    <td><?php echo htmlspecialchars($row['reward_date']); ?></td>
+                </tr>
+            <?php endwhile; ?>
+        </table>
+    </div>
+</div>
+
 
 <?php require('footer.php'); ?>
