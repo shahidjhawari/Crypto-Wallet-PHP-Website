@@ -113,7 +113,9 @@ $result = $stmt->get_result();
                             <i class="fa fa-unlock unlocked"></i>
                         <?php endif; ?>
                     </p>
-                    <p>Referral Link: <?php echo htmlspecialchars($referral_link); ?></p>
+                    <p>Referral Link: <span id="referral-link"><?php echo htmlspecialchars($referral_link); ?></span></p>
+                    <button onclick="copyReferralLink()" class="btn btn-secondary">Copy Link</button>
+                    <span id="copy-success" style="display:none; color: green; margin-left: 10px;">Copied!</span>
                     <p>Claimable Amount: $<?php echo htmlspecialchars(number_format($claimable_amount, 2)); ?></p>
                 </div>
             </div>
@@ -157,3 +159,18 @@ $result = $stmt->get_result();
 </div>
 
 <?php require('footer.php'); ?>
+
+<script>
+function copyReferralLink() {
+    var referralLink = document.getElementById("referral-link").textContent;
+    navigator.clipboard.writeText(referralLink).then(function() {
+        var copySuccess = document.getElementById("copy-success");
+        copySuccess.style.display = "inline";
+        setTimeout(function() {
+            copySuccess.style.display = "none";
+        }, 2000);
+    }, function() {
+        alert("Failed to copy the link.");
+    });
+}
+</script>
