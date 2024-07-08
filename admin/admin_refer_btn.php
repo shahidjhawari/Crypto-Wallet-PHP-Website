@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($stmt2->num_rows > 0) {
             $stmt2->bind_result($transaction_id);
             while ($stmt2->fetch()) {
-                // Reward referrer
+                // Reward referrer only for level 1
                 rewardReferrer($referrer_id, 5, 1);
 
                 // Mark the transaction as rewarded
@@ -44,24 +44,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 function rewardReferrer($referrer_id, $points, $level)
 {
     global $con;
-    if ($level > 3) {
+    if ($level > 1) {
         return;
     }
 
     // Update rewards and level count for the current referrer
     if ($level == 1) {
         $stmt = $con->prepare("UPDATE rewards SET reward_points = reward_points + ?, referral_count = referral_count + 1, level_one_count = level_one_count + 1 WHERE user_id = ?");
-    } elseif ($level == 2) {
-        $stmt = $con->prepare("UPDATE rewards SET reward_points = reward_points + ?, level_two_count = level_two_count + 1 WHERE user_id = ?");
-    } else {
-        $stmt = $con->prepare("UPDATE rewards SET reward_points = reward_points + ?, level_three_count = level_three_count + 1 WHERE user_id = ?");
-    }
-    $stmt->bind_param("ii", $points, $referrer_id);
-    $stmt->execute();
-    $stmt->close();
+        $stmt->bind_param("ii", $points, $referrer_id);
+        $stmt->execute();
+        $stmt->close();
 
-    if ($level < 3) {
-        // Get the next level referrer
+        // Get the next level referrer for further levels but do not reward them
         $stmt = $con->prepare("SELECT referrer_id FROM users WHERE id = ?");
         $stmt->bind_param("i", $referrer_id);
         $stmt->execute();
@@ -70,9 +64,7 @@ function rewardReferrer($referrer_id, $points, $level)
         $stmt->close();
 
         if ($next_referrer_id !== null) {
-            // Determine points for the next level
-            $next_points = ($level == 1) ? 5 : 2;
-            rewardReferrer($next_referrer_id, $next_points, $level + 1);
+            rewardReferrer($next_referrer_id, 0, $level + 1);
         }
     }
 }
