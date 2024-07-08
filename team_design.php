@@ -28,23 +28,8 @@ $stmt->close();
 $referral_code = $user_referral['referral_code'];
 $referral_link = SITE_PATH . "/signup.php?referral=" . $referral_code;
 
-// Calculate the claimable amount from referral rewards
-$stmt = $conn->prepare("SELECT SUM(reward_amount) AS total_rewards FROM referral_rewards WHERE referrer_id = ?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$total_rewards = $stmt->get_result()->fetch_assoc()['total_rewards'] ?? 0;
-$stmt->close();
-
-// Fetch the total claimed rewards
-$stmt = $conn->prepare("SELECT SUM(amount) AS total_claimed FROM deposits WHERE user_id = ?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$total_claimed = $stmt->get_result()->fetch_assoc()['total_claimed'] ?? 0;
-$stmt->close();
-
-// Calculate the claimable amount
-$claimable_amount = $total_rewards - $total_claimed;
-$claimable_amount = max(0, $claimable_amount);
+// Calculate the claimable amount from reward points
+$claimable_amount = floatval($user_rewards['reward_points']);
 
 // Fetch the user's transaction status
 $stmt = $conn->prepare("SELECT status FROM transactions WHERE user_id = ? ORDER BY id DESC LIMIT 1");
@@ -64,10 +49,6 @@ $stmt->close();
 $level_two_locked = $total_deposited < 30;
 $level_three_locked = $total_deposited < 50;
 
-
-
-
-
 // Fetch referral rewards for the logged-in user
 $stmt = $conn->prepare("
     SELECT rr.*, u.name AS referred_user
@@ -79,7 +60,6 @@ $stmt = $conn->prepare("
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
-
 ?>
 
 <style>
@@ -102,7 +82,6 @@ $result = $stmt->get_result();
         color: white;
     }
 </style>
-
 
 <div class="col-12 mb-4">
     <div class="card">
@@ -145,18 +124,11 @@ $result = $stmt->get_result();
 <?php if ($claimable_amount > 0) : ?>
     <form action="claim_refer_rewards.php" method="post">
         <input type="hidden" name="claim_amount" value="<?php echo htmlspecialchars($claimable_amount); ?>">
-
-        <?php if ($transaction_status === "accepted") { ?>
-            <button type="submit" class="btn btn-primary">Claim Rewards</button>
-        <?php } else { ?>
-            <button type="submit" class="btn btn-primary" disabled>Claim Rewards</button>
-            <span>Please activate account to claim rewards.</span>
-        <?php } ?>
+        <button type="submit" class="btn btn-primary">Claim Rewards</button>
     </form>
 <?php else : ?>
     <p>No rewards to claim.</p>
 <?php endif; ?>
-
 
 <div class="container mt-5">
     <h1>Referral Rewards</h1>
@@ -167,7 +139,6 @@ $result = $stmt->get_result();
                 <th>Daily Earning Amount ($)</th>
                 <th>Reward Percentage (%)</th>
                 <th>Reward Amount ($)</th>
-                <th>User 10% Reward ($)</th>
                 <th>User 10% Reward ($)</th>
                 <th>Reward Date</th>
             </tr>
@@ -184,6 +155,5 @@ $result = $stmt->get_result();
         </table>
     </div>
 </div>
-
 
 <?php require('footer.php'); ?>
