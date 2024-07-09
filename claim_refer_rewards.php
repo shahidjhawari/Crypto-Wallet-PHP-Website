@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->execute();
             $stmt->close();
 
-            header("Location: refer_page.php?claim_success=1");
+            header("Location: team_design.php");
             exit();
         } else {
             echo "Error: " . $stmt->error;

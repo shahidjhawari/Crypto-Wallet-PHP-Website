@@ -92,7 +92,7 @@ $result = $stmt->get_result();
                     <p>Referral Count: <?php echo htmlspecialchars($user_rewards['referral_count']); ?></p>
                     <p>
                         Level One Count:
-                        <?php echo  htmlspecialchars($user_rewards['level_one_count']); ?>
+                        <?php echo htmlspecialchars($user_rewards['level_one_count']); ?>
                         <i class="fa fa-unlock unlocked"></i>
                     </p>
                     <p>
@@ -143,6 +143,7 @@ $result = $stmt->get_result();
                 <th>Reward Amount ($)</th>
                 <th>User 10% Reward ($)</th>
                 <th>Reward Date</th>
+                <th>Action</th>
             </tr>
             <?php while ($row = $result->fetch_assoc()) : ?>
                 <tr>
@@ -152,6 +153,16 @@ $result = $stmt->get_result();
                     <td><?php echo htmlspecialchars($row['reward_amount']); ?></td>
                     <td><?php echo htmlspecialchars($row['user_10_percent_reward']); ?></td>
                     <td><?php echo htmlspecialchars($row['reward_date']); ?></td>
+                    <td>
+                        <?php if (floatval($row['user_10_percent_reward']) > 0) : ?>
+                            <form action="claim_user_reward.php" method="post">
+                                <input type="hidden" name="reward_id" value="<?php echo htmlspecialchars($row['id']); ?>">
+                                <button type="submit" class="btn btn-success">Claim Now</button>
+                            </form>
+                        <?php else : ?>
+                            <span>Reward Claimed</span>
+                        <?php endif; ?>
+                    </td>
                 </tr>
             <?php endwhile; ?>
         </table>
@@ -161,16 +172,16 @@ $result = $stmt->get_result();
 <?php require('footer.php'); ?>
 
 <script>
-function copyReferralLink() {
-    var referralLink = document.getElementById("referral-link").textContent;
-    navigator.clipboard.writeText(referralLink).then(function() {
-        var copySuccess = document.getElementById("copy-success");
-        copySuccess.style.display = "inline";
-        setTimeout(function() {
-            copySuccess.style.display = "none";
-        }, 2000);
-    }, function() {
-        alert("Failed to copy the link.");
-    });
-}
+    function copyReferralLink() {
+        var referralLink = document.getElementById("referral-link").textContent;
+        navigator.clipboard.writeText(referralLink).then(function() {
+            var copySuccess = document.getElementById("copy-success");
+            copySuccess.style.display = "inline";
+            setTimeout(function() {
+                copySuccess.style.display = "none";
+            }, 2000);
+        }, function() {
+            alert("Failed to copy the link.");
+        });
+    }
 </script>
