@@ -38,18 +38,30 @@ foreach ($staking_records as $staking) {
         $staking['total_earning'] += $daily_earning;
         $staking['remaining_earning'] -= $daily_earning;
 
-        // Insert daily earning record
-        $stmt = $con->prepare("INSERT INTO daily_earnings (user_id, staking_id, date, amount) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("iisd", $user_id, $staking_id, $today_str, $daily_earning);
+        // Check if user exists in users table before inserting
+        $stmt = $con->prepare("SELECT id FROM users WHERE id = ?");
+        $stmt->bind_param("i", $user_id);
         $stmt->execute();
-        $stmt->close();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->close();
 
-        // Update total earned, remaining earnings, and daily calculation count
-        $is_tripled = (int)($staking['total_earning'] >= 3 * $staking['amount']);
-        $stmt = $con->prepare("UPDATE stakings SET total_earning = ?, remaining_earning = ?, is_tripled = ?, daily_calculation_count = daily_calculation_count + 1 WHERE id = ?");
-        $stmt->bind_param("ddii", $staking['total_earning'], $staking['remaining_earning'], $is_tripled, $staking_id);
-        $stmt->execute();
-        $stmt->close();
+            // Insert daily earning record
+            $stmt = $con->prepare("INSERT INTO daily_earnings (user_id, staking_id, date, amount) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("iisd", $user_id, $staking_id, $today_str, $daily_earning);
+            $stmt->execute();
+            $stmt->close();
+
+            // Update total earned, remaining earnings, and daily calculation count
+            $is_tripled = (int)($staking['total_earning'] >= 3 * $staking['amount']);
+            $stmt = $con->prepare("UPDATE stakings SET total_earning = ?, remaining_earning = ?, is_tripled = ?, daily_calculation_count = daily_calculation_count + 1 WHERE id = ?");
+            $stmt->bind_param("ddii", $staking['total_earning'], $staking['remaining_earning'], $is_tripled, $staking_id);
+            $stmt->execute();
+            $stmt->close();
+        } else {
+            $stmt->close();
+            error_log("User ID $user_id does not exist in users table.");
+        }
     }
 }
 
