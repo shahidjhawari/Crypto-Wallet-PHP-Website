@@ -1,4 +1,5 @@
 <?php
+ob_start();
 require('top.inc.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
