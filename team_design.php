@@ -157,7 +157,13 @@ $result = $stmt->get_result();
                         <?php if (floatval($row['user_10_percent_reward']) > 0) : ?>
                             <form action="claim_user_reward.php" method="post">
                                 <input type="hidden" name="reward_id" value="<?php echo htmlspecialchars($row['id']); ?>">
-                                <button type="submit" class="btn btn-success">Claim Now</button>
+                                <?php if ($row['reward_percentage'] == 5 && $level_two_locked) : ?>
+                                    <button type="submit" class="btn btn-success" disabled>Claim Now</button>
+                                <?php elseif ($row['reward_percentage'] == 10 && $level_three_locked) : ?>
+                                    <button type="submit" class="btn btn-success" disabled>Claim Now</button>
+                                <?php else : ?>
+                                    <button type="submit" class="btn btn-success">Claim Now</button>
+                                <?php endif; ?>
                             </form>
                         <?php else : ?>
                             <span>Reward Claimed</span>
