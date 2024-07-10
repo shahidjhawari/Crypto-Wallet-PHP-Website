@@ -46,6 +46,7 @@ $stmt->execute();
 $total_deposited = $stmt->get_result()->fetch_assoc()['total_deposited'] ?? 0;
 $stmt->close();
 
+$level_one_locked = false; // Assuming level one is always unlocked
 $level_two_locked = $total_deposited < 30;
 $level_three_locked = $total_deposited < 50;
 
@@ -157,9 +158,11 @@ $result = $stmt->get_result();
                         <?php if (floatval($row['user_10_percent_reward']) > 0) : ?>
                             <form action="claim_user_reward.php" method="post">
                                 <input type="hidden" name="reward_id" value="<?php echo htmlspecialchars($row['id']); ?>">
-                                <?php if ($row['reward_percentage'] == 5 && $level_two_locked) : ?>
+                                <?php if ($row['reward_percentage'] == 10 && $level_one_locked) : ?>
                                     <button type="submit" class="btn btn-success" disabled>Claim Now</button>
-                                <?php elseif ($row['reward_percentage'] == 10 && $level_three_locked) : ?>
+                                <?php elseif ($row['reward_percentage'] == 5 && $level_two_locked) : ?>
+                                    <button type="submit" class="btn btn-success" disabled>Claim Now</button>
+                                <?php elseif ($row['reward_percentage'] == 2 && $level_three_locked) : ?>
                                     <button type="submit" class="btn btn-success" disabled>Claim Now</button>
                                 <?php else : ?>
                                     <button type="submit" class="btn btn-success">Claim Now</button>
