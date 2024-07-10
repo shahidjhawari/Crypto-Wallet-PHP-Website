@@ -52,7 +52,12 @@ $level_three_locked = $total_deposited < 50;
 
 // Fetch referral rewards for the logged-in user
 $stmt = $conn->prepare("
-    SELECT rr.*, u.name AS referred_user
+    SELECT rr.*, u.name AS referred_user,
+           CASE
+               WHEN rr.reward_percentage = 10 THEN 'Level 1'
+               WHEN rr.reward_percentage = 5 THEN 'Level 2'
+               WHEN rr.reward_percentage = 2 THEN 'Level 3'
+           END AS reward_level
     FROM referral_rewards rr
     JOIN users u ON rr.referred_user_id = u.id
     WHERE rr.referrer_id = ?
@@ -144,6 +149,7 @@ $result = $stmt->get_result();
                 <th>Reward Amount ($)</th>
                 <th>User 10% Reward ($)</th>
                 <th>Reward Date</th>
+                <th>Level</th>
                 <th>Action</th>
             </tr>
             <?php while ($row = $result->fetch_assoc()) : ?>
@@ -154,6 +160,7 @@ $result = $stmt->get_result();
                     <td><?php echo htmlspecialchars($row['reward_amount']); ?></td>
                     <td><?php echo htmlspecialchars($row['user_10_percent_reward']); ?></td>
                     <td><?php echo htmlspecialchars($row['reward_date']); ?></td>
+                    <td><?php echo htmlspecialchars($row['reward_level']); ?></td>
                     <td>
                         <?php if (floatval($row['user_10_percent_reward']) > 0) : ?>
                             <form action="claim_user_reward.php" method="post">
