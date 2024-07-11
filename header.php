@@ -43,8 +43,14 @@
                     <li class="nav-item">
                         <a class="nav-link" href="wallet_design.php">Wallet</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="staking.php">Stacking</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="transactionsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Transactions
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="transactionsDropdown">
+                            <li><a class="dropdown-item" href="deposit.php">Deposit</a></li>
+                            <li><a class="dropdown-item" href="withdrawal.php">Withdrawal</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="team_design.php">Team Building</a>
