@@ -1,58 +1,58 @@
 <?php
 // calculate_daily_earnings.php
-ob_start();
-session_start();
-require('header.php');
+// ob_start();
+// session_start();
+// require('header.php');
 
 // Ensure only admin can access this script
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
-    header("Location: index.php");
-    exit();
-}
+// if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
+//     header("Location: index.php");
+//     exit();
+// }
 
-if (!isset($_POST['percentage'])) {
-    echo "No percentage specified.";
-    exit();
-}
+// if (!isset($_POST['percentage'])) {
+//     echo "No percentage specified.";
+//     exit();
+// }
 
-$percentage = floatval($_POST['percentage']);
+// $percentage = floatval($_POST['percentage']);
 
 // Fetch all active stakings
-$stmt = $conn->prepare("SELECT * FROM stakings WHERE status = 'active' AND is_tripled = 0");
-$stmt->execute();
-$staking_records = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+// $stmt = $conn->prepare("SELECT * FROM stakings WHERE status = 'active' AND is_tripled = 0");
+// $stmt->execute();
+// $staking_records = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+// $stmt->close();
 
-$today = new DateTime();
-$today_str = $today->format('Y-m-d');
+// $today = new DateTime();
+// $today_str = $today->format('Y-m-d');
 
-foreach ($staking_records as $staking) {
-    $user_id = $staking['user_id'];
-    $staking_id = $staking['id'];
-    $start_date = new DateTime($staking['created_at']);
-    $interval = $start_date->diff($today)->days;
+// foreach ($staking_records as $staking) {
+//     $user_id = $staking['user_id'];
+//     $staking_id = $staking['id'];
+//     $start_date = new DateTime($staking['created_at']);
+//     $interval = $start_date->diff($today)->days;
 
     // Ensure not to recalculate the first day's earnings
-    if ($interval >= 0) {
-        // Calculate the correct percentage based on the provided percentage
-        $daily_earning = $staking['amount'] * $percentage;
-        $staking['total_earning'] += $daily_earning;
-        $staking['remaining_earning'] -= $daily_earning;
+    // if ($interval >= 0) {
+    //     // Calculate the correct percentage based on the provided percentage
+    //     $daily_earning = $staking['amount'] * $percentage;
+    //     $staking['total_earning'] += $daily_earning;
+    //     $staking['remaining_earning'] -= $daily_earning;
 
         // Insert daily earning record
-        $stmt = $conn->prepare("INSERT INTO daily_earnings (user_id, staking_id, date, amount) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("iisd", $user_id, $staking_id, $today_str, $daily_earning);
-        $stmt->execute();
-        $stmt->close();
+        // $stmt = $conn->prepare("INSERT INTO daily_earnings (user_id, staking_id, date, amount) VALUES (?, ?, ?, ?)");
+        // $stmt->bind_param("iisd", $user_id, $staking_id, $today_str, $daily_earning);
+        // $stmt->execute();
+        // $stmt->close();
 
         // Update total earned, remaining earnings, and daily calculation count
-        $is_tripled = (int)($staking['total_earning'] >= 3 * $staking['amount']);
-        $stmt = $conn->prepare("UPDATE stakings SET total_earning = ?, remaining_earning = ?, is_tripled = ?, daily_calculation_count = daily_calculation_count + 1 WHERE id = ?");
-        $stmt->bind_param("ddii", $staking['total_earning'], $staking['remaining_earning'], $is_tripled, $staking_id);
-        $stmt->execute();
-        $stmt->close();
-    }
-}
+//         $is_tripled = (int)($staking['total_earning'] >= 3 * $staking['amount']);
+//         $stmt = $conn->prepare("UPDATE stakings SET total_earning = ?, remaining_earning = ?, is_tripled = ?, daily_calculation_count = daily_calculation_count + 1 WHERE id = ?");
+//         $stmt->bind_param("ddii", $staking['total_earning'], $staking['remaining_earning'], $is_tripled, $staking_id);
+//         $stmt->execute();
+//         $stmt->close();
+//     }
+// }
 
-echo "Daily earnings calculated successfully.";
+// echo "Daily earnings calculated successfully.";
 ?>
