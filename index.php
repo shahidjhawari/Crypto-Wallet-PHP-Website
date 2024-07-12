@@ -2,8 +2,6 @@
 require('header.php');
 session_start();
 
-$showRandomKeyField = !(isset($_SESSION['viewed_key']) && $_SESSION['viewed_key']);
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     function test_input($data) {
         $data = trim($data);
@@ -14,34 +12,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $email = test_input($_POST["email"]);
     $password = test_input($_POST["password"]);
-    $random_string = $showRandomKeyField ? test_input($_POST["random_string"]) : null;
 
-    $stmt = $conn->prepare("SELECT id, password, random_string, name FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT id, password, name FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
 
     $emailError = "";
     $passwordError = "";
-    $randomStringError = "";
 
     if ($stmt->num_rows > 0) {
-        $stmt->bind_result($id, $hashed_password, $stored_random_string, $name);
+        $stmt->bind_result($id, $hashed_password, $name);
         $stmt->fetch();
 
         if (!password_verify($password, $hashed_password)) {
             $passwordError = "Invalid password.";
         }
 
-        if ($showRandomKeyField && $random_string !== $stored_random_string) {
-            $randomStringError = "Invalid random key.";
-        }
-
-        if (empty($passwordError) && empty($randomStringError)) {
+        if (empty($passwordError)) {
             $_SESSION['user_id'] = $id;
             $_SESSION['user_name'] = $name;
-            $_SESSION['random_string'] = $stored_random_string;
-            $_SESSION['viewed_key'] = true;
             $_SESSION['login_time'] = time(); // Store the login time
             header("Location: dashboard.php");
             exit();
@@ -96,9 +86,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (!empty($passwordError)) {
                 echo '<p class="error-message">' . $passwordError . '</p>';
             }
-            if (!empty($randomStringError)) {
-                echo '<p class="error-message">' . $randomStringError . '</p>';
-            }
             ?>
             <form method="post" autocomplete="off">
                 <div class="form-group">
@@ -109,12 +96,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label for="password">Password *</label>
                     <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
                 </div>
-                <?php if ($showRandomKeyField) : ?>
-                    <div class="form-group">
-                        <label for="random_string">Private Key *</label>
-                        <input type="text" class="form-control" id="random_string" name="random_string" placeholder="Private Key">
-                    </div>
-                <?php endif; ?>
                 <div class="form-group text-right">
                     <a href="#" class="text-decoration-none">Forgot password?</a>
                 </div>
