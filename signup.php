@@ -14,20 +14,40 @@ function generateReferralCode($length = 8)
 $emailError = "";
 $passwordError = "";
 $referralError = "";
+$usernameError = "";
 
 // Check for referral code in URL
 $referral_code = isset($_GET['referral']) ? test_input($_GET['referral']) : "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = test_input($_POST["name"]);
+    $username = test_input($_POST["username"]);
     $email = test_input($_POST["email"]);
     $password = test_input($_POST["password"]);
     $confirmPassword = test_input($_POST["confirmPassword"]);
     $referral = test_input($_POST["referral"]);
 
+    // Validate username
+    if (!preg_match("/^[a-z0-9]+$/", $username)) {
+        $usernameError = "Username can only contain lowercase letters and numbers.";
+    } else {
+        // Check if the username already exists
+        $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            $usernameError = "Username already exists.";
+            $stmt->close();
+        } else {
+            $stmt->close();
+        }
+    }
+
     if ($password != $confirmPassword) {
         $passwordError = "Passwords do not match.";
-    } else {
+    } else if (empty($usernameError)) {
         // Check if the email already exists
         $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
@@ -63,8 +83,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $referral_code = generateReferralCode();
 
                 // Insert new user
-                $stmt = $conn->prepare("INSERT INTO users (name, email, password, random_string, referrer_id, referral_code) VALUES (?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssssis", $name, $email, $hashed_password, $randomString, $referrer_id, $referral_code);
+                $stmt = $conn->prepare("INSERT INTO users (name, username, email, password, random_string, referrer_id, referral_code) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("sssssis", $name, $username, $email, $hashed_password, $randomString, $referrer_id, $referral_code);
                 if ($stmt->execute()) {
                     $user_id = $stmt->insert_id;
                     $stmt->close();
@@ -117,7 +137,7 @@ function rewardReferrer($referrer_id, $points, $level)
 
     // Adjust the points here
     $adjusted_points = ($points == 10) ? 5 : $points;
-    
+
     $stmt->bind_param("ii", $adjusted_points, $referrer_id);
     $stmt->execute();
     $stmt->close();
@@ -138,11 +158,7 @@ function rewardReferrer($referrer_id, $points, $level)
         }
     }
 }
-
-
 ?>
-
-
 
 <style>
     body {
@@ -184,6 +200,11 @@ function rewardReferrer($referrer_id, $points, $level)
                 <div class="form-group">
                     <label for="name">Name *</label>
                     <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required autocomplete="new-name">
+                </div>
+                <div class="form-group">
+                    <label for="username">Username *</label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required autocomplete="new-username" minlength="8" maxlength="18">
+                    <span class="error"><?php echo $usernameError; ?></span>
                 </div>
                 <div class="form-group">
                     <label for="email">Email *</label>
