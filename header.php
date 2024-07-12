@@ -52,8 +52,14 @@
                             <li><a class="dropdown-item" href="withdrawal.php">Withdrawal</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="team_design.php">Team Building</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="stackingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Stacking
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="stackingDropdown">
+                            <li><a class="dropdown-item" href="staking.php">Stacking</a></li>
+                            <li><a class="dropdown-item" href="#">P2P (Coming Soon)</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="bonus_rewards.php">Bonus Reward</a>
