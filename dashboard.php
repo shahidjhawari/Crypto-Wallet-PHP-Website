@@ -390,15 +390,15 @@ while ($row_accepted = $result_accepted->fetch_assoc()) {
                             <!-- Wallet Balance Amount (in larger size) -->
                             <h1 class="display-5 mb-4" style="margin-top: -15px;">$<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></h1>
                             <!-- Your Account Has Been Activated message -->
-                            <?php if ($transaction_status === 'accepted') : ?>
+                            <!-- <?php if ($transaction_status === 'accepted') : ?>
                                 <p>Your account has been <span style="color: green;">Activated</span></p>
-                            <?php endif; ?>
+                            <?php endif; ?> -->
                             <!-- Deposit Button -->
-                            <?php if ($transaction_status === 'accepted') : ?>
+                            <!-- <?php if ($transaction_status === 'accepted') : ?>
                                 <p><a href="deposit.php" class="btn btn-info">Deposit</a></p>
-                            <?php endif; ?>
+                            <?php endif; ?> -->
                             <!-- Transaction Status and Resend Activation Request Button -->
-                            <?php if ($transaction_status === 'rejected') : ?>
+                            <!-- <?php if ($transaction_status === 'rejected') : ?>
                                 <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
                                 <p><a href="activate.php" class="btn btn-info">Resend Activation Request</a></p>
                             <?php elseif ($transaction_status === 'pending') : ?>
@@ -407,59 +407,7 @@ while ($row_accepted = $result_accepted->fetch_assoc()) {
                                 <p><a href="activate.php" class="btn btn-info">Activate Account</a></p>
                             <?php elseif ($transaction_status === 'accepted' && $deposit_status) : ?>
                                 <p>Deposit Status: <?php echo htmlspecialchars($deposit_status); ?></p>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-
-
-        <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-12">
-                            <p class="fs-5 mb-3">Total On Stacking</p>
-                            <?php
-                            // Check if there are any staking records and sum their amounts, otherwise set to 0
-                            $total_staking_amount = 0;
-                            if (!empty($staking_records)) {
-                                foreach ($staking_records as $record) {
-                                    $total_staking_amount += $record['amount'];
-                                }
-                            }
-                            ?>
-                            <h1 class="display-5 mb-4" style="margin-top: -15px;">
-                                <?php echo '$' . htmlspecialchars(number_format($total_staking_amount, 2)); ?>
-                            </h1>
-                            <!-- Remove the loop as we are only showing the total -->
-                            <!-- <p><a href="#" class="btn btn-info">Stacking</a></p> -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-12">
-                            <p class="fs-5 mb-3">Daily Earning</p>
-                            <?php
-                            // Check if there are any daily earnings records and get the latest one, otherwise set to 0
-                            $latest_daily_earning_record = !empty($daily_earnings_records) ? end($daily_earnings_records) : ['amount' => 0, 'date' => ''];
-                            ?>
-                            <h1 class="display-5 mb-4" style="margin-top: -15px;">
-                                <?php echo '$' . htmlspecialchars(number_format($latest_daily_earning_record['amount'], 2)); ?>
-                            </h1>
-                            <p><?php echo htmlspecialchars($latest_daily_earning_record['date']); ?></p>
-                            <!-- Remove the loop as we are only showing the latest record -->
-                            <!-- <p><a href="#" class="btn btn-info">Daily Earning Record</a></p> -->
+                            <?php endif; ?> -->
                         </div>
                     </div>
                 </div>
@@ -497,14 +445,12 @@ while ($row_accepted = $result_accepted->fetch_assoc()) {
         </div>
 
 
-
-
         <div class="col-12 mb-4">
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-12">
-                            <p class="fs-5 mb-3">Team Reward</p>
+                            <p class="fs-5 mb-3">Team Earning</p>
                             <h1 class="display-5 mb-4" style="margin-top: -15px;">$<?php echo htmlspecialchars($user_rewards['reward_points']); ?>.00</h1>
                             <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
                         </div>
@@ -513,43 +459,27 @@ while ($row_accepted = $result_accepted->fetch_assoc()) {
             </div>
         </div>
 
+
         <div class="col-12 mb-4">
             <div class="card">
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-12">
-                            <p class="fs-5 mb-3">Total Earning</p>
+                            <p class="fs-5 mb-3">Total 3X Earning</p>
+                            <?php
+                            // Check if there are any staking records and sum their amounts, otherwise set to 0
+                            $total_staking_amount = 0;
+                            if (!empty($staking_records)) {
+                                foreach ($staking_records as $record) {
+                                    $total_staking_amount += $record['amount'];
+                                }
+                            }
+                            ?>
                             <h1 class="display-5 mb-4" style="margin-top: -15px;">
-                                $<?php
-                                    $reward_points = isset($user_rewards['reward_points']) ? $user_rewards['reward_points'] : 0;
-                                    $total_earning = isset($record['total_earning']) ? $record['total_earning'] : 0;
-                                    echo number_format($reward_points + $total_earning, 2);
-                                    ?>
+                                <?php echo '$' . htmlspecialchars(number_format($total_staking_amount, 2)); ?>
                             </h1>
-                            <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
-                            <p>Daily & Refer Total Earning</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-12">
-                            <p class="fs-5 mb-3">Bonus Reward</p>
-                            <?php if (empty($bonus_rewards)) : ?>
-                                <h1 class="display-5 mb-4" style="margin-top: -15px;">$0.00</h1>
-                            <?php else : ?>
-                                <?php foreach ($bonus_rewards as $bonus) : ?>
-                                    <h1 class="display-5 mb-4" style="margin-top: -15px;">$<?php echo htmlspecialchars(number_format($bonus['bonus_amount'], 2)); ?></h1>
-                                    <p><?php echo $bonus['claimed'] ? 'Claimed' : 'Unclaimed'; ?></p>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                            <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
+                            <!-- Remove the loop as we are only showing the total -->
+                            <!-- <p><a href="#" class="btn btn-info">Stacking</a></p> -->
                         </div>
                     </div>
                 </div>
@@ -563,7 +493,87 @@ while ($row_accepted = $result_accepted->fetch_assoc()) {
                 <div class="card-body p-3">
                     <div class="row">
                         <div class="col-12">
-                            <p class="fs-5 mb-3">Withdraw</p>
+                            <p class="fs-5 mb-3">Total On Stacking</p>
+                            <?php
+                            // Check if there are any staking records and sum their amounts, otherwise set to 0
+                            $total_staking_amount = 0;
+                            if (!empty($staking_records)) {
+                                foreach ($staking_records as $record) {
+                                    $total_staking_amount += $record['amount'];
+                                }
+                            }
+                            ?>
+                            <h1 class="display-5 mb-4" style="margin-top: -15px;">
+                                <?php echo '$' . htmlspecialchars(number_format($total_staking_amount, 2)); ?>
+                            </h1>
+                            <!-- Remove the loop as we are only showing the total -->
+                            <!-- <p><a href="#" class="btn btn-info">Stacking</a></p> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="fs-5 mb-3">In Progress</p>
+                            <?php
+                            // Check if there are any staking records and sum their amounts, otherwise set to 0
+                            $total_staking_amount = 0;
+                            if (!empty($staking_records)) {
+                                foreach ($staking_records as $record) {
+                                    $total_staking_amount += $record['amount'];
+                                }
+                            }
+                            ?>
+                            <h1 class="display-5 mb-4" style="margin-top: -15px;">
+                                <?php echo '$' . htmlspecialchars(number_format($total_staking_amount, 2)); ?>
+                            </h1>
+                            <!-- Remove the loop as we are only showing the total -->
+                            <!-- <p><a href="#" class="btn btn-info">Stacking</a></p> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="fs-5 mb-3">Total Team Member</p>
+                            <?php
+                            // Check if there are any daily earnings records and get the latest one, otherwise set to 0
+                            $latest_daily_earning_record = !empty($daily_earnings_records) ? end($daily_earnings_records) : ['amount' => 0, 'date' => ''];
+                            ?>
+                            <h1 class="display-5 mb-4" style="margin-top: -15px;">
+                                <?php echo '$' . htmlspecialchars(number_format($latest_daily_earning_record['amount'], 2)); ?>
+                            </h1>
+                            <p><?php echo htmlspecialchars($latest_daily_earning_record['date']); ?></p>
+                            <!-- Remove the loop as we are only showing the latest record -->
+                            <!-- <p><a href="#" class="btn btn-info">Daily Earning Record</a></p> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="fs-5 mb-3">Total Withdraw</p>
                             <h1 class="display-5 mb-4" style="margin-top: -15px;">
                                 $<?php echo number_format(isset($total_accepted_amount) ? $total_accepted_amount : 0, 2); ?>
                             </h1>
