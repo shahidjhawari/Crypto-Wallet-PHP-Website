@@ -1,4 +1,4 @@
-<?php require('connection.inc.php'); ?>
+<?php require('connection.inc.php');?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -64,6 +64,7 @@
                             Transactions
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="transactionsDropdown">
+                            <li><a class="dropdown-item" href="activate.php">Activate Account</a></li>
                             <li><a class="dropdown-item" href="deposit.php">Deposit</a></li>
                             <li><a class="dropdown-item" href="withdrawal.php">Withdrawal</a></li>
                         </ul>
