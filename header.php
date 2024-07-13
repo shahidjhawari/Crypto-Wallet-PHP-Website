@@ -1,4 +1,4 @@
-<?php require('connection.inc.php');?>
+<?php require('connection.inc.php'); ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -29,27 +29,13 @@
             color: inherit;
             /* Inherit color on hover */
         }
-
-        .navbar-brand img {
-            max-height: 50px;
-            /* Adjust the max height as needed */
-        }
-
-        .navbar .container-fluid {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
     </style>
 </head>
 
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-lg">
         <div class="container-fluid">
-            <a class="navbar-brand" href="dashboard.php">
-                <img src="assets/img/Logo.webp" alt="StakingHUB Logo">
-                <b>StakingHUB</b>
-            </a>
+            <a class="navbar-brand" href="dashboard.php"><b>StakingHUB</b></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fas fa-bars" style="color: white;"></i>
             </button>
@@ -64,7 +50,6 @@
                             Transactions
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="transactionsDropdown">
-                            <li><a class="dropdown-item" href="activate.php">Activate Account</a></li>
                             <li><a class="dropdown-item" href="deposit.php">Deposit</a></li>
                             <li><a class="dropdown-item" href="withdrawal.php">Withdrawal</a></li>
                         </ul>
