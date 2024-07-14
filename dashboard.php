@@ -494,7 +494,7 @@ while ($row_accepted = $result_accepted->fetch_assoc()) {
                     <div class="row">
                         <div class="col-12">
                             <p class="fs-5 mb-3">Total Team Member</p>
-                            <h1 class="display-5 mb-4" style="margin-top: -15px;">$<?php echo htmlspecialchars($user_rewards['reward_points']); ?>.00</h1>
+                            <h1 class="display-5 mb-4" style="margin-top: -15px;"><?php echo htmlspecialchars($user_rewards['referral_count']) +  $user_rewards['level_two_count'] + $user_rewards['level_three_count'] ?></h1>
                             <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
                         </div>
                     </div>
