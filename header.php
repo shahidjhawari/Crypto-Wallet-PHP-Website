@@ -1,4 +1,50 @@
-<?php require('connection.inc.php'); ?>
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+require('connection.inc.php');
+
+// Redirect to login page if not logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+$user_name = $_SESSION['user_name'];
+
+// Fetch user-specific data
+$stmt = $conn->prepare("SELECT * FROM rewards WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$user_rewards = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+
+// Fetch the user's transaction status
+$stmt = $conn->prepare("SELECT status FROM transactions WHERE user_id = ? ORDER BY id DESC LIMIT 1");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$transaction_status_row = $stmt->get_result()->fetch_assoc();
+$transaction_status = $transaction_status_row['status'] ?? null;
+$stmt->close();
+
+// Fetch the latest deposit status
+$stmt = $conn->prepare("SELECT status FROM deposits WHERE user_id = ? ORDER BY id DESC LIMIT 1");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$deposit_status_row = $stmt->get_result()->fetch_assoc();
+$deposit_status = $deposit_status_row['status'] ?? null;
+$stmt->close();
+
+// Calculate the wallet balance (sum of accepted deposits)
+$stmt = $conn->prepare("SELECT SUM(amount) AS wallet_balance FROM deposits WHERE user_id = ? AND status = 'accepted'");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$wallet_balance_row = $stmt->get_result()->fetch_assoc();
+$wallet_balance = $wallet_balance_row['wallet_balance'] ?? 0;
+$stmt->close();
+
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -50,8 +96,26 @@
                             Transactions
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="transactionsDropdown">
-                            <li><a class="dropdown-item" href="activate.php">Activate</a></li>
-                            <li><a class="dropdown-item" href="deposit.php">Deposit</a></li>
+                            <?php if ($transaction_status === 'accepted') : ?>
+                                <li><a class="dropdown-item" href="deposit.php" class="btn btn-info">Deposit</a></li>
+                            <?php elseif ($transaction_status === 'rejected') : ?>
+                                <li>
+                                    <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
+                                </li>
+                                <li><a href="activate.php" class="dropdown-item">Resend Activation Request</a></li>
+                            <?php elseif ($transaction_status === 'pending') : ?>
+                                <li>
+                                    <p>Transaction Status: <?php echo htmlspecialchars($transaction_status); ?></p>
+                                </li>
+                            <?php elseif (!$transaction_status) : ?>
+                                <li>
+                                    <p><a href="activate.php" class="dropdown-item">Activate Account</a></p>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if ($transaction_status === 'accepted' && $deposit_status) : ?>
+                                <!-- <li><p>Deposit Status: <?php echo htmlspecialchars($deposit_status); ?></p></li> -->
+                            <?php endif; ?>
                             <li><a class="dropdown-item" href="withdrawal.php">Withdrawal</a></li>
                         </ul>
                     </li>
@@ -80,3 +144,6 @@
             </div>
         </div>
     </nav>
+</body>
+
+</html>
