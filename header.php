@@ -2,16 +2,17 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+
 require('connection.inc.php');
 
-// Redirect to login page if not logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php");
-    exit();
-}
+// Check if user_id and user_name are set in the session
+$user_id = $_SESSION['user_id'] ?? null;
+$user_name = $_SESSION['user_name'] ?? null;
 
-$user_id = $_SESSION['user_id'];
-$user_name = $_SESSION['user_name'];
+// Redirect to login page if user_id or user_name is not set
+if (!$user_id || !$user_name) {
+    // echo "hgf";
+}
 
 // Fetch user-specific data
 $stmt = $conn->prepare("SELECT * FROM rewards WHERE user_id = ?");
@@ -53,7 +54,6 @@ $stmt->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     <!-- Bootstrap CSS -->
@@ -62,18 +62,14 @@ $stmt->close();
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="css/own1.css" rel="stylesheet">
-
     <style>
         .navbar-nav .nav-link {
             text-decoration: none;
-            /* Remove underline */
             color: inherit;
-            /* Inherit color */
         }
 
         .navbar-nav .nav-link:hover {
             color: inherit;
-            /* Inherit color on hover */
         }
     </style>
 </head>
@@ -85,7 +81,6 @@ $stmt->close();
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fas fa-bars" style="color: white;"></i>
             </button>
-
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
@@ -112,7 +107,6 @@ $stmt->close();
                                     <p><a href="activate.php" class="dropdown-item">Activate Account</a></p>
                                 </li>
                             <?php endif; ?>
-
                             <?php if ($transaction_status === 'accepted' && $deposit_status) : ?>
                                 <!-- <li><p>Deposit Status: <?php echo htmlspecialchars($deposit_status); ?></p></li> -->
                             <?php endif; ?>
@@ -144,6 +138,3 @@ $stmt->close();
             </div>
         </div>
     </nav>
-</body>
-
-</html>
