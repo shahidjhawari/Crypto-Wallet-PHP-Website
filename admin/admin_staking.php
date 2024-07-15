@@ -1,4 +1,5 @@
 <?php
+ob_start();
 require('top.inc.php');
 
 // Ensure only admin can access this page
@@ -43,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['req
         }
     }
 
-    header("Location: admin_panel.php");
+    header("Location: admin_staking.php");
     exit();
 }
 

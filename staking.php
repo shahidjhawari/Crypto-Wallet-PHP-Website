@@ -112,27 +112,36 @@ $stmt->close();
         <button type="submit" class="btn btn-primary">Stake</button>
     </form>
 
-    <h3>Stcking Records</h3>
-    <table class="table table-responsive">
-        <thead>
+    <h3>Staking Records</h3>
+<table class="table table-responsive">
+    <thead>
+        <tr>
+            <th>Request ID</th>
+            <th>Stake Amount</th>
+            <th>Status</th>
+            <th>Request Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($staking_requests as $request) : ?>
             <tr>
-                <th>Request ID</th>
-                <th>Stake Amount</th>
-                <th>Status</th>
-                <th>Request Date</th>
+                <td><?php echo htmlspecialchars($request['id']); ?></td>
+                <td><?php echo htmlspecialchars(number_format($request['stake_amount'], 2)); ?></td>
+                <td><?php echo htmlspecialchars($request['status']); ?></td>
+                <td><?php echo htmlspecialchars($request['request_date']); ?></td>
             </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($staking_requests as $request) : ?>
+            <?php if ($request['status'] === 'pending') : ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($request['id']); ?></td>
-                    <td><?php echo htmlspecialchars(number_format($request['stake_amount'], 2)); ?></td>
-                    <td><?php echo htmlspecialchars($request['status']); ?></td>
-                    <td><?php echo htmlspecialchars($request['request_date']); ?></td>
+                    <td colspan="4">
+                        <div class="alert alert-info">
+                            Your staking will start in 48 hours.
+                        </div>
+                    </td>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </tbody>
+</table>
 </div>
 
 <?php require('footer.php'); ?>
