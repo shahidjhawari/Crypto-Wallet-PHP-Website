@@ -26,13 +26,6 @@ $stmt->close();
 // Initialize variables for success and error messages
 $success_message = $error_message = "";
 
-// Function to calculate earnings based on the day number
-function calculate_daily_earning($day, $amount)
-{
-    $percentages = [0.0045, 0.0055, 0.0065];
-    return $amount * $percentages[$day % 3];
-}
-
 // Handle the staking form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['stake_amount'], $_POST['random_string'])) {
@@ -42,115 +35,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($input_random_string !== $stored_random_string) {
             $error_message = "You have provided an incorrect random string.";
         } elseif ($stake_amount > 0 && $stake_amount <= $wallet_balance) {
-            $estimated_earning = 3 * $stake_amount;
-            $remaining_earning = $estimated_earning;
-
-            // Insert staking record
-            $stmt = $conn->prepare("INSERT INTO stakings (user_id, amount, estimated_earning, remaining_earning, status) VALUES (?, ?, ?, ?, 'active')");
-            $stmt->bind_param("iddd", $user_id, $stake_amount, $estimated_earning, $remaining_earning);
-            $stmt->execute();
-            $staking_id = $stmt->insert_id; // Get the ID of the newly inserted staking record
-            $stmt->close();
-
-            // Deduct the staked amount from the user's balance
-            $remaining_to_deduct = $stake_amount;
-            while ($remaining_to_deduct > 0) {
-                $stmt = $conn->prepare("SELECT id, amount FROM deposits WHERE user_id = ? AND status = 'accepted' AND amount > 0 ORDER BY id ASC LIMIT 1");
-                $stmt->bind_param("i", $user_id);
-                $stmt->execute();
-                $deposit = $stmt->get_result()->fetch_assoc();
-                $stmt->close();
-
-                if ($deposit) {
-                    $deposit_id = $deposit['id'];
-                    $deposit_amount = $deposit['amount'];
-
-                    if ($deposit_amount >= $remaining_to_deduct) {
-                        $stmt = $conn->prepare("UPDATE deposits SET amount = amount - ? WHERE id = ?");
-                        $stmt->bind_param("di", $remaining_to_deduct, $deposit_id);
-                        $stmt->execute();
-                        $stmt->close();
-                        $remaining_to_deduct = 0;
-                    } else {
-                        $stmt = $conn->prepare("UPDATE deposits SET amount = 0 WHERE id = ?");
-                        $stmt->bind_param("i", $deposit_id);
-                        $stmt->execute();
-                        $stmt->close();
-                        $remaining_to_deduct -= $deposit_amount;
-                    }
-                } else {
-                    break; // No more deposits to deduct from
-                }
-            }
-
-            // Calculate the first day's earnings and insert the record
-            /*
-            $first_daily_earning = calculate_daily_earning(0, $stake_amount);
-            $stmt = $conn->prepare("INSERT INTO daily_earnings (user_id, staking_id, date, amount) VALUES (?, ?, CURDATE(), ?)");
-            $stmt->bind_param("iid", $user_id, $staking_id, $first_daily_earning);
+            // Insert staking request record
+            $stmt = $conn->prepare("INSERT INTO staking_requests (user_id, stake_amount, random_string, status) VALUES (?, ?, ?, 'pending')");
+            $stmt->bind_param("ids", $user_id, $stake_amount, $input_random_string);
             $stmt->execute();
             $stmt->close();
 
-            // Update total earned and remaining earning in stakings table
-            $remaining_earning -= $first_daily_earning;
-            $stmt = $conn->prepare("UPDATE stakings SET total_earning = ?, remaining_earning = ? WHERE id = ?");
-            $stmt->bind_param("dii", $first_daily_earning, $remaining_earning, $staking_id);
-            $stmt->execute();
-            $stmt->close();
-            */
-
-            // Recalculate the wallet balance
-            $stmt = $conn->prepare("SELECT SUM(amount) AS wallet_balance FROM deposits WHERE user_id = ? AND status = 'accepted'");
-            $stmt->bind_param("i", $user_id);
-            $stmt->execute();
-            $wallet_balance = $stmt->get_result()->fetch_assoc()['wallet_balance'] ?? 0;
-            $stmt->close();
-
-            $success_message = "Successfully staked $" . htmlspecialchars(number_format($stake_amount, 2)) . ".";
+            $success_message = "Staking request submitted successfully. Awaiting admin approval.";
 
             // Redirect to prevent form resubmission
             header("Location: staking.php");
-            exit(); // Ensure script termination after redirection
+            exit();
         } else {
             $error_message = "Invalid staking amount.";
         }
-    } elseif (isset($_POST['claim_now'])) {
-        // Handle the "Claim Now" button click
-        // Fetch the total earning from the staking records
-        $stmt = $conn->prepare("SELECT SUM(total_earning) AS total_earning FROM stakings WHERE user_id = ? AND status = 'active'");
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-        $total_earning = $stmt->get_result()->fetch_assoc()['total_earning'] ?? 0;
-        $stmt->close();
-
-        if ($total_earning > 0) {
-            // Update the user's wallet balance
-            $stmt = $conn->prepare("UPDATE deposits SET amount = amount + ? WHERE user_id = ? AND status = 'accepted'");
-            $stmt->bind_param("di", $total_earning, $user_id);
-            $stmt->execute();
-            $stmt->close();
-
-            // Reset the total earning in the staking records
-            $stmt = $conn->prepare("UPDATE stakings SET total_earning = 0, remaining_earning = 0 WHERE user_id = ? AND status = 'active'");
-            $stmt->bind_param("i", $user_id);
-            $stmt->execute();
-            $stmt->close();
-
-            // Recalculate the wallet balance
-            $stmt = $conn->prepare("SELECT SUM(amount) AS wallet_balance FROM deposits WHERE user_id = ? AND status = 'accepted'");
-            $stmt->bind_param("i", $user_id);
-            $stmt->execute();
-            $wallet_balance = $stmt->get_result()->fetch_assoc()['wallet_balance'] ?? 0;
-            $stmt->close();
-
-            $success_message = "Successfully claimed $" . htmlspecialchars(number_format($total_earning, 2)) . " to your wallet.";
-        } else {
-            $error_message = "No earnings available to claim.";
-        }
-
-        // Redirect to prevent form resubmission
-        header("Location: staking.php");
-        exit(); // Ensure script termination after redirection
     }
 }
 
@@ -165,28 +63,17 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Fetch daily earnings records
-$daily_earnings_records = [];
-$stmt = $conn->prepare("SELECT * FROM daily_earnings WHERE user_id = ?");
+// Fetch staking request records
+$staking_requests = [];
+$stmt = $conn->prepare("SELECT * FROM staking_requests WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 while ($row = $result->fetch_assoc()) {
-    $daily_earnings_records[] = $row;
+    $staking_requests[] = $row;
 }
 $stmt->close();
 
-// Calculate total staking amount
-$total_staking_amount = 0;
-foreach ($staking_records as $record) {
-    $total_staking_amount += $record['amount'];
-}
-
-// Calculate total earning amount
-$total_earning_amount = 0;
-foreach ($staking_records as $record) {
-    $total_earning_amount += $record['total_earning'];
-}
 ?>
 
 <style>
@@ -197,8 +84,6 @@ foreach ($staking_records as $record) {
 </style>
 
 <div class="container">
-
-    <!-- Add this message here -->
 
     <h2>Staking</h2>
     <p>Wallet Balance: $<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></p>
@@ -227,57 +112,27 @@ foreach ($staking_records as $record) {
         <button type="submit" class="btn btn-primary">Stake</button>
     </form>
 
-    <form method="post" action="staking.php">
-        <button type="submit" name="claim_now" class="btn btn-success" <?php echo $total_earning_amount == 0 ? 'disabled' : ''; ?>>Claim Now</button>
-    </form>
-
-    <h3>Staking Records</h3>
+    <h3>Stcking Records</h3>
     <table class="table table-responsive">
         <thead>
             <tr>
-                <th>Amount</th>
-                <th>Estimated Earning</th>
-                <th>Total Earning</th>
-                <th>Remaining Earning</th>
+                <th>Request ID</th>
+                <th>Stake Amount</th>
                 <th>Status</th>
+                <th>Request Date</th>
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($staking_records as $record) : ?>
+            <?php foreach ($staking_requests as $request) : ?>
                 <tr>
-                    <td><?php echo htmlspecialchars(number_format($record['amount'], 2)); ?></td>
-                    <td><?php echo htmlspecialchars(number_format($record['estimated_earning'], 2)); ?></td>
-                    <td><?php echo htmlspecialchars(number_format($record['total_earning'], 2)); ?></td>
-                    <td><?php echo htmlspecialchars(number_format($record['remaining_earning'], 2)); ?></td>
-                    <td><?php echo htmlspecialchars($record['status']); ?></td>
+                    <td><?php echo htmlspecialchars($request['id']); ?></td>
+                    <td><?php echo htmlspecialchars(number_format($request['stake_amount'], 2)); ?></td>
+                    <td><?php echo htmlspecialchars($request['status']); ?></td>
+                    <td><?php echo htmlspecialchars($request['request_date']); ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
-
-    <h3>Daily Earnings Records</h3>
-    <table class="table table-responsive">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($daily_earnings_records as $record) : ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($record['date']); ?></td>
-                    <td><?php echo htmlspecialchars(number_format($record['amount'], 2)); ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-
-    <div class="alert alert-info">
-        ID to ID transfer is coming soon!
-    </div>
 </div>
-
-
 
 <?php require('footer.php'); ?>

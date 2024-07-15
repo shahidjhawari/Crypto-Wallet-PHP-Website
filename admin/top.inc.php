@@ -72,6 +72,9 @@ if (isset($_SESSION['ADMIN_LOGIN']) && $_SESSION['ADMIN_LOGIN'] != '') {
                <li class="menu-item-has-children dropdown">
                   <a href="manage_announcements.php"> Edit & Delete Announcement </a>
                </li>
+               <li class="menu-item-has-children dropdown">
+                  <a href="admin_staking.php"> admin_staking </a>
+               </li>
             </ul>
          </div>
       </nav>
