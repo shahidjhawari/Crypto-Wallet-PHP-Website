@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+
 $user_id = $_SESSION['user_id'];
 
 // Fetch referral rewards for the logged-in user
