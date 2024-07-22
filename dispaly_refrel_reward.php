@@ -8,6 +8,7 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit();
 }
+
 $user_id = $_SESSION['user_id'];
 
 // Fetch referral rewards for the logged-in user
