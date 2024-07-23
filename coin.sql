@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 06, 2024 at 09:01 AM
+-- Generation Time: Jul 23, 2024 at 12:28 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -152,6 +152,13 @@ CREATE TABLE `rewards` (
   `level_three_count` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `rewards`
+--
+
+INSERT INTO `rewards` (`id`, `user_id`, `reward_points`, `referral_count`, `level_one_count`, `level_two_count`, `level_three_count`) VALUES
+(1, 154, 0, 0, 0, 0, 0);
+
 -- --------------------------------------------------------
 
 --
@@ -198,6 +205,21 @@ CREATE TABLE `stakings` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `staking_requests`
+--
+
+CREATE TABLE `staking_requests` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `stake_amount` decimal(10,2) NOT NULL,
+  `random_string` varchar(255) NOT NULL,
+  `status` enum('pending','accepted','rejected') DEFAULT 'pending',
+  `request_date` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `transactions`
 --
 
@@ -229,8 +251,16 @@ CREATE TABLE `users` (
   `random_string` varchar(255) NOT NULL,
   `referrer_id` int(11) DEFAULT NULL,
   `referral_code` varchar(50) DEFAULT NULL,
-  `referred_bonus_received` tinyint(1) NOT NULL DEFAULT 0
+  `referred_bonus_received` tinyint(1) NOT NULL DEFAULT 0,
+  `username` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `random_string`, `referrer_id`, `referral_code`, `referred_bonus_received`, `username`) VALUES
+(154, 'NAWAB', 'shahidjhawari@gmail.com', '$2y$10$LI40l0Q5KHsFX1CdDoSQ1.PBA/M.bFgjklNFpqSPfUFjpaSAMoRz6', '4e39b891a8a24c986bf002b9c29e3d72af7811724ea043b98e84679788a06dd2cb98f493c2d5faa25e4efa86521f36795250', NULL, '34yJjLrs', 0, 'shahidiqbaljhawari');
 
 -- --------------------------------------------------------
 
@@ -329,6 +359,13 @@ ALTER TABLE `stakings`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `staking_requests`
+--
+ALTER TABLE `staking_requests`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `transactions`
 --
 ALTER TABLE `transactions`
@@ -400,7 +437,7 @@ ALTER TABLE `referral_rewards`
 -- AUTO_INCREMENT for table `rewards`
 --
 ALTER TABLE `rewards`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `reward_logs`
@@ -415,6 +452,12 @@ ALTER TABLE `stakings`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
 
 --
+-- AUTO_INCREMENT for table `staking_requests`
+--
+ALTER TABLE `staking_requests`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
@@ -424,7 +467,7 @@ ALTER TABLE `transactions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=154;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=155;
 
 --
 -- AUTO_INCREMENT for table `user_payments`
@@ -473,6 +516,12 @@ ALTER TABLE `rewards`
 --
 ALTER TABLE `reward_logs`
   ADD CONSTRAINT `reward_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `staking_requests`
+--
+ALTER TABLE `staking_requests`
+  ADD CONSTRAINT `staking_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `transactions`
