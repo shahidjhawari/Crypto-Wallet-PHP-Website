@@ -8,92 +8,79 @@ if (isset($_SESSION['ADMIN_LOGIN']) && $_SESSION['ADMIN_LOGIN'] != '') {
 }
 ?>
 <!doctype html>
-<html class="no-js" lang="">
-<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+<html lang="en">
 
 <head>
-   <meta charset="utf-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <title>Dashboard Page</title>
-   <meta name="viewport" content="width=device-width, initial-scale=1">
-   <link rel="stylesheet" href="assets/css/normalize.css">
-   <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-   <link rel="stylesheet" href="assets/css/font-awesome.min.css">
-   <link rel="stylesheet" href="assets/css/themify-icons.css">
-   <link rel="stylesheet" href="assets/css/pe-icon-7-filled.css">
-   <link rel="stylesheet" href="assets/css/flag-icon.min.css">
-   <link rel="stylesheet" href="assets/css/cs-skin-elastic.css">
-   <link rel="stylesheet" href="assets/css/style.css">
-   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Dashboard Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-   <aside id="left-panel" class="left-panel">
-      <nav class="navbar navbar-expand-sm navbar-default">
-         <div id="main-menu" class="main-menu collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-               <li class="menu-title">Menu</li>
-               <li class="menu-item-has-children dropdown">
-                  <a href="activate.php"> Activation Request </a>
-               </li>
-               <li class="menu-item-has-children dropdown">
-                  <a href="admin_deposits.php"> Deposit Request </a>
-               </li>
-               <li class="menu-item-has-children dropdown">
-                  <a href="admin_staking.php"> Stacking Request </a>
-               </li>
-               <li class="menu-item-has-children dropdown">
-                  <a href="users.php"> User </a>
-               </li>
-               <li class="menu-item-has-children dropdown">
-                  <a href="trans_rejected.php"> Rejected Activation </a>
-               </li>
-               <li class="menu-item-has-children dropdown">
-                  <a href="trans_accepted.php"> Accepted Activation </a>
-               </li>
-               <li class="menu-item-has-children dropdown">
-                  <a href="deposit_rejected.php"> Rejected Deposit </a>
-               </li>
-               <li class="menu-item-has-children dropdown">
-                  <a href="deposit_accepted.php"> Accepted Deposit </a>
-               </li>
-               <li class="menu-item-has-children dropdown">
-                  <a href="admin_refer_btn.php"> Refer </a>
-               </li>
-               <li class="menu-item-has-children dropdown">
-                  <a href="process_referral_bonus.php"> Refer2 </a>
-               </li>
-               <li class="menu-item-has-children dropdown">
-                  <a href="admin_add_message.php"> Dollar Rate </a>
-               </li>
-               <li class="menu-item-has-children dropdown">
-                  <a href="admin_manage_payments.php"> Widraw Request </a>
-               </li>
-               <li class="menu-item-has-children dropdown">
-                  <a href="add_announcement.php"> Add Announcement </a>
-               </li>
-               <li class="menu-item-has-children dropdown">
-                  <a href="manage_announcements.php"> Edit & Delete Announcement </a>
-               </li>
-            </ul>
-         </div>
-      </nav>
-   </aside>
-   <div id="right-panel" class="right-panel">
-      <header id="header" class="header">
-         <div class="top-left">
-            <div class="navbar-header">
-               <a id="menuToggle" class="menutoggle"><i class="fa fa-bars"></i></a>
-            </div>
-         </div>
-         <div class="top-right">
-            <div class="header-menu">
-               <div class="user-area dropdown float-right">
-                  <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Welcome Admin</a>
-                  <div class="user-menu dropdown-menu">
-                     <a class="nav-link" href="logout.php"><i class="fa fa-power-off"></i>Logout</a>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </header>
+    <div class="d-flex">
+        <aside id="left-panel" class="bg-light border-right">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light flex-column align-items-start">
+                <a class="navbar-brand" href="#">StakingHUB</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav flex-column w-100">
+                        <li class="nav-item">
+                            <a class="nav-link" href="activate.php">Activation Request</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin_deposits.php">Deposit Request</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin_staking.php">Stacking Request</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="users.php">User</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="trans_rejected.php">Rejected Activation</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="trans_accepted.php">Accepted Activation</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="deposit_rejected.php">Rejected Deposit</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="deposit_accepted.php">Accepted Deposit</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin_refer_btn.php">Refer</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="process_referral_bonus.php">Refer2</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin_add_message.php">Dollar Rate</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin_manage_payments.php">Withdraw Request</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="add_announcement.php">Add Announcement</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="manage_announcements.php">Edit & Delete Announcement</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

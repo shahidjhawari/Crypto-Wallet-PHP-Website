@@ -1,5 +1,4 @@
 <?php
-session_start();
 require('top.inc.php');
 
 // Ensure only admin can access
