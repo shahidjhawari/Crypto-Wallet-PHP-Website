@@ -193,9 +193,6 @@ function rewardReferrer($referrer_id, $points, $level)
 <div class="container">
     <div class="centered-form">
         <div class="form-container">
-            <div class="text-center mb-4">
-                <img src="img/logo.png" alt="Logo" class="img-fluid" width="300">
-            </div>
             <form action="signup.php" method="post" autocomplete="off">
                 <div class="form-group">
                     <label for="name">Name *</label>
