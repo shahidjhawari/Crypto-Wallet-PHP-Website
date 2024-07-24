@@ -198,6 +198,30 @@ foreach ($staking_records as $record) {
 
 <div class="container">
 
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-body p-3">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 class="fs-5 mb-3">On Stacking</h3>
+                        <?php
+                        // Check if there are any staking records and sum their amounts, otherwise set to 0
+                        $total_staking_amount = 0;
+                        if (!empty($staking_records)) {
+                            foreach ($staking_records as $record) {
+                                $total_staking_amount += $record['amount'];
+                            }
+                        }
+                        ?>
+                        <h2 class="display-5 mb-4" style="margin-top: -15px;">
+                            <?php echo '$' . htmlspecialchars(number_format($total_staking_amount, 2)); ?>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Add this message here -->
 
     <h2>Staking</h2>
@@ -277,6 +301,7 @@ foreach ($staking_records as $record) {
         ID to ID transfer is coming soon!
     </div>
 </div>
+
 
 
 
