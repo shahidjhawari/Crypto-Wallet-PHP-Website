@@ -222,38 +222,46 @@ foreach ($staking_records as $record) {
         </div>
     </div>
 
+
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-body p-3">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 class="fs-5 mb-3">Estimated Earning</h3>
+                        <?php
+                        $total_estimated_earning = 0;
+                        foreach ($staking_records as $record) {
+                            $total_estimated_earning += $record['estimated_earning'];
+                        }
+                        ?>
+                        <h1 class="display-5 mb-4" style="margin-top: -15px;">
+                            $<?php echo htmlspecialchars(number_format($total_estimated_earning, 2)); ?>
+                        </h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-body p-3">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 class="fs-5 mb-3">Claim Daily Earning</h3>
+                        <form method="post" action="stacking_dummy.php">
+                            <button type="submit" name="claim_now" class="btn btn-success" <?php echo $total_earning_amount == 0 ? 'disabled' : ''; ?>>Claim Now</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Add this message here -->
-
-    <h2>Staking</h2>
-    <p>Wallet Balance: $<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></p>
-
-    <?php if (!empty($success_message)) : ?>
-        <div class="alert alert-success">
-            <?php echo $success_message; ?>
-        </div>
-    <?php endif; ?>
-
-    <?php if (!empty($error_message)) : ?>
-        <div class="alert alert-danger">
-            <?php echo $error_message; ?>
-        </div>
-    <?php endif; ?>
-
-    <form method="post" action="staking.php">
-        <div class="form-group">
-            <label for="stake_amount">Stake Amount</label>
-            <input type="number" placeholder="Enter Stack Amount" class="form-control" id="stake_amount" name="stake_amount" min="0.01" step="0.01" required>
-        </div>
-        <div class="form-group">
-            <label for="random_string">Private Key</label>
-            <input type="text" placeholder="Enter Private Key" class="form-control" id="random_string" name="random_string" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Stake</button>
-    </form>
-
-    <form method="post" action="staking.php">
-        <button type="submit" name="claim_now" class="btn btn-success" <?php echo $total_earning_amount == 0 ? 'disabled' : ''; ?>>Claim Now</button>
-    </form>
 
     <h3>Staking Records</h3>
     <table class="table table-responsive">
