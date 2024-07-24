@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $success_message = "Successfully staked $" . htmlspecialchars(number_format($stake_amount, 2)) . ".";
 
             // Redirect to prevent form resubmission
-            header("Location: staking.php");
+            header("Location: stacking_dummy.php");
             exit(); // Ensure script termination after redirection
         } else {
             $error_message = "Invalid staking amount.";
@@ -149,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Redirect to prevent form resubmission
-        header("Location: staking.php");
+        header("Location: stacking_dummy.php");
         exit(); // Ensure script termination after redirection
     }
 }
@@ -261,9 +261,11 @@ foreach ($staking_records as $record) {
     </div>
 
 
+
+
     <!-- Add this message here -->
 
-    <h3>Staking Records</h3>
+    <!-- <h3>Staking Records</h3>
     <table class="table table-responsive">
         <thead>
             <tr>
@@ -285,29 +287,29 @@ foreach ($staking_records as $record) {
                 </tr>
             <?php endforeach; ?>
         </tbody>
-    </table>
+    </table> -->
 
     <h3>Daily Earnings Records</h3>
     <table class="table table-responsive">
         <thead>
             <tr>
-                <th>Date</th>
+                <th>ID</th>
                 <th>Amount</th>
+                <th>Date</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($daily_earnings_records as $record) : ?>
                 <tr>
+                    <td><?php echo htmlspecialchars($record['id']); ?></td>
+                    <td><?php echo "$" . htmlspecialchars(number_format($record['amount'], 2)); ?></td>
                     <td><?php echo htmlspecialchars($record['date']); ?></td>
-                    <td><?php echo htmlspecialchars(number_format($record['amount'], 2)); ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
 
-    <div class="alert alert-info">
-        ID to ID transfer is coming soon!
-    </div>
+
 </div>
 
 
