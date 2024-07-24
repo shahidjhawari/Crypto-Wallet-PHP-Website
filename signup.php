@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $referral = test_input($_POST["referral"]);
 
     // Validate username
-    if (!preg_match("/^[a-z0-9]+$/", $username)) {
+    if (!preg_match("/^[a-zA-Z0-9]+$/", $username)) {
         $usernameError = "Username can only contain lowercase letters and numbers.";
     } else {
         // Check if the username already exists
