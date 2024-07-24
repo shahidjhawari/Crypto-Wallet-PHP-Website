@@ -14,6 +14,7 @@ $stmt->close();
             <tr>
                 <th>ID</th>
                 <th>Name</th>
+                <th>Username</th>
                 <th>Email</th>
                 <th>Private Key</th>
                 <th>Referrer ID</th>
@@ -25,6 +26,7 @@ $stmt->close();
                 <tr>
                     <td><?php echo htmlspecialchars($user['id']); ?></td>
                     <td><?php echo htmlspecialchars($user['name']); ?></td>
+                    <td><?php echo htmlspecialchars($user['username']); ?></td>
                     <td><?php echo htmlspecialchars($user['email']); ?></td>
                     <td><?php echo htmlspecialchars($user['random_string']); ?></td>
                     <td><?php echo htmlspecialchars($user['referrer_id']); ?></td>
