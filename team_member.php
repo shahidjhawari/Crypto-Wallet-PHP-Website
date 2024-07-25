@@ -114,7 +114,9 @@ $result = $stmt->get_result();
                         </p>
                         <div class="collapse" id="levelOneDetails">
                             <!-- Level One Users Details Here -->
-                            <p>Level One Users List or Details...</p>
+                            <?php while ($row = $result->fetch_assoc()) : ?>
+                                <p><?php echo htmlspecialchars($row['referred_user']); ?></p>
+                            <?php endwhile; ?>
                         </div>
 
                         <p>
