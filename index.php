@@ -1,4 +1,5 @@
 <?php
+ob_start();
 require('header.php');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
