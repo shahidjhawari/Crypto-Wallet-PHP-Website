@@ -22,13 +22,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['req
 
     if ($request && $request['status'] === 'pending') {
         if ($action === 'accept') {
+            $user_id = $request['user_id'];
+            $stake_amount = $request['stake_amount'];
+            $estimated_earning = 3 * $stake_amount;
+            $remaining_earning = $estimated_earning;
+
             // Insert staking record
             $stmt = $con->prepare("INSERT INTO stakings (user_id, amount, estimated_earning, remaining_earning, status) VALUES (?, ?, ?, ?, 'active')");
-            $estimated_earning = 3 * $request['stake_amount'];
-            $remaining_earning = $estimated_earning;
-            $stmt->bind_param("iddd", $request['user_id'], $request['stake_amount'], $estimated_earning, $remaining_earning);
+            $stmt->bind_param("iddd", $user_id, $stake_amount, $estimated_earning, $remaining_earning);
             $stmt->execute();
             $stmt->close();
+
+            // Deduct the staked amount from the user's deposits
+            $remaining_to_deduct = $stake_amount;
+            while ($remaining_to_deduct > 0) {
+                $stmt = $con->prepare("SELECT id, amount FROM deposits WHERE user_id = ? AND status = 'accepted' AND amount > 0 ORDER BY id ASC LIMIT 1");
+                $stmt->bind_param("i", $user_id);
+                $stmt->execute();
+                $deposit = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
+
+                if ($deposit) {
+                    $deposit_id = $deposit['id'];
+                    $deposit_amount = $deposit['amount'];
+
+                    if ($deposit_amount >= $remaining_to_deduct) {
+                        $stmt = $con->prepare("UPDATE deposits SET amount = amount - ? WHERE id = ?");
+                        $stmt->bind_param("di", $remaining_to_deduct, $deposit_id);
+                        $stmt->execute();
+                        $stmt->close();
+                        $remaining_to_deduct = 0;
+                    } else {
+                        $stmt = $con->prepare("UPDATE deposits SET amount = 0 WHERE id = ?");
+                        $stmt->bind_param("i", $deposit_id);
+                        $stmt->execute();
+                        $stmt->close();
+                        $remaining_to_deduct -= $deposit_amount;
+                    }
+                } else {
+                    break; // No more deposits to deduct from
+                }
+            }
 
             // Update request status
             $stmt = $con->prepare("UPDATE staking_requests SET status = 'accepted' WHERE id = ?");
@@ -101,5 +135,7 @@ $stmt->close();
         </tbody>
     </table>
 
+    <?php require('footer.inc.php'); ?>
+</body>
 
-    <?php require('footer.inc.php');
+</html>
