@@ -130,7 +130,7 @@ $stmt->close();
                             Team Building
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="teamDropdown">
-                            <li><a class="dropdown-item" href="#">Team Building Member</a></li>
+                            <li><a class="dropdown-item" href="team_member.php">Team Building Member</a></li>
                             <li><a class="dropdown-item" href="#">Team Building Earning</a></li>
                         </ul>
                     </li>
