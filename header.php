@@ -54,8 +54,8 @@ $stmt->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-     <!-- Fonts -->
-     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome Icons -->
@@ -124,6 +124,15 @@ $stmt->close();
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="stacking_dummy.php">Daily Earning</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="teamDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
+                            Team Building
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="teamDropdown">
+                            <li><a class="dropdown-item" href="#">Team Building Member</a></li>
+                            <li><a class="dropdown-item" href="#">Team Building Earning</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="bonus_rewards.php">Bonus Reward</a>
