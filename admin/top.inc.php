@@ -3,8 +3,8 @@ require('connection.inc.php');
 require('functions.inc.php');
 if (isset($_SESSION['ADMIN_LOGIN']) && $_SESSION['ADMIN_LOGIN'] != '') {
 } else {
-   header('location:login.php');
-   die();
+    header('location:login.php');
+    die();
 }
 ?>
 <!doctype html>
@@ -38,6 +38,15 @@ if (isset($_SESSION['ADMIN_LOGIN']) && $_SESSION['ADMIN_LOGIN'] != '') {
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="admin_staking.php">Stacking Request</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin.php">Daily Earning</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin_staking_accepted.php">Stacking Request Accepted</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin_staking_rejected.php">Stacking Request Rejected</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="users.php">User</a>
@@ -77,10 +86,10 @@ if (isset($_SESSION['ADMIN_LOGIN']) && $_SESSION['ADMIN_LOGIN'] != '') {
             </nav>
         </aside>
 
-        
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>
 
+</html>
