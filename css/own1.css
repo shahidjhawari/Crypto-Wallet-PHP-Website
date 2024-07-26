@@ -30,6 +30,8 @@ body,
 .card {
   background-color: #141E46 !important;
   border-color: #141E46 !important;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px black inset;
 }
 
 a,
