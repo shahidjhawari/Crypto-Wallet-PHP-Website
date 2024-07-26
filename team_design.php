@@ -152,7 +152,6 @@ $result = $stmt->get_result();
                 <th>Action</th>
             </tr>
             <?php while ($row = $result->fetch_assoc()) : ?>
-                
                 <tr>
                     <td><?php echo htmlspecialchars($row['referred_user']); ?></td>
                     <td><?php echo htmlspecialchars($row['daily_earning_amount']); ?></td>
