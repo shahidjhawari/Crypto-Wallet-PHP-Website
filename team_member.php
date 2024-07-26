@@ -114,19 +114,7 @@ $result = $stmt->get_result();
                         </p>
 
                         <div class="collapse" id="levelOneDetails">
-                            <!-- Level One Users Details Here -->
-                            <?php
-                            $displayedNames = array(); // Array to track displayed names
-                            while ($row = $result->fetch_assoc()) :
-                                // Check if the name has already been displayed
-                                if (!in_array($row['referred_user'], $displayedNames)) :
-                                    $displayedNames[] = $row['referred_user']; // Add name to displayed list
-                            ?>
-                                    <p><?php echo htmlspecialchars($row['referred_user']); ?></p>
-                            <?php
-                                endif;
-                            endwhile;
-                            ?>
+                        <p>Level One Users List or Details...</p>
                         </div>
 
 
