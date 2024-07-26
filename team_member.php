@@ -112,12 +112,23 @@ $result = $stmt->get_result();
                             </a>
                             <i class="fa fa-unlock unlocked"></i>
                         </p>
+
                         <div class="collapse" id="levelOneDetails">
                             <!-- Level One Users Details Here -->
-                            <?php while ($row = $result->fetch_assoc()) : ?>
-                                <p><?php echo htmlspecialchars($row['referred_user']); ?></p>
-                            <?php endwhile; ?>
+                            <?php
+                            $displayedNames = array(); // Array to track displayed names
+                            while ($row = $result->fetch_assoc()) :
+                                // Check if the name has already been displayed
+                                if (!in_array($row['referred_user'], $displayedNames)) :
+                                    $displayedNames[] = $row['referred_user']; // Add name to displayed list
+                            ?>
+                                    <p><?php echo htmlspecialchars($row['referred_user']); ?></p>
+                            <?php
+                                endif;
+                            endwhile;
+                            ?>
                         </div>
+
 
                         <p>
                             <a href="#levelTwoDetails" class="no-underline" data-toggle="collapse" aria-expanded="false" aria-controls="levelTwoDetails">
