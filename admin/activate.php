@@ -1,5 +1,5 @@
 <?php
-require('top.inc.php');
+require('index.php');
 
 // Fetch all pending transactions
 $stmt = $con->prepare("SELECT * FROM transactions WHERE status = 'pending'");
