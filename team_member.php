@@ -17,6 +17,33 @@ $stmt->execute();
 $user_rewards = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
+$level_two_unlocked = $user_rewards['level_two_unlocked'];
+$level_three_unlocked = $user_rewards['level_three_unlocked'];
+
+// Check total deposits (to determine if new levels should be unlocked)
+$stmt = $conn->prepare("SELECT SUM(amount) AS total_deposited FROM deposits WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$total_deposited = $stmt->get_result()->fetch_assoc()['total_deposited'] ?? 0;
+$stmt->close();
+
+// Unlock levels based on total deposit
+if ($total_deposited >= 30 && !$level_two_unlocked) {
+    $stmt = $conn->prepare("UPDATE rewards SET level_two_unlocked = 1 WHERE user_id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $stmt->close();
+    $level_two_unlocked = 1;
+}
+
+if ($total_deposited >= 50 && !$level_three_unlocked) {
+    $stmt = $conn->prepare("UPDATE rewards SET level_three_unlocked = 1 WHERE user_id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $stmt->close();
+    $level_three_unlocked = 1;
+}
+
 // Fetch the user's referral code
 $stmt = $conn->prepare("SELECT referral_code FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
@@ -60,34 +87,10 @@ while ($row = $level1_result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Check total deposits
-$stmt = $conn->prepare("SELECT SUM(amount) AS total_deposited FROM deposits WHERE user_id = ?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$total_deposited = $stmt->get_result()->fetch_assoc()['total_deposited'] ?? 0;
-$stmt->close();
+// Display logic for locked/unlocked status
+$level_two_locked = !$level_two_unlocked;
+$level_three_locked = !$level_three_unlocked;
 
-$level_one_locked = false; // Assuming level one is always unlocked
-$level_two_locked = $total_deposited < 30;
-$level_three_locked = $total_deposited < 50;
-
-
-// Fetch referral rewards for the logged-in user
-$stmt = $conn->prepare("
-    SELECT rr.*, u.name AS referred_user,
-           CASE
-               WHEN rr.reward_percentage = 10 THEN 'Level 1'
-               WHEN rr.reward_percentage = 5 THEN 'Level 2'
-               WHEN rr.reward_percentage = 2 THEN 'Level 3'
-           END AS reward_level
-    FROM referral_rewards rr
-    JOIN users u ON rr.referred_user_id = u.id
-    WHERE rr.referrer_id = ?
-    ORDER BY rr.reward_date DESC
-");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
 ?>
 
 <style>
