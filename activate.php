@@ -78,10 +78,6 @@ $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['mes
               <input type="text" class="form-control" id="amount" name="amount" value="$<?php echo $fixed_amount_usd; ?>" readonly>
             </div>
             <div class="form-group">
-              <label for="transaction_id">Transaction ID</label>
-              <input type="text" class="form-control" id="transaction_id" name="transaction_id" required>
-            </div>
-            <div class="form-group">
               <label for="payment_method">Payment Method</label>
               <select class="form-control" id="payment_method" name="payment_method" onchange="toggleFields()" required>
                 <option value="" disabled selected>Select a payment method</option>
@@ -92,6 +88,10 @@ $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['mes
               </select>
             </div>
             <div id="additional_fields"></div>
+            <div class="form-group">
+              <label for="transaction_id">Transaction ID</label>
+              <input type="text" class="form-control" id="transaction_id" name="transaction_id" required>
+            </div>
             <div class="form-group">
               <label for="screenshot">Screenshot</label>
               <input type="file" class="form-control-file" id="screenshot" name="screenshot" required>
