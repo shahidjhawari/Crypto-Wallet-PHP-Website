@@ -27,15 +27,37 @@ $stmt->close();
 $referral_code = $user_referral['referral_code'];
 $referral_link = SITE_PATH . "/signup.php?referral=" . $referral_code;
 
-// Calculate the claimable amount from reward points
-$claimable_amount = floatval($user_rewards['reward_points']);
+// Fetch referred users' names by level
+$levels = [1 => [], 2 => [], 3 => []];
 
-// Fetch the user's transaction status
-$stmt = $conn->prepare("SELECT status FROM transactions WHERE user_id = ? ORDER BY id DESC LIMIT 1");
+// Fetch Level 1 referrals
+$stmt = $conn->prepare("SELECT id, name FROM users WHERE referrer_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$transaction_status_row = $stmt->get_result()->fetch_assoc();
-$transaction_status = $transaction_status_row['status'] ?? null;
+$level1_result = $stmt->get_result();
+while ($row = $level1_result->fetch_assoc()) {
+    $levels[1][] = htmlspecialchars($row['name']);
+
+    // Fetch Level 2 referrals for each Level 1 user
+    $stmt2 = $conn->prepare("SELECT id, name FROM users WHERE referrer_id = ?");
+    $stmt2->bind_param("i", $row['id']);
+    $stmt2->execute();
+    $level2_result = $stmt2->get_result();
+    while ($row2 = $level2_result->fetch_assoc()) {
+        $levels[2][] = htmlspecialchars($row2['name']);
+
+        // Fetch Level 3 referrals for each Level 2 user
+        $stmt3 = $conn->prepare("SELECT name FROM users WHERE referrer_id = ?");
+        $stmt3->bind_param("i", $row2['id']);
+        $stmt3->execute();
+        $level3_result = $stmt3->get_result();
+        while ($row3 = $level3_result->fetch_assoc()) {
+            $levels[3][] = htmlspecialchars($row3['name']);
+        }
+        $stmt3->close();
+    }
+    $stmt2->close();
+}
 $stmt->close();
 
 // Check total deposits
@@ -48,23 +70,6 @@ $stmt->close();
 $level_one_locked = false; // Assuming level one is always unlocked
 $level_two_locked = $total_deposited < 30;
 $level_three_locked = $total_deposited < 50;
-
-// Fetch referral rewards for the logged-in user
-$stmt = $conn->prepare("
-    SELECT rr.*, u.name AS referred_user,
-           CASE
-               WHEN rr.reward_percentage = 10 THEN 'Level 1'
-               WHEN rr.reward_percentage = 5 THEN 'Level 2'
-               WHEN rr.reward_percentage = 2 THEN 'Level 3'
-           END AS reward_level
-    FROM referral_rewards rr
-    JOIN users u ON rr.referred_user_id = u.id
-    WHERE rr.referrer_id = ?
-    ORDER BY rr.reward_date DESC
-");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
 ?>
 
 <style>
@@ -114,9 +119,10 @@ $result = $stmt->get_result();
                         </p>
 
                         <div class="collapse" id="levelOneDetails">
-                        <p>Level One Users List or Details...</p>
+                            <?php foreach ($levels[1] as $user_name) : ?>
+                                <p><?php echo $user_name; ?></p>
+                            <?php endforeach; ?>
                         </div>
-
 
                         <p>
                             <a href="#levelTwoDetails" class="no-underline" data-toggle="collapse" aria-expanded="false" aria-controls="levelTwoDetails">
@@ -130,8 +136,9 @@ $result = $stmt->get_result();
                             <?php endif; ?>
                         </p>
                         <div class="collapse" id="levelTwoDetails">
-                            <!-- Level Two Users Details Here -->
-                            <p>Level Two Users List or Details...</p>
+                            <?php foreach ($levels[2] as $user_name) : ?>
+                                <p><?php echo $user_name; ?></p>
+                            <?php endforeach; ?>
                         </div>
 
                         <p>
@@ -146,8 +153,9 @@ $result = $stmt->get_result();
                             <?php endif; ?>
                         </p>
                         <div class="collapse" id="levelThreeDetails">
-                            <!-- Level Three Users Details Here -->
-                            <p>Level Three Users List or Details...</p>
+                            <?php foreach ($levels[3] as $user_name) : ?>
+                                <p><?php echo $user_name; ?></p>
+                            <?php endforeach; ?>
                         </div>
 
                     </div>
@@ -168,6 +176,5 @@ $result = $stmt->get_result();
         });
     }
 </script>
-
 
 <?php require('footer.php'); ?>
