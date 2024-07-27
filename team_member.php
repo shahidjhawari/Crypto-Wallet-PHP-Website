@@ -70,6 +70,24 @@ $stmt->close();
 $level_one_locked = false; // Assuming level one is always unlocked
 $level_two_locked = $total_deposited < 30;
 $level_three_locked = $total_deposited < 50;
+
+
+// Fetch referral rewards for the logged-in user
+$stmt = $conn->prepare("
+    SELECT rr.*, u.name AS referred_user,
+           CASE
+               WHEN rr.reward_percentage = 10 THEN 'Level 1'
+               WHEN rr.reward_percentage = 5 THEN 'Level 2'
+               WHEN rr.reward_percentage = 2 THEN 'Level 3'
+           END AS reward_level
+    FROM referral_rewards rr
+    JOIN users u ON rr.referred_user_id = u.id
+    WHERE rr.referrer_id = ?
+    ORDER BY rr.reward_date DESC
+");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <style>
