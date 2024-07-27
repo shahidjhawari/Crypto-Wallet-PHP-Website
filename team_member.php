@@ -128,8 +128,7 @@ $level_three_locked = !$level_three_unlocked;
                         <button onclick="copyReferralLink()" class="btn btn-secondary">Copy Link</button>
                         <span id="copy-success" style="display:none; color: green; margin-left: 10px;">Copied!</span>
                         <hr>
-                        <p>Your Reward Points: $<?php echo htmlspecialchars($user_rewards['reward_points']) ?>.00</p>
-                        <p>Referral Count: <?php echo htmlspecialchars($user_rewards['referral_count']); ?></p>
+                        <p>Total Referral Users: <?php echo htmlspecialchars($user_rewards['referral_count']); ?></p>
 
                         <p>
                             <a href="#levelOneDetails" class="no-underline" data-toggle="collapse" aria-expanded="false" aria-controls="levelOneDetails">
