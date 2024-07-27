@@ -1,4 +1,5 @@
 <?php
+ob_start();
 require('header.php');
 
 // Redirect to login page if not logged in
