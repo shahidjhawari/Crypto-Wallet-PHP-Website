@@ -83,7 +83,7 @@ $stmt->close();
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
+                    <li class="nav-item">
                         <a class="nav-link" href="profile.php">My Profile</a>
                     </li>
                     <li class="nav-item">
@@ -136,15 +136,6 @@ $stmt->close();
                             <li><a class="dropdown-item" href="team_member.php">Team Building Member</a></li>
                             <li><a class="dropdown-item" href="#">Team Building Earning</a></li>
                         </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="bonus_rewards.php">Bonus Reward</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="user_payment.php">Withdraw</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="announcements.php">Announcements</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="logout.php">Logout</a>
