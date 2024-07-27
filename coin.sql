@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 23, 2024 at 12:28 PM
+-- Generation Time: Jul 27, 2024 at 11:19 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -149,15 +149,10 @@ CREATE TABLE `rewards` (
   `referral_count` int(11) DEFAULT 0,
   `level_one_count` int(11) DEFAULT 0,
   `level_two_count` int(11) DEFAULT 0,
-  `level_three_count` int(11) DEFAULT 0
+  `level_three_count` int(11) DEFAULT 0,
+  `level_two_unlocked` tinyint(1) DEFAULT 0,
+  `level_three_unlocked` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `rewards`
---
-
-INSERT INTO `rewards` (`id`, `user_id`, `reward_points`, `referral_count`, `level_one_count`, `level_two_count`, `level_three_count`) VALUES
-(1, 154, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -254,13 +249,6 @@ CREATE TABLE `users` (
   `referred_bonus_received` tinyint(1) NOT NULL DEFAULT 0,
   `username` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `random_string`, `referrer_id`, `referral_code`, `referred_bonus_received`, `username`) VALUES
-(154, 'NAWAB', 'shahidjhawari@gmail.com', '$2y$10$LI40l0Q5KHsFX1CdDoSQ1.PBA/M.bFgjklNFpqSPfUFjpaSAMoRz6', '4e39b891a8a24c986bf002b9c29e3d72af7811724ea043b98e84679788a06dd2cb98f493c2d5faa25e4efa86521f36795250', NULL, '34yJjLrs', 0, 'shahidiqbaljhawari');
 
 -- --------------------------------------------------------
 
@@ -437,7 +425,7 @@ ALTER TABLE `referral_rewards`
 -- AUTO_INCREMENT for table `rewards`
 --
 ALTER TABLE `rewards`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `reward_logs`
@@ -449,7 +437,7 @@ ALTER TABLE `reward_logs`
 -- AUTO_INCREMENT for table `stakings`
 --
 ALTER TABLE `stakings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=112;
 
 --
 -- AUTO_INCREMENT for table `staking_requests`
@@ -467,7 +455,7 @@ ALTER TABLE `transactions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=155;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=168;
 
 --
 -- AUTO_INCREMENT for table `user_payments`
