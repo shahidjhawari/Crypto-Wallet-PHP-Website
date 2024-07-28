@@ -83,22 +83,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            // Calculate the first day's earnings and insert the record
-            /*
-            $first_daily_earning = calculate_daily_earning(0, $stake_amount);
-            $stmt = $conn->prepare("INSERT INTO daily_earnings (user_id, staking_id, date, amount) VALUES (?, ?, CURDATE(), ?)");
-            $stmt->bind_param("iid", $user_id, $staking_id, $first_daily_earning);
-            $stmt->execute();
-            $stmt->close();
-
-            // Update total earned and remaining earning in stakings table
-            $remaining_earning -= $first_daily_earning;
-            $stmt = $conn->prepare("UPDATE stakings SET total_earning = ?, remaining_earning = ? WHERE id = ?");
-            $stmt->bind_param("dii", $first_daily_earning, $remaining_earning, $staking_id);
-            $stmt->execute();
-            $stmt->close();
-            */
-
             // Recalculate the wallet balance
             $stmt = $conn->prepare("SELECT SUM(amount) AS wallet_balance FROM deposits WHERE user_id = ? AND status = 'accepted'");
             $stmt->bind_param("i", $user_id);
@@ -187,6 +171,13 @@ $total_earning_amount = 0;
 foreach ($staking_records as $record) {
     $total_earning_amount += $record['total_earning'];
 }
+
+// Calculate total remaining earning amount
+$total_remaining_earning = 0;
+foreach ($staking_records as $record) {
+    $total_remaining_earning += $record['remaining_earning'];
+}
+
 ?>
 
 <style>
@@ -252,7 +243,7 @@ foreach ($staking_records as $record) {
                     <div class="col-12">
                         <h3 class="fs-5 mb-3">Remaining Earning</h3>
                         <h1 class="display-5 mb-4" style="margin-top: -15px;">
-                            Remaining Earning Here
+                            $<?php echo htmlspecialchars(number_format($total_remaining_earning, 2)); ?>
                         </h1>
                     </div>
                 </div>
