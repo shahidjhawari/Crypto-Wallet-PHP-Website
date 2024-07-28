@@ -1,6 +1,5 @@
 <?php
 ob_start();
-session_start();
 require('top.inc.php');
 
 // Ensure only admin can access this script
