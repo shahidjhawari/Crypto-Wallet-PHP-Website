@@ -1,4 +1,5 @@
 <?php
+ob_start();
 require('header.php');
 session_start();
 
@@ -41,6 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['error'] = "Invalid reward or reward already claimed.";
     }
 
-    header("Location: team_design.php");
+    header("Location: team_earning.php");
     exit();
 }

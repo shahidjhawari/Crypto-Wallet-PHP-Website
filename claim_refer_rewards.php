@@ -1,4 +1,5 @@
 <?php
+ob_start();
 require('header.php');
 session_start();
 

@@ -103,7 +103,7 @@ $result = $stmt->get_result();
     </div>
 </div>
 
-<div class="col-12 mb-4">
+<!-- <div class="col-12 mb-4">
     <div class="card">
         <div class="card-body p-3">
             <div class="row">
@@ -116,7 +116,7 @@ $result = $stmt->get_result();
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <div class="col-12 mb-4">
     <div class="card">
