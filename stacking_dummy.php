@@ -114,8 +114,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute();
             $stmt->close();
 
-            // Reset the total earning in the staking records
-            $stmt = $conn->prepare("UPDATE stakings SET total_earning = 0, remaining_earning = 0 WHERE user_id = ? AND status = 'active'");
+            // Update staking records
+            $stmt = $conn->prepare("UPDATE stakings SET total_earning = 0 WHERE user_id = ? AND status = 'active'");
             $stmt->bind_param("i", $user_id);
             $stmt->execute();
             $stmt->close();
@@ -250,7 +250,6 @@ foreach ($staking_records as $record) {
             </div>
         </div>
     </div>
-
 
 
     <div class="col-12 mb-4">
