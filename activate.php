@@ -36,15 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->execute();
     $stmt->close();
 
-    // Check if payment method is USDT and give bonus
-    if ($payment_method == 'USDT') {
-      $bonus_amount = $fixed_amount_usd * 0.05; // 5% bonus
-      $stmt = $conn->prepare("INSERT INTO bonus_rewards (user_id, transaction_id, bonus_amount) VALUES (?, ?, ?)");
-      $stmt->bind_param("isd", $user_id, $transaction_id, $bonus_amount);
-      $stmt->execute();
-      $stmt->close();
-    }
-
     echo "Transaction submitted successfully.";
   } else {
     echo "Sorry, there was an error uploading your file.";
@@ -99,9 +90,6 @@ $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['mes
             <button type="submit" class="btn btn-info btn-block">Submit</button>
           </form>
           <p id="converted-amount" class="mt-3">Equivalent Amount in PKR: <?php echo number_format($fixed_amount_pkr, 2); ?></p>
-          <div class="alert alert-info mt-3">
-            By selecting USDT, you will receive a 5% bonus on your deposit!
-          </div>
         </div>
       </div>
     </div>

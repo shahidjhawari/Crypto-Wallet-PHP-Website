@@ -44,6 +44,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute();
         $stmt->close();
 
+        // Check if payment method is USDT and give bonus
+        if ($payment_method == 'USDT') {
+          $bonus_amount = $amount * 0.05; // 5% bonus
+          $stmt = $conn->prepare("INSERT INTO bonus_rewards (user_id, transaction_id, bonus_amount) VALUES (?, ?, ?)");
+          $stmt->bind_param("isd", $user_id, $transaction_id, $bonus_amount);
+          $stmt->execute();
+          $stmt->close();
+        }
+
         // JavaScript redirect to dashboard page
         echo "<script>alert('Deposit submitted successfully.'); window.location.href = 'dashboard.php';</script>";
         exit();
@@ -57,8 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 // Fetch the latest exchange rate from the database
 $stmt = $conn->prepare("SELECT * FROM admin_messages ORDER BY created_at DESC LIMIT 1");
 $stmt->execute();
-$result = $stmt->get_result();
-$latestMessage = $result->fetch_assoc();
+$result = $stmt->get_result(); // Get the result set
+$latestMessage = $result->fetch_assoc(); // Fetch associative array
 $stmt->close();
 
 $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['message']) : 0.0;
@@ -107,6 +116,9 @@ $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['mes
             <button type="submit" class="btn btn-info btn-block">Submit</button>
           </form>
           <p id="converted-amount" class="mt-3"></p>
+          <div class="alert alert-info mt-3">
+            By selecting USDT, you will receive a 5% bonus on your deposit!
+          </div>
         </div>
       </div>
     </div>
@@ -174,4 +186,6 @@ $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['mes
   }
 </script>
 
-<?php require('footer.php'); ?>
+<?php
+require('footer.php');
+?>
