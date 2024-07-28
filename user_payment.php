@@ -26,21 +26,21 @@ $stmt->close();
         var amount = document.getElementById("amount").value;
         var fee = 0;
 
-        if (paymentMethod === "Dollar") {
-            addressField.style.display = "block";
-            accountNumberField.style.display = "none";
-            fee = 0.01 * amount;
-            feeInfo.textContent = "Note: A 1% fee will be deducted.";
-        } else if (paymentMethod === "USDTP") {
+        if (paymentMethod === "USDTP") {
             addressField.style.display = "none";
             accountNumberField.style.display = "block";
-            fee = 0.01 * amount;
-            feeInfo.textContent = "Note: A 1% fee will be deducted.";
+            fee = 0.03 * amount; // 3% fee for USDTP
+            feeInfo.textContent = "Note: A 3% fee will be deducted.";
+        } else if (paymentMethod === "Dollar") {
+            addressField.style.display = "block";
+            accountNumberField.style.display = "none";
+            fee = 0.03 * amount; // 1% fee for Dollar (assuming you meant USDT)
+            feeInfo.textContent = "Note: A 3% fee will be deducted.";
         } else {
             addressField.style.display = "none";
             accountNumberField.style.display = "block";
-            fee = 0.03 * amount;
-            feeInfo.textContent = "Note: A 3% fee will be deducted.";
+            fee = 0.05 * amount; // 5% fee for other payment methods
+            feeInfo.textContent = "Note: A 5% fee will be deducted.";
         }
 
         document.getElementById("fee_amount").textContent = fee.toFixed(2);
