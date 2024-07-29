@@ -65,6 +65,16 @@ $stmt = $conn->prepare("
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
+
+
+// Fetch total referral earnings
+$stmt = $conn->prepare("SELECT SUM(referral_daily_reward) AS total_referral_earnings FROM deposits WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$total_referral_earnings_row = $stmt->get_result()->fetch_assoc();
+$total_referral_earnings = $total_referral_earnings_row['total_referral_earnings'] ?? 0;
+$stmt->close();
+
 ?>
 
 <style>
@@ -155,14 +165,15 @@ $result = $stmt->get_result();
 </div>
 
 
+
 <div class="col-12 mb-4">
     <div class="card">
         <div class="card-body p-3">
             <div class="row">
                 <div class="col-12">
-                    <h3 class="fs-5 mb-3">Total Claimed Earning</h3>
+                    <h3 class="fs-5 mb-3">Total Claimed Earning from Referrals</h3>
                     <h2 class="display-5 mb-4" style="margin-top: -15px;">
-                        Total Claimed Earning here
+                        $<?php echo number_format($total_referral_earnings, 2); ?>
                     </h2>
                 </div>
             </div>

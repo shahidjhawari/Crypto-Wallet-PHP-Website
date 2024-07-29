@@ -27,10 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($claim_amount > 0) {
             // Insert the claim amount into the deposits table with status 'Accepted'
-            $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, status) VALUES (?, ?, 'Accepted')");
-            $stmt->bind_param("id", $user_id, $claim_amount);
+            // Insert the claim amount into the deposits table with status 'Accepted' and track as referral reward
+            $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, referral_daily_reward, status) VALUES (?, ?, ?, 'Accepted')");
+            $stmt->bind_param("idd", $user_id, $claim_amount, $claim_amount);
             $stmt->execute();
             $stmt->close();
+
 
             // Update the referral reward to set the user_10_percent_reward to 0
             $stmt = $conn->prepare("UPDATE referral_rewards SET user_10_percent_reward = 0 WHERE id = ?");
