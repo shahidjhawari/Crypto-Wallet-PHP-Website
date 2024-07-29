@@ -143,64 +143,77 @@ $result = $stmt->get_result();
 
 <div class="container mt-5">
     <h1>Referral Rewards</h1>
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered">
-            <tr>
-                <th>Referred User</th>
-                <th>Daily Earning Amount ($)</th>
-                <th>Reward Percentage (%)</th>
-                <th>Reward Amount ($)</th>
-                <th>User 10% Reward ($)</th>
-                <th>Reward Date</th>
-                <th>Level</th>
-                <th>Action</th>
-            </tr>
-            <?php while ($row = $result->fetch_assoc()) : ?>
+    <form id="claimAllForm" action="claim_user_reward.php" method="post">
+        <button type="button" id="claimAllButton" class="btn btn-success mb-3" onclick="claimAllRewards()">Claim All Rewards</button>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
                 <tr>
-                    <td><?php echo htmlspecialchars($row['referred_user']); ?></td>
-                    <td><?php echo htmlspecialchars($row['daily_earning_amount']); ?></td>
-                    <td><?php echo htmlspecialchars($row['reward_percentage']); ?></td>
-                    <td><?php echo htmlspecialchars($row['reward_amount']); ?></td>
-                    <td><?php echo htmlspecialchars($row['user_10_percent_reward']); ?></td>
-                    <td><?php echo htmlspecialchars($row['reward_date']); ?></td>
-                    <td><?php echo htmlspecialchars($row['reward_level']); ?></td>
-                    <td>
-                        <?php if (floatval($row['user_10_percent_reward']) > 0) : ?>
-                            <form action="claim_user_reward.php" method="post">
-                                <input type="hidden" name="reward_id" value="<?php echo htmlspecialchars($row['id']); ?>">
-                                <?php if ($row['reward_percentage'] == 10 && $level_one_locked) : ?>
-                                    <button type="submit" class="btn btn-success" disabled>Claim Now</button>
-                                <?php elseif ($row['reward_percentage'] == 5 && $level_two_locked) : ?>
-                                    <button type="submit" class="btn btn-success" disabled>Claim Now</button>
-                                <?php elseif ($row['reward_percentage'] == 2 && $level_three_locked) : ?>
-                                    <button type="submit" class="btn btn-success" disabled>Claim Now</button>
-                                <?php else : ?>
-                                    <button type="submit" class="btn btn-success">Claim Now</button>
-                                <?php endif; ?>
-                            </form>
-                        <?php else : ?>
-                            <span>Reward Claimed</span>
-                        <?php endif; ?>
-                    </td>
+                    <th>Referred User</th>
+                    <th>Daily Earning Amount ($)</th>
+                    <th>Reward Percentage (%)</th>
+                    <th>Reward Amount ($)</th>
+                    <th>User 10% Reward ($)</th>
+                    <th>Reward Date</th>
+                    <th>Level</th>
+                    <th>Action</th>
                 </tr>
-            <?php endwhile; ?>
-        </table>
-    </div>
+                <?php while ($row = $result->fetch_assoc()) : ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($row['referred_user']); ?></td>
+                        <td><?php echo htmlspecialchars($row['daily_earning_amount']); ?></td>
+                        <td><?php echo htmlspecialchars($row['reward_percentage']); ?></td>
+                        <td><?php echo htmlspecialchars($row['reward_amount']); ?></td>
+                        <td><?php echo htmlspecialchars($row['user_10_percent_reward']); ?></td>
+                        <td><?php echo htmlspecialchars($row['reward_date']); ?></td>
+                        <td><?php echo htmlspecialchars($row['reward_level']); ?></td>
+                        <td>
+                            <?php if (floatval($row['user_10_percent_reward']) > 0) : ?>
+                                <form action="claim_user_reward.php" method="post">
+                                    <input type="hidden" name="reward_id" value="<?php echo htmlspecialchars($row['id']); ?>">
+                                    <?php if ($row['reward_percentage'] == 10 && $level_one_locked) : ?>
+                                        <button type="submit" class="btn btn-success" disabled>Claim Now</button>
+                                    <?php elseif ($row['reward_percentage'] == 5 && $level_two_locked) : ?>
+                                        <button type="submit" class="btn btn-success" disabled>Claim Now</button>
+                                    <?php elseif ($row['reward_percentage'] == 2 && $level_three_locked) : ?>
+                                        <button type="submit" class="btn btn-success" disabled>Claim Now</button>
+                                    <?php else : ?>
+                                        <button type="submit" class="btn btn-success">Claim Now</button>
+                                        <input type="hidden" name="reward_ids[]" value="<?php echo htmlspecialchars($row['id']); ?>">
+                                    <?php endif; ?>
+                                </form>
+                            <?php else : ?>
+                                <span>Reward Claimed</span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </table>
+        </div>
+    </form>
 </div>
+
 
 <?php require('footer.php'); ?>
 
 <script>
-    function copyReferralLink() {
-        var referralLink = document.getElementById("referral-link").textContent;
-        navigator.clipboard.writeText(referralLink).then(function() {
-            var copySuccess = document.getElementById("copy-success");
-            copySuccess.style.display = "inline";
-            setTimeout(function() {
-                copySuccess.style.display = "none";
-            }, 2000);
-        }, function() {
-            alert("Failed to copy the link.");
+    function claimAllRewards() {
+        var form = document.getElementById('claimAllForm');
+        var inputs = form.querySelectorAll('input[name="reward_ids[]"]');
+        var hasEnabledRewards = false;
+
+        inputs.forEach(function(input) {
+            if (input.closest('tr').querySelector('button[type="submit"]').disabled === false) {
+                hasEnabledRewards = true;
+                input.disabled = false;
+            } else {
+                input.disabled = true;
+            }
         });
+
+        if (hasEnabledRewards) {
+            form.submit();
+        } else {
+            alert('No rewards available for claiming.');
+        }
     }
 </script>
