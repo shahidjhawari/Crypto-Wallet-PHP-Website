@@ -12,44 +12,42 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['reward_ids']) && is_array($_POST['reward_ids'])) {
-        $reward_ids = $_POST['reward_ids'];
+    // Fetch all eligible rewards for the user
+    $stmt = $conn->prepare("SELECT id, user_10_percent_reward FROM referral_rewards WHERE referrer_id = ? AND user_10_percent_reward > 0");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $rewards = $stmt->get_result();
+    $stmt->close();
 
-        foreach ($reward_ids as $reward_id) {
-            $reward_id = intval($reward_id);
+    $total_claimed = 0;
 
-            // Fetch the reward details
-            $stmt = $conn->prepare("SELECT user_10_percent_reward FROM referral_rewards WHERE id = ? AND referrer_id = ?");
-            $stmt->bind_param("ii", $reward_id, $user_id);
+    while ($reward = $rewards->fetch_assoc()) {
+        $reward_id = $reward['id'];
+        $claim_amount = floatval($reward['user_10_percent_reward']);
+
+        if ($claim_amount > 0) {
+            // Insert the claim amount into the deposits table with status 'Accepted'
+            $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, status) VALUES (?, ?, 'Accepted')");
+            $stmt->bind_param("id", $user_id, $claim_amount);
             $stmt->execute();
-            $reward = $stmt->get_result()->fetch_assoc();
             $stmt->close();
 
-            if ($reward && floatval($reward['user_10_percent_reward']) > 0) {
-                $claim_amount = floatval($reward['user_10_percent_reward']);
+            // Update the referral reward to set the user_10_percent_reward to 0
+            $stmt = $conn->prepare("UPDATE referral_rewards SET user_10_percent_reward = 0 WHERE id = ?");
+            $stmt->bind_param("i", $reward_id);
+            $stmt->execute();
+            $stmt->close();
 
-                // Insert the claim amount into the deposits table with status 'Accepted'
-                $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, status) VALUES (?, ?, 'Accepted')");
-                $stmt->bind_param("id", $user_id, $claim_amount);
-                $stmt->execute();
-                $stmt->close();
-
-                // Update the referral reward to set the user_10_percent_reward to 0
-                $stmt = $conn->prepare("UPDATE referral_rewards SET user_10_percent_reward = 0 WHERE id = ?");
-                $stmt->bind_param("i", $reward_id);
-                $stmt->execute();
-                $stmt->close();
-
-                $_SESSION['message'] = "Reward claimed successfully!";
-            } else {
-                $_SESSION['error'] = "Invalid reward or reward already claimed.";
-            }
+            $total_claimed += $claim_amount;
         }
+    }
+
+    if ($total_claimed > 0) {
+        $_SESSION['message'] = "Total reward claimed: $total_claimed";
     } else {
-        $_SESSION['error'] = "No rewards selected for claiming.";
+        $_SESSION['error'] = "No rewards available for claiming.";
     }
 
     header("Location: team_earning.php");
     exit();
 }
-?>

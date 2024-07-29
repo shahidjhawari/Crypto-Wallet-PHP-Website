@@ -141,10 +141,26 @@ $result = $stmt->get_result();
 </div>
 
 
+<div class="col-12 mb-4">
+    <div class="card">
+        <div class="card-body p-3">
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="fs-5 mb-3">Claim All Reward</h3>
+                    <button type="button" id="claimAllButton" class="btn btn-success mb-3" onclick="claimAllRewards()" disabled>Claim All Rewards</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Add Claim All Rewards Button -->
+
 <div class="container mt-5">
     <h1>Referral Rewards</h1>
     <form id="claimAllForm" action="claim_user_reward.php" method="post">
-        <button type="button" id="claimAllButton" class="btn btn-success mb-3" onclick="claimAllRewards()">Claim All Rewards</button>
         <div class="table-responsive">
             <table class="table table-striped table-bordered">
                 <tr>
@@ -156,7 +172,17 @@ $result = $stmt->get_result();
                     <th>Level</th>
                     <th>Action</th>
                 </tr>
-                <?php while ($row = $result->fetch_assoc()) : ?>
+                <?php
+                $rewards_available = false;
+                while ($row = $result->fetch_assoc()) :
+                    $can_claim = floatval($row['user_10_percent_reward']) > 0 &&
+                        !(($row['reward_percentage'] == 10 && $level_one_locked) ||
+                            ($row['reward_percentage'] == 5 && $level_two_locked) ||
+                            ($row['reward_percentage'] == 2 && $level_three_locked));
+                    if ($can_claim) {
+                        $rewards_available = true;
+                    }
+                ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row['referred_user']); ?></td>
                         <td><?php echo htmlspecialchars($row['daily_earning_amount']); ?></td>
@@ -165,15 +191,9 @@ $result = $stmt->get_result();
                         <td><?php echo htmlspecialchars($row['reward_date']); ?></td>
                         <td><?php echo htmlspecialchars($row['reward_level']); ?></td>
                         <td>
-                            <?php if (floatval($row['user_10_percent_reward']) > 0) : ?>
-                                <form action="claim_user_reward.php" method="post">
-                                    <input type="hidden" name="reward_ids[]" value="<?php echo htmlspecialchars($row['id']); ?>" disabled>
-                                    <?php if (($row['reward_percentage'] == 10 && $level_one_locked) || ($row['reward_percentage'] == 5 && $level_two_locked) || ($row['reward_percentage'] == 2 && $level_three_locked)) : ?>
-                                        <button type="submit" class="btn btn-success" disabled>Claim Now</button>
-                                    <?php else : ?>
-                                        <button type="submit" class="btn btn-success">Claim Now</button>
-                                    <?php endif; ?>
-                                </form>
+                            <?php if ($can_claim) : ?>
+                                <input type="hidden" name="reward_ids[]" value="<?php echo htmlspecialchars($row['id']); ?>">
+                                <button type="submit" class="btn btn-success">Claim Now</button>
                             <?php else : ?>
                                 <span>Reward Claimed</span>
                             <?php endif; ?>
@@ -185,26 +205,20 @@ $result = $stmt->get_result();
     </form>
 </div>
 
+<?php require('footer.php'); ?>
+
 <script>
+    // Enable the "Claim All" button if there are rewards available to claim
+    document.addEventListener('DOMContentLoaded', function() {
+        var rewardsAvailable = <?php echo json_encode($rewards_available); ?>;
+        var claimAllButton = document.getElementById('claimAllButton');
+        if (rewardsAvailable) {
+            claimAllButton.disabled = false;
+        }
+    });
+
     function claimAllRewards() {
         var form = document.getElementById('claimAllForm');
-        var inputs = form.querySelectorAll('input[name="reward_ids[]"]');
-        var hasEnabledRewards = false;
-
-        inputs.forEach(function(input) {
-            var button = input.closest('tr').querySelector('button[type="submit"]');
-            if (button && button.disabled === false) {
-                hasEnabledRewards = true;
-                input.disabled = false;
-            } else {
-                input.disabled = true;
-            }
-        });
-
-        if (hasEnabledRewards) {
-            form.submit();
-        } else {
-            alert('No rewards available for claiming.');
-        }
+        form.submit();
     }
 </script>
