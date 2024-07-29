@@ -152,7 +152,6 @@ $result = $stmt->get_result();
                     <th>Daily Earning Amount ($)</th>
                     <th>Reward Percentage (%)</th>
                     <th>Reward Amount ($)</th>
-                    <th>User 10% Reward ($)</th>
                     <th>Reward Date</th>
                     <th>Level</th>
                     <th>Action</th>
@@ -162,7 +161,6 @@ $result = $stmt->get_result();
                         <td><?php echo htmlspecialchars($row['referred_user']); ?></td>
                         <td><?php echo htmlspecialchars($row['daily_earning_amount']); ?></td>
                         <td><?php echo htmlspecialchars($row['reward_percentage']); ?></td>
-                        <td><?php echo htmlspecialchars($row['reward_amount']); ?></td>
                         <td><?php echo htmlspecialchars($row['user_10_percent_reward']); ?></td>
                         <td><?php echo htmlspecialchars($row['reward_date']); ?></td>
                         <td><?php echo htmlspecialchars($row['reward_level']); ?></td>
