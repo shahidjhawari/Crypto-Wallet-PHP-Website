@@ -155,6 +155,23 @@ $result = $stmt->get_result();
 </div>
 
 
+<div class="col-12 mb-4">
+    <div class="card">
+        <div class="card-body p-3">
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="fs-5 mb-3">Total Claimed Earning</h3>
+                    <h2 class="display-5 mb-4" style="margin-top: -15px;">
+                        Total Claimed Earning here
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 
 <!-- Add Claim All Rewards Button -->
 
