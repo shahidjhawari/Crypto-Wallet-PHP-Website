@@ -21,10 +21,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
 
     if ($claim_amount > 0 && $claim_amount <= $user_rewards['reward_points']) {
-        // Insert the claim into the deposits table
-        $status = 'Accepted'; // Assuming reward claims are automatically accepted
-        $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, status) VALUES (?, ?, ?)");
-        $stmt->bind_param("iis", $user_id, $claim_amount, $status);
+        // Insert the claim into the referral_earnings table
+        $stmt = $conn->prepare("INSERT INTO referral_earnings (user_id, amount) VALUES (?, ?)");
+        $stmt->bind_param("id", $user_id, $claim_amount);
 
         if ($stmt->execute()) {
             $stmt->close();
