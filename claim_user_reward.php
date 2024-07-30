@@ -26,8 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $claim_amount = floatval($reward['user_10_percent_reward']);
 
         if ($claim_amount > 0) {
-            // Insert the claim amount into the deposits table with status 'Accepted'
-            $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, referral_daily_reward, status) VALUES (?, ?, ?, 'Accepted')");
+            // Insert the claim amount into the referral_earnings table
+            $stmt = $conn->prepare("INSERT INTO referral_earnings (user_id, amount, referral_daily_reward) VALUES (?, ?, ?)");
             $stmt->bind_param("idd", $user_id, $claim_amount, $claim_amount);
             $stmt->execute();
             $stmt->close();
