@@ -141,6 +141,9 @@ $stmt->close();
                         <a class="nav-link" href="bonus_rewards.php">Bonus Reward</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="referral_earning.php">Referral Earning</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="logout.php">Logout</a>
                     </li>
                 </ul>
