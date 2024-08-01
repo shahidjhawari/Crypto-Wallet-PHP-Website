@@ -451,9 +451,6 @@ $stmt->close();
                             <h1 class="display-5 mb-4" style="margin-top: -15px;">
                                 $<?php echo htmlspecialchars(number_format($total_daily_earnings, 2)); ?>
                             </h1>
-                            <p>Total Daily Earning</p>
-                            <!-- Remove the loop as we are only showing the total -->
-                            <!-- <p><a href="#" class="btn btn-info">Daily Earning Record</a></p> -->
                         </div>
                     </div>
                 </div>
