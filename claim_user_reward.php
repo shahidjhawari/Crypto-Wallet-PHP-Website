@@ -26,16 +26,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $claim_amount = floatval($reward['user_10_percent_reward']);
 
         if ($claim_amount > 0) {
-            // Insert the claim amount into the referral_earnings table
-            $stmt = $conn->prepare("INSERT INTO referral_earnings (user_id, amount, referral_daily_reward) VALUES (?, ?, ?)");
-            $stmt->bind_param("idd", $user_id, $claim_amount, $claim_amount);
+            // Check if there is an existing deposit record for the user
+            $stmt = $conn->prepare("SELECT id, amount FROM deposits WHERE user_id = ? LIMIT 1");
+            $stmt->bind_param("i", $user_id);
             $stmt->execute();
+            $deposit = $stmt->get_result()->fetch_assoc();
             $stmt->close();
+
+            if ($deposit) {
+                // Update the existing deposit record by adding the claimed amount
+                $new_amount = $deposit['amount'] + $claim_amount;
+                $stmt = $conn->prepare("UPDATE deposits SET amount = ? WHERE id = ?");
+                $stmt->bind_param("di", $new_amount, $deposit['id']);
+                $stmt->execute();
+                $stmt->close();
+            } else {
+                // If no existing record, this part can be omitted if a record is mandatory
+                $_SESSION['error'] = "No existing deposit record found for the user.";
+                header("Location: team_earning.php");
+                exit();
+            }
 
             // Deduct the claimed amount from the remaining_earning in the stakings table
             $remaining_claim_amount = $claim_amount;
 
-            // Fetch stakings with remaining earnings greater than 0
             $stmt = $conn->prepare("SELECT id, remaining_earning FROM stakings WHERE user_id = ? AND remaining_earning > 0 ORDER BY id ASC");
             $stmt->bind_param("i", $user_id);
             $stmt->execute();
@@ -75,4 +89,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: team_earning.php");
     exit();
 }
-?>
