@@ -165,7 +165,7 @@ $stmt->close();
         <div class="card-body p-3">
             <div class="row">
                 <div class="col-12">
-                    <h3 class="fs-5 mb-3">Total Withdraw Earning</h3>
+                    <h3 class="fs-5 mb-3">Total Claim Earning</h3>
                     <h2 class="display-5 mb-4" style="margin-top: -15px;">
                         $<?php echo number_format($total_referral_earnings, 2); ?>
                     </h2>
