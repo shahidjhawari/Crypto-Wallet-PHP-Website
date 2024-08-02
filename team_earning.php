@@ -103,32 +103,26 @@ $stmt->close();
         <div class="card-body p-3">
             <div class="row">
                 <div class="col-12">
-                    <h3 class="fs-5 mb-3">Referral Reward</h3>
+                    <h3 class="fs-5 mb-3">Registration Reward</h3>
                     <h2 class="display-5 mb-4" style="margin-top: -15px;">
                         $<?php echo htmlspecialchars($user_rewards['reward_points']) ?>.00
                     </h2>
+                    <?php if ($claimable_amount > 0) : ?>
+                        <form action="claim_refer_rewards.php" method="post">
+                            <input type="hidden" name="claim_amount" value="<?php echo htmlspecialchars($claimable_amount); ?>">
+                            <button type="submit" class="btn btn-primary">Claim</button>
+                        </form>
+                    <?php else : ?>
+                        <button type="submit" class="btn btn-primary" disabled>Claim</button>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- <div class="col-12 mb-4">
-    <div class="card">
-        <div class="card-body p-3">
-            <div class="row">
-                <div class="col-12">
-                    <h3 class="fs-5 mb-3">User Daily Earning Reward</h3>
-                    <h2 class="display-5 mb-4" style="margin-top: -15px;">
-                        $<?php echo htmlspecialchars($user_rewards['reward_points']) ?>.00
-                    </h2>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> -->
 
-<div class="col-12 mb-4">
+<!-- <div class="col-12 mb-4">
     <div class="card">
         <div class="card-body p-3">
             <div class="row">
@@ -148,7 +142,7 @@ $stmt->close();
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 
 <div class="col-12 mb-4">
@@ -156,8 +150,8 @@ $stmt->close();
         <div class="card-body p-3">
             <div class="row">
                 <div class="col-12">
-                    <h3 class="fs-5 mb-3">Claim All Reward</h3>
-                    <button type="button" id="claimAllButton" class="btn btn-success mb-3" onclick="claimAllRewards()" disabled>Claim All Rewards</button>
+                    <h3 class="fs-5 mb-3">Claim Referr Reward</h3>
+                    <button type="button" id="claimAllButton" class="btn btn-success mb-3" onclick="claimAllRewards()" disabled>Claim</button>
                 </div>
             </div>
         </div>
@@ -198,7 +192,6 @@ $stmt->close();
                     <th>Reward Amount ($)</th>
                     <th>Reward Date</th>
                     <th>Level</th>
-                    <th>Action</th>
                 </tr>
                 <?php
                 $rewards_available = false;
@@ -218,14 +211,13 @@ $stmt->close();
                         <td><?php echo htmlspecialchars($row['user_10_percent_reward']); ?></td>
                         <td><?php echo htmlspecialchars($row['reward_date']); ?></td>
                         <td><?php echo htmlspecialchars($row['reward_level']); ?></td>
-                        <td>
-                            <?php if ($can_claim) : ?>
-                                <input type="hidden" name="reward_ids[]" value="<?php echo htmlspecialchars($row['id']); ?>">
-                                <button type="submit" class="btn btn-success">Claim Now</button>
-                            <?php else : ?>
-                                <span>Reward Claimed</span>
-                            <?php endif; ?>
-                        </td>
+                    <tr>
+                        <?php if ($can_claim) : ?>
+
+                        <?php else : ?>
+
+                        <?php endif; ?>
+                    </tr>
                     </tr>
                 <?php endwhile; ?>
             </table>

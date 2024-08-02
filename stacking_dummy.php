@@ -257,7 +257,7 @@ foreach ($staking_records as $record) {
             <div class="card-body p-3">
                 <div class="row">
                     <div class="col-12">
-                        <h3 class="fs-5 mb-3">Claim Daily Earning</h3>
+                        <h3 class="fs-5 mb-3">Daily Earning</h3>
                         <form method="post" action="stacking_dummy.php">
                             <button type="submit" name="claim_now" class="btn btn-success" <?php echo $total_earning_amount == 0 ? 'disabled' : ''; ?>>Claim Now</button>
                         </form>
