@@ -70,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
 
         $_SESSION['message'] = "Earnings successfully claimed and added to your deposit.";
-        header("Location: team_design.php");
+        header("Location: team_earning.php");
         exit();
     } else {
         echo "Invalid claim amount.";
