@@ -66,9 +66,8 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
-
-// Fetch total referral earnings
-$stmt = $conn->prepare("SELECT SUM(referral_daily_reward) AS total_referral_earnings FROM deposits WHERE user_id = ?");
+// Fetch total referral earnings from ClaimedEarning table
+$stmt = $conn->prepare("SELECT SUM(amount) AS total_referral_earnings FROM ClaimedEarning WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $total_referral_earnings_row = $stmt->get_result()->fetch_assoc();
@@ -121,30 +120,6 @@ $stmt->close();
     </div>
 </div>
 
-
-<!-- <div class="col-12 mb-4">
-    <div class="card">
-        <div class="card-body p-3">
-            <div class="row">
-                <div class="col-12">
-                    <h3 class="fs-5 mb-3">Claim Reward</h3>
-                    <h2 class="display-5 mb-4" style="margin-top: -15px;">
-                        <?php if ($claimable_amount > 0) : ?>
-                            <form action="claim_refer_rewards.php" method="post">
-                                <input type="hidden" name="claim_amount" value="<?php echo htmlspecialchars($claimable_amount); ?>">
-                                <button type="submit" class="btn btn-primary">Claim Rewards</button>
-                            </form>
-                        <?php else : ?>
-                            <button type="submit" class="btn btn-primary" disabled>Claim Rewards</button>
-                        <?php endif; ?>
-                    </h2>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> -->
-
-
 <div class="col-12 mb-4">
     <div class="card">
         <div class="card-body p-3">
@@ -157,8 +132,6 @@ $stmt->close();
         </div>
     </div>
 </div>
-
-
 
 <div class="col-12 mb-4">
     <div class="card">
@@ -174,11 +147,6 @@ $stmt->close();
         </div>
     </div>
 </div>
-
-
-
-
-<!-- Add Claim All Rewards Button -->
 
 <div class="container mt-5">
     <h1>Referral Rewards</h1>

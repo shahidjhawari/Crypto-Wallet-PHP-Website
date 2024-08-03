@@ -76,6 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute();
             $stmt->close();
 
+            // Insert the claimed amount into ClaimedEarning table
+            $stmt = $conn->prepare("INSERT INTO ClaimedEarning (user_id, amount) VALUES (?, ?)");
+            $stmt->bind_param("id", $user_id, $claim_amount);
+            $stmt->execute();
+            $stmt->close();
+
             $total_claimed += $claim_amount;
         }
     }
@@ -89,3 +95,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: team_earning.php");
     exit();
 }
+?>
