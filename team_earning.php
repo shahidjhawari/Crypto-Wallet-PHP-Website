@@ -160,7 +160,11 @@ $stmt->close();
 
 <div class="col-12 mb-4">
     <div class="alert alert-info mt-3">
-        Start stacking to calim reward
+        <?php if ($claimable_amount > 0 && $accepted_requests) : ?>
+
+        <?php else : ?>
+            Start stacking to calim reward
+        <?php endif; ?>
     </div>
 </div>
 
