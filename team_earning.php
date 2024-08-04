@@ -65,6 +65,7 @@ $stmt = $conn->prepare("
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
+$stmt->close();
 
 // Fetch total referral earnings from ClaimedEarning table
 $stmt = $conn->prepare("SELECT SUM(amount) AS total_referral_earnings FROM ClaimedEarning WHERE user_id = ?");
@@ -72,6 +73,14 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $total_referral_earnings_row = $stmt->get_result()->fetch_assoc();
 $total_referral_earnings = $total_referral_earnings_row['total_referral_earnings'] ?? 0;
+$stmt->close();
+
+// Check if the user has at least one accepted staking request
+$stmt = $conn->prepare("SELECT COUNT(*) AS accepted_requests FROM staking_requests WHERE user_id = ? AND status = 'accepted'");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$accepted_requests_row = $stmt->get_result()->fetch_assoc();
+$accepted_requests = $accepted_requests_row['accepted_requests'] > 0;
 $stmt->close();
 
 ?>
@@ -106,7 +115,7 @@ $stmt->close();
                     <h2 class="display-5 mb-4" style="margin-top: -15px;">
                         $<?php echo htmlspecialchars($user_rewards['reward_points']) ?>.00
                     </h2>
-                    <?php if ($claimable_amount > 0) : ?>
+                    <?php if ($claimable_amount > 0 && $accepted_requests) : ?>
                         <form action="claim_refer_rewards.php" method="post">
                             <input type="hidden" name="claim_amount" value="<?php echo htmlspecialchars($claimable_amount); ?>">
                             <button type="submit" class="btn btn-primary">Claim</button>
@@ -125,8 +134,8 @@ $stmt->close();
         <div class="card-body p-3">
             <div class="row">
                 <div class="col-12">
-                    <h3 class="fs-5 mb-3">Claim Referr Reward</h3>
-                    <button type="button" id="claimAllButton" class="btn btn-success mb-3" onclick="claimAllRewards()" disabled>Claim</button>
+                    <h3 class="fs-5 mb-3">Claim Referral Reward</h3>
+                    <button type="button" id="claimAllButton" class="btn btn-success mb-3" onclick="claimAllRewards()" <?php echo $accepted_requests ? '' : 'disabled'; ?>>Claim</button>
                 </div>
             </div>
         </div>
@@ -138,13 +147,20 @@ $stmt->close();
         <div class="card-body p-3">
             <div class="row">
                 <div class="col-12">
-                    <h3 class="fs-5 mb-3">Total Claim Earning</h3>
+                    <h3 class="fs-5 mb-3">Total Claim Earnings</h3>
                     <h2 class="display-5 mb-4" style="margin-top: -15px;">
                         $<?php echo number_format($total_referral_earnings, 2); ?>
                     </h2>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+
+<div class="col-12 mb-4">
+    <div class="alert alert-info mt-3">
+        Start stacking to calim reward
     </div>
 </div>
 
@@ -179,13 +195,6 @@ $stmt->close();
                         <td><?php echo htmlspecialchars($row['user_10_percent_reward']); ?></td>
                         <td><?php echo htmlspecialchars($row['reward_date']); ?></td>
                         <td><?php echo htmlspecialchars($row['reward_level']); ?></td>
-                    <tr>
-                        <?php if ($can_claim) : ?>
-
-                        <?php else : ?>
-
-                        <?php endif; ?>
-                    </tr>
                     </tr>
                 <?php endwhile; ?>
             </table>
@@ -200,7 +209,7 @@ $stmt->close();
     document.addEventListener('DOMContentLoaded', function() {
         var rewardsAvailable = <?php echo json_encode($rewards_available); ?>;
         var claimAllButton = document.getElementById('claimAllButton');
-        if (rewardsAvailable) {
+        if (rewardsAvailable && <?php echo json_encode($accepted_requests); ?>) {
             claimAllButton.disabled = false;
         }
     });
