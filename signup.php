@@ -189,7 +189,21 @@ function rewardReferrer($referrer_id, $points, $level)
         color: red;
         margin-top: 5px;
     }
+
+    .password-container {
+        position: relative;
+    }
+
+    .toggle-password {
+        position: absolute;
+        top: 75%;
+        right: 10px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: black;
+    }
 </style>
+
 
 <div class="container">
     <div class="centered-form">
@@ -209,14 +223,16 @@ function rewardReferrer($referrer_id, $points, $level)
                     <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required autocomplete="new-email">
                     <span class="error"><?php echo $emailError; ?></span>
                 </div>
-                <div class="form-group">
+                <div class="form-group password-container">
                     <label for="password">Password *</label>
                     <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required autocomplete="new-password">
+                    <i class="fas fa-eye toggle-password" data-target="password"></i>
                     <span class="error"><?php echo $passwordError; ?></span>
                 </div>
-                <div class="form-group">
+                <div class="form-group password-container">
                     <label for="confirmPassword">Confirm Password *</label>
                     <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required autocomplete="new-password">
+                    <i class="fas fa-eye toggle-password" data-target="confirmPassword"></i>
                 </div>
                 <div class="form-group">
                     <label for="referral">Referral Code (optional)</label>
@@ -231,5 +247,20 @@ function rewardReferrer($referrer_id, $points, $level)
         </div>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('.toggle-password').forEach(item => {
+        item.addEventListener('click', function() {
+            const target = document.getElementById(this.getAttribute('data-target'));
+            if (target.getAttribute('type') === 'password') {
+                target.setAttribute('type', 'text');
+                this.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                target.setAttribute('type', 'password');
+                this.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        });
+    });
+</script>
 
 <?php require('footer.php'); ?>

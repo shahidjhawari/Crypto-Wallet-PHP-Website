@@ -72,7 +72,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         color: red;
         margin-top: 10px;
     }
+
+    .password-container {
+        position: relative;
+    }
+
+    .toggle-password {
+        position: absolute;
+        top: 75%;
+        right: 10px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: black;
+    }
 </style>
+
 
 <div class="container">
     <div class="centered-form">
@@ -93,9 +107,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label for="email">Email *</label>
                     <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group password-container">
                     <label for="password">Password *</label>
                     <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                    <i class="fas fa-eye toggle-password" data-target="password"></i>
                 </div>
                 <div class="form-group text-right">
                     <a href="#" class="text-decoration-none">Forgot password?</a>
@@ -108,5 +123,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('.toggle-password').forEach(item => {
+        item.addEventListener('click', function() {
+            const target = document.getElementById(this.getAttribute('data-target'));
+            if (target.getAttribute('type') === 'password') {
+                target.setAttribute('type', 'text');
+                this.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                target.setAttribute('type', 'password');
+                this.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        });
+    });
+</script>
 
 <?php require('footer.php'); ?>
