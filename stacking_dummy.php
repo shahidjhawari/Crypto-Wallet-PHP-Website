@@ -157,6 +157,8 @@ foreach ($staking_records as $record) {
     $total_remaining_earning += $remaining_earning;
 }
 
+// Disable claim button if total remaining earning is zero
+$claim_button_disabled = $total_remaining_earning <= 0;
 ?>
 
 <style>
@@ -192,7 +194,6 @@ foreach ($staking_records as $record) {
         </div>
     </div>
 
-
     <div class="col-12 mb-4">
         <div class="card">
             <div class="card-body p-3">
@@ -214,7 +215,6 @@ foreach ($staking_records as $record) {
         </div>
     </div>
 
-
     <div class="col-12 mb-4">
         <div class="card">
             <div class="card-body p-3">
@@ -230,8 +230,6 @@ foreach ($staking_records as $record) {
         </div>
     </div>
 
-
-
     <div class="col-12 mb-4">
         <div class="card">
             <div class="card-body p-3">
@@ -239,14 +237,13 @@ foreach ($staking_records as $record) {
                     <div class="col-12">
                         <h3 class="fs-5 mb-3">Daily Earning</h3>
                         <form method="post" action="stacking_dummy.php">
-                            <button type="submit" name="claim_now" class="btn btn-success" <?php echo $total_earning_amount == 0 ? 'disabled' : ''; ?>>Claim Now</button>
+                            <button type="submit" name="claim_now" class="btn btn-success" <?php echo $claim_button_disabled ? 'disabled' : ''; ?>>Claim Now</button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 
     <h3>Daily Earnings Records</h3>
     <table class="table table-responsive">
