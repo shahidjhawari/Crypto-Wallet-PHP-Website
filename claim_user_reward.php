@@ -21,11 +21,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $total_claimed = 0;
 
+    // Check total remaining earnings before processing claims
+    $stmt = $conn->prepare("SELECT SUM(remaining_earning) AS total_remaining_earning FROM stakings WHERE user_id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $total_remaining_earning_row = $stmt->get_result()->fetch_assoc();
+    $total_remaining_earning = $total_remaining_earning_row['total_remaining_earning'] ?? 0;
+    $stmt->close();
+
     while ($reward = $rewards->fetch_assoc()) {
         $reward_id = $reward['id'];
         $claim_amount = floatval($reward['user_10_percent_reward']);
 
         if ($claim_amount > 0) {
+            if ($total_remaining_earning < $claim_amount) {
+                $_SESSION['error'] = "Insufficient remaining earnings to claim the reward.";
+                header("Location: team_earning.php");
+                exit();
+            }
+
             // Check if there is an existing deposit record for the user
             $stmt = $conn->prepare("SELECT id, amount FROM deposits WHERE user_id = ? LIMIT 1");
             $stmt->bind_param("i", $user_id);
@@ -95,4 +109,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: team_earning.php");
     exit();
 }
-?>

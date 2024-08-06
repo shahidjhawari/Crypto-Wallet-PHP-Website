@@ -143,7 +143,7 @@ $stmt->close();
             <div class="row">
                 <div class="col-12">
                     <h3 class="fs-5 mb-3">Claim Referral Reward</h3>
-                    <button type="button" id="claimAllButton" class="btn btn-success mb-3" onclick="claimAllRewards()" <?php echo $accepted_requests && $total_remaining_earning >= $claimable_amount ? '' : 'disabled'; ?>>Claim</button>
+                    <button type="button" id="claimAllButton" class="btn btn-success mb-3" onclick="claimAllRewards()" <?php echo ($accepted_requests && $total_remaining_earning >= $claimable_amount) ? '' : 'disabled'; ?>>Claim</button>
                 </div>
             </div>
         </div>
@@ -219,13 +219,14 @@ $stmt->close();
     document.addEventListener('DOMContentLoaded', function() {
         var rewardsAvailable = <?php echo json_encode($rewards_available); ?>;
         var claimAllButton = document.getElementById('claimAllButton');
-        if (rewardsAvailable && <?php echo json_encode($accepted_requests); ?>) {
+        if (rewardsAvailable) {
             claimAllButton.disabled = false;
+        } else {
+            claimAllButton.disabled = true;
         }
     });
 
     function claimAllRewards() {
-        var form = document.getElementById('claimAllForm');
-        form.submit();
+        document.getElementById('claimAllForm').submit();
     }
 </script>
