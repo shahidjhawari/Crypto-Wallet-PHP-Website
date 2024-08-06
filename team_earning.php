@@ -83,6 +83,14 @@ $accepted_requests_row = $stmt->get_result()->fetch_assoc();
 $accepted_requests = $accepted_requests_row['accepted_requests'] > 0;
 $stmt->close();
 
+// Check total remaining earnings
+$stmt = $conn->prepare("SELECT SUM(remaining_earning) AS total_remaining_earning FROM stakings WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$total_remaining_earning_row = $stmt->get_result()->fetch_assoc();
+$total_remaining_earning = $total_remaining_earning_row['total_remaining_earning'] ?? 0;
+$stmt->close();
+
 ?>
 
 <style>
@@ -115,7 +123,7 @@ $stmt->close();
                     <h2 class="display-5 mb-4" style="margin-top: -15px;">
                         $<?php echo htmlspecialchars($user_rewards['reward_points']) ?>.00
                     </h2>
-                    <?php if ($claimable_amount > 0 && $accepted_requests) : ?>
+                    <?php if ($claimable_amount > 0 && $accepted_requests && $total_remaining_earning >= $claimable_amount) : ?>
                         <form action="claim_refer_rewards.php" method="post">
                             <input type="hidden" name="claim_amount" value="<?php echo htmlspecialchars($claimable_amount); ?>">
                             <button type="submit" class="btn btn-primary">Claim</button>
@@ -135,7 +143,7 @@ $stmt->close();
             <div class="row">
                 <div class="col-12">
                     <h3 class="fs-5 mb-3">Claim Referral Reward</h3>
-                    <button type="button" id="claimAllButton" class="btn btn-success mb-3" onclick="claimAllRewards()" <?php echo $accepted_requests ? '' : 'disabled'; ?>>Claim</button>
+                    <button type="button" id="claimAllButton" class="btn btn-success mb-3" onclick="claimAllRewards()" <?php echo $accepted_requests && $total_remaining_earning >= $claimable_amount ? '' : 'disabled'; ?>>Claim</button>
                 </div>
             </div>
         </div>
@@ -157,13 +165,11 @@ $stmt->close();
     </div>
 </div>
 
-
 <div class="col-12 mb-4">
     <div class="alert alert-info mt-3">
         <?php if ($claimable_amount > 0 && $accepted_requests) : ?>
-
         <?php else : ?>
-            Start stacking to calim reward
+            Start staking to claim reward
         <?php endif; ?>
     </div>
 </div>
