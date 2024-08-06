@@ -115,10 +115,29 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Fetch daily earnings records
-$daily_earnings_records = [];
-$stmt = $conn->prepare("SELECT * FROM daily_earnings WHERE user_id = ?");
+// Fetch total number of daily earnings records
+$stmt = $conn->prepare("SELECT COUNT(*) AS total_records FROM daily_earnings WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
+$stmt->execute();
+$total_records = $stmt->get_result()->fetch_assoc()['total_records'] ?? 0;
+$stmt->close();
+
+// Define the number of records per page
+$records_per_page = 10;
+$total_pages = ceil($total_records / $records_per_page);
+
+// Get the current page or set to 1 if not set
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($current_page < 1) $current_page = 1;
+if ($current_page > $total_pages) $current_page = $total_pages;
+
+// Calculate the offset for the current page
+$offset = ($current_page - 1) * $records_per_page;
+
+// Fetch daily earnings records for the current page
+$daily_earnings_records = [];
+$stmt = $conn->prepare("SELECT * FROM daily_earnings WHERE user_id = ? LIMIT ? OFFSET ?");
+$stmt->bind_param("iii", $user_id, $records_per_page, $offset);
 $stmt->execute();
 $result = $stmt->get_result();
 while ($row = $result->fetch_assoc()) {
@@ -181,6 +200,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$daily_earnings_disabled) {
     th,
     td {
         color: white;
+    }
+
+    .pagination-container {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 1rem;
+        margin-left: -18px;
+    }
+
+    .pagination {
+        display: inline-flex;
+    }
+
+    .pagination a {
+        color: white;
+        background-color: black;
+        padding: 8px 16px;
+        text-decoration: none;
+        margin: 0 4px;
+        display: inline-block;
+    }
+
+    .pagination a:hover {
+        background-color: #333;
+    }
+
+    @media (max-width: 600px) {
+        .pagination a {
+            padding: 4px 8px;
+            margin: 0 2px;
+        }
     }
 </style>
 
@@ -252,11 +302,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$daily_earnings_disabled) {
                 <div class="row">
                     <div class="col-12">
                         <h3 class="fs-5 mb-3">Daily Earning</h3>
-                        <?php if (!$daily_earnings_disabled): ?>
+                        <?php if (!$daily_earnings_disabled) : ?>
                             <form method="post" action="stacking_dummy.php">
                                 <button type="submit" name="claim_now" class="btn btn-success" <?php echo $claim_button_disabled ? 'disabled' : ''; ?>>Claim Now</button>
                             </form>
-                        <?php else: ?>
+                        <?php else : ?>
                             <p>Daily earnings are not available!!</p>
                         <?php endif; ?>
                     </div>
@@ -284,6 +334,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$daily_earnings_disabled) {
             <?php endforeach; ?>
         </tbody>
     </table>
+
+    <!-- Pagination controls -->
+    <div class="pagination-container">
+        <div class="pagination">
+            <?php if ($current_page > 1) : ?>
+                <a href="?page=<?php echo $current_page - 1; ?>">&laquo; Previous</a>
+            <?php endif; ?>
+            <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
+                <a href="?page=<?php echo $i; ?>" <?php echo $i === $current_page ? ' style="background-color: #333;"' : ''; ?>><?php echo $i; ?></a>
+            <?php endfor; ?>
+            <?php if ($current_page < $total_pages) : ?>
+                <a href="?page=<?php echo $current_page + 1; ?>">Next &raquo;</a>
+            <?php endif; ?>
+        </div>
+    </div>
 </div>
 
 <?php require('footer.php'); ?>
