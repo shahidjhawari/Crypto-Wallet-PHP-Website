@@ -51,8 +51,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->close();
 
             // Deduct the staked amount from the user's balance
-            // (This part of the code can stay the same as in your original snippet)
-            // ...
+            $stmt = $conn->prepare("UPDATE deposits SET amount = amount - ? WHERE user_id = ? AND status = 'accepted'");
+            $stmt->bind_param("di", $stake_amount, $user_id);
+            $stmt->execute();
+            $stmt->close();
 
             $success_message = "Successfully staked $" . htmlspecialchars(number_format($stake_amount, 2)) . ".";
 
@@ -145,6 +147,11 @@ foreach ($staking_records as $record) {
     // Ensure remaining earnings do not exceed the estimated earnings
     if ($remaining_earning > $estimated_earning) {
         $remaining_earning = $estimated_earning;
+    }
+
+    // Ensure remaining earnings do not go below zero
+    if ($remaining_earning < 0) {
+        $remaining_earning = 0;
     }
 
     $total_remaining_earning += $remaining_earning;
