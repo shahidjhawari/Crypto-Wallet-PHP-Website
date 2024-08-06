@@ -257,7 +257,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$daily_earnings_disabled) {
                                 <button type="submit" name="claim_now" class="btn btn-success" <?php echo $claim_button_disabled ? 'disabled' : ''; ?>>Claim Now</button>
                             </form>
                         <?php else: ?>
-                            <p>Daily earnings are not available as remaining earnings are zero.</p>
+                            <p>Daily earnings are not available!!</p>
                         <?php endif; ?>
                     </div>
                 </div>
