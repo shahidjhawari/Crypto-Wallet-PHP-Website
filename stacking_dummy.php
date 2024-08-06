@@ -134,9 +134,9 @@ if ($current_page > $total_pages) $current_page = $total_pages;
 // Calculate the offset for the current page
 $offset = ($current_page - 1) * $records_per_page;
 
-// Fetch daily earnings records for the current page
+// Fetch daily earnings records for the current page in descending order
 $daily_earnings_records = [];
-$stmt = $conn->prepare("SELECT * FROM daily_earnings WHERE user_id = ? LIMIT ? OFFSET ?");
+$stmt = $conn->prepare("SELECT * FROM daily_earnings WHERE user_id = ? ORDER BY date DESC LIMIT ? OFFSET ?");
 $stmt->bind_param("iii", $user_id, $records_per_page, $offset);
 $stmt->execute();
 $result = $stmt->get_result();
