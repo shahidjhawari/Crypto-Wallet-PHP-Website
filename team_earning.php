@@ -50,7 +50,26 @@ $level_two_locked = $total_deposited < 30;
 $level_three_locked = $total_deposited < 50;
 
 // Fetch referral rewards for the logged-in user
-$stmt = $conn->prepare("
+// Pagination logic
+$records_per_page = 10;
+$total_records_stmt = $conn->prepare("
+    SELECT COUNT(*) AS total_records
+    FROM referral_rewards rr
+    WHERE rr.referrer_id = ?
+");
+$total_records_stmt->bind_param("i", $user_id);
+$total_records_stmt->execute();
+$total_records_row = $total_records_stmt->get_result()->fetch_assoc();
+$total_records = $total_records_row['total_records'];
+$total_records_stmt->close();
+
+$total_pages = ceil($total_records / $records_per_page);
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($current_page < 1) $current_page = 1;
+if ($current_page > $total_pages) $current_page = $total_pages;
+$offset = ($current_page - 1) * $records_per_page;
+
+$referral_rewards_stmt = $conn->prepare("
     SELECT rr.*, u.name AS referred_user,
            CASE
                WHEN rr.reward_percentage = 10 THEN 'Level 1'
@@ -61,11 +80,12 @@ $stmt = $conn->prepare("
     JOIN users u ON rr.referred_user_id = u.id
     WHERE rr.referrer_id = ?
     ORDER BY rr.reward_date DESC
+    LIMIT ? OFFSET ?
 ");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$stmt->close();
+$referral_rewards_stmt->bind_param("iii", $user_id, $records_per_page, $offset);
+$referral_rewards_stmt->execute();
+$result = $referral_rewards_stmt->get_result();
+$referral_rewards_stmt->close();
 
 // Fetch total referral earnings from ClaimedEarning table
 $stmt = $conn->prepare("SELECT SUM(amount) AS total_referral_earnings FROM ClaimedEarning WHERE user_id = ?");
@@ -111,6 +131,37 @@ $stmt->close();
     th,
     td {
         color: white;
+    }
+
+    .pagination-container {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 1rem;
+        margin-left: -18px;
+    }
+
+    .pagination {
+        display: inline-flex;
+    }
+
+    .pagination a {
+        color: white;
+        background-color: black;
+        padding: 8px 16px;
+        text-decoration: none;
+        margin: 0 4px;
+        display: inline-block;
+    }
+
+    .pagination a:hover {
+        background-color: #333;
+    }
+
+    @media (max-width: 600px) {
+        .pagination a {
+            padding: 4px 8px;
+            margin: 0 2px;
+        }
     }
 </style>
 
@@ -209,7 +260,22 @@ $stmt->close();
                 <?php endwhile; ?>
             </table>
         </div>
-    </form>
+        <!-- Pagination controls -->
+        <div class="pagination-container">
+            <div class="pagination">
+                <?php if ($current_page > 1) : ?>
+                    <a href="?page=<?php echo $current_page - 1; ?>">&laquo; Previous</a>
+                <?php endif; ?>
+                <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
+                    <a href="?page=<?php echo $i; ?>" <?php echo $i === $current_page ? ' style="background-color: #333;"' : ''; ?>><?php echo $i; ?></a>
+                <?php endfor; ?>
+                <?php if ($current_page < $total_pages) : ?>
+                    <a href="?page=<?php echo $current_page + 1; ?>">Next &raquo;</a>
+                <?php endif; ?>
+            </div>
+        </div>
+</div>
+</form>
 </div>
 
 <?php require('footer.php'); ?>
