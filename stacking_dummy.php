@@ -78,8 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute();
             $stmt->close();
 
-            // Update staking records
-            $stmt = $conn->prepare("UPDATE stakings SET total_earning = 0, remaining_earning = 0 WHERE user_id = ? AND status = 'active'");
+            // Update staking records - only reset total_earning, not remaining_earning
+            $stmt = $conn->prepare("UPDATE stakings SET total_earning = 0 WHERE user_id = ? AND status = 'active'");
             $stmt->bind_param("i", $user_id);
             $stmt->execute();
             $stmt->close();
