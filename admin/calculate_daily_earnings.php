@@ -35,8 +35,19 @@ foreach ($staking_records as $staking) {
     if ($interval >= 0) {
         // Calculate the correct percentage based on the provided percentage
         $daily_earning = $staking['amount'] * $percentage;
+
+        // Check if remaining earning would be zero or negative after this calculation
+        if ($staking['remaining_earning'] <= 0) {
+            continue; // Skip if no remaining earning
+        }
+
         $staking['total_earning'] += $daily_earning;
         $staking['remaining_earning'] -= $daily_earning;
+
+        // Ensure remaining earnings do not go below zero
+        if ($staking['remaining_earning'] < 0) {
+            $staking['remaining_earning'] = 0;
+        }
 
         // Check if user exists in users table before inserting
         $stmt = $con->prepare("SELECT id FROM users WHERE id = ?");
@@ -46,11 +57,13 @@ foreach ($staking_records as $staking) {
         if ($stmt->num_rows > 0) {
             $stmt->close();
 
-            // Insert daily earning record
-            $stmt = $con->prepare("INSERT INTO daily_earnings (user_id, staking_id, date, amount) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("iisd", $user_id, $staking_id, $today_str, $daily_earning);
-            $stmt->execute();
-            $stmt->close();
+            // Insert daily earning record only if remaining earning is not zero
+            if ($staking['remaining_earning'] > 0) {
+                $stmt = $con->prepare("INSERT INTO daily_earnings (user_id, staking_id, date, amount) VALUES (?, ?, ?, ?)");
+                $stmt->bind_param("iisd", $user_id, $staking_id, $today_str, $daily_earning);
+                $stmt->execute();
+                $stmt->close();
+            }
 
             // Update total earned, remaining earnings, and daily calculation count
             $is_tripled = (int)($staking['total_earning'] >= 3 * $staking['amount']);
@@ -71,4 +84,3 @@ $_SESSION['earnings_processed'] = true;
 // Redirect to prevent form resubmission
 header("Location: admin.php");
 exit();
-?>

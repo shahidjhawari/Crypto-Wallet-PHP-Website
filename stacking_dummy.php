@@ -157,8 +157,24 @@ foreach ($staking_records as $record) {
     $total_remaining_earning += $remaining_earning;
 }
 
-// Disable claim button if total remaining earning is zero
+// Disable claim button and daily earnings form if total remaining earning is zero
 $claim_button_disabled = $total_remaining_earning <= 0;
+$daily_earnings_disabled = $total_remaining_earning <= 0;
+
+// Prevent insertion of new daily earnings records if remaining earnings are zero
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$daily_earnings_disabled) {
+    // Example logic for inserting a new daily earnings record
+    $current_day = date('j'); // Day of the month
+    $daily_earning_amount = calculate_daily_earning($current_day, $total_remaining_earning);
+
+    if ($daily_earning_amount > 0) {
+        // Insert daily earnings record
+        $stmt = $conn->prepare("INSERT INTO daily_earnings (user_id, amount, date) VALUES (?, ?, NOW())");
+        $stmt->bind_param("id", $user_id, $daily_earning_amount);
+        $stmt->execute();
+        $stmt->close();
+    }
+}
 ?>
 
 <style>
@@ -236,9 +252,13 @@ $claim_button_disabled = $total_remaining_earning <= 0;
                 <div class="row">
                     <div class="col-12">
                         <h3 class="fs-5 mb-3">Daily Earning</h3>
-                        <form method="post" action="stacking_dummy.php">
-                            <button type="submit" name="claim_now" class="btn btn-success" <?php echo $claim_button_disabled ? 'disabled' : ''; ?>>Claim Now</button>
-                        </form>
+                        <?php if (!$daily_earnings_disabled): ?>
+                            <form method="post" action="stacking_dummy.php">
+                                <button type="submit" name="claim_now" class="btn btn-success" <?php echo $claim_button_disabled ? 'disabled' : ''; ?>>Claim Now</button>
+                            </form>
+                        <?php else: ?>
+                            <p>Daily earnings are not available as remaining earnings are zero.</p>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
