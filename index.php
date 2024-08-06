@@ -112,9 +112,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
                     <i class="fas fa-eye toggle-password" data-target="password"></i>
                 </div>
-                <div class="form-group text-right">
-                    <a href="#" class="text-decoration-none">Forgot password?</a>
-                </div>
                 <button type="submit" class="btn btn-primary btn-block">Login</button>
             </form>
             <div class="text-center mt-3">
