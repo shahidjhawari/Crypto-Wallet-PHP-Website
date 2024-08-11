@@ -2,7 +2,8 @@
 ob_start();
 require('header.php');
 
-function test_input($data) {
+function test_input($data)
+{
     return htmlspecialchars(stripslashes(trim($data)));
 }
 
@@ -13,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $confirm_password = test_input($_POST["confirm_password"]);
 
     if ($new_password !== $confirm_password) {
-        echo "Passwords do not match.";
+        $error_message = "Passwords do not match.";
     } else {
         // Validate the reset token
         $stmt = $conn->prepare("SELECT username FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()");
@@ -35,27 +36,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->execute();
             $stmt->close();
 
-            echo "Your password has been reset successfully.";
+            $success_message = "Your password has been reset successfully.";
         } else {
-            echo "Invalid or expired reset token.";
+            $error_message = "Invalid or expired reset token.";
         }
     }
 }
 ?>
 
-<div class="container">
-    <h2>Reset Password</h2>
-    <form action="reset_password.php?token=<?php echo urlencode($token); ?>" method="POST">
-        <div class="form-group">
-            <label for="new_password">New Password:</label>
-            <input type="password" id="new_password" name="new_password" required>
+<div class="container mt-5">
+    <h2 class="text-center">Reset Password</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <?php if (isset($error_message)): ?>
+                <div class="alert alert-danger" role="alert">
+                    <?php echo $error_message; ?>
+                </div>
+            <?php endif; ?>
+            <?php if (isset($success_message)): ?>
+                <div class="alert alert-success" role="alert">
+                    <?php echo $success_message; ?>
+                </div>
+            <?php endif; ?>
+            <form action="reset_password.php?token=<?php echo urlencode($token); ?>" method="POST">
+                <div class="form-group">
+                    <label for="new_password">New Password:</label>
+                    <input type="password" class="form-control" id="new_password" name="new_password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password:</label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Reset Password</button>
+            </form>
         </div>
-        <div class="form-group">
-            <label for="confirm_password">Confirm Password:</label>
-            <input type="password" id="confirm_password" name="confirm_password" required>
-        </div>
-        <button type="submit">Reset Password</button>
-    </form>
+    </div>
 </div>
-
-<?php require('footer.php'); ?>

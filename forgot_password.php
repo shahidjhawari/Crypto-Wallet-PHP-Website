@@ -2,7 +2,8 @@
 ob_start();
 require('header.php');
 
-function test_input($data) {
+function test_input($data)
+{
     return htmlspecialchars(stripslashes(trim($data)));
 }
 
@@ -15,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->store_result();
-    
+
     if ($stmt->num_rows > 0) {
         $stmt->bind_result($email, $stored_random_string);
         $stmt->fetch();
@@ -34,27 +35,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: reset_password.php?token=" . urlencode($reset_token));
             exit();
         } else {
-            echo "Invalid random string.";
+            $error_message = "Invalid random string.";
         }
     } else {
-        echo "Username not found.";
+        $error_message = "Username not found.";
     }
 }
 ?>
 
-<div class="container">
-    <h2>Forgot Password</h2>
-    <form action="forgot_password.php" method="POST">
-        <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+<div class="container mt-5">
+    <h2 class="text-center">Forgot Password</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <?php if (isset($error_message)): ?>
+                <div class="alert alert-danger" role="alert">
+                    <?php echo $error_message; ?>
+                </div>
+            <?php endif; ?>
+            <form action="forgot_password.php" method="POST">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="random_string">Random String:</label>
+                    <input type="text" class="form-control" id="random_string" name="random_string" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Verify</button>
+            </form>
         </div>
-        <div class="form-group">
-            <label for="random_string">Random String:</label>
-            <input type="text" id="random_string" name="random_string" required>
-        </div>
-        <button type="submit">Verify</button>
-    </form>
+    </div>
 </div>
-
-<?php require('footer.php'); ?>
