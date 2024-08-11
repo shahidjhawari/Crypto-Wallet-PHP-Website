@@ -1,4 +1,5 @@
 <?php
+ob_start();
 session_start();
 require('header.php'); // Include database connection
 
@@ -14,10 +15,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Ensure all required fields are filled
     if (
         empty($name) || empty($payment_method) || empty($amount) ||
-        ($payment_method == 'Dollar' && empty($address)) ||
-        ($payment_method != 'Dollar' && empty($account_number)) || empty($random_string)
+        ($payment_method === 'Dollar' && empty($address)) ||
+        ($payment_method !== 'Dollar' && empty($account_number)) || empty($random_string)
     ) {
-        echo "Error: All fields are required.";
+        $_SESSION['error'] = "Error: All fields are required.";
+        header("Location: user_payment.php");
         exit();
     }
 
@@ -29,7 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
 
     if ($random_string !== $stored_random_string) {
-        echo "Error: Invalid random string.";
+        $_SESSION['error'] = "Error: Invalid random string.";
+        header("Location: user_payment.php");
         exit();
     }
 
@@ -40,16 +43,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $wallet_balance = $stmt->get_result()->fetch_assoc()['wallet_balance'] ?? 0;
     $stmt->close();
 
-    // Calculate fee
-    if ($payment_method === "USDTP" || $payment_method === "Dollar") {
-        $fee = 0.01 * $amount;
+    // Calculate fee based on payment method
+    if ($payment_method === "Dollar") {
+        $fee = 0.01 * $amount; // 1% fee for Dollar (USDT)
+    } elseif ($payment_method === "USDTP") {
+        $fee = 0.03 * $amount; // 3% fee for USDTP
     } else {
-        $fee = 0.03 * $amount;
+        $fee = 0.05 * $amount; // 5% fee for other payment methods
     }
     $total_amount = $amount + $fee;
 
     if ($total_amount > $wallet_balance) {
-        echo "Error: Insufficient balance.";
+        $_SESSION['error'] = "Error: Insufficient balance.";
+        header("Location: user_payment.php");
         exit();
     }
 
@@ -59,7 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute();
     $stmt->close();
 
-    echo "Payment request submitted successfully.";
+    $_SESSION['success'] = "Payment request submitted successfully.";
+    header("Location: user_payment.php");
+    exit();
 } else {
     echo "Invalid request.";
 }

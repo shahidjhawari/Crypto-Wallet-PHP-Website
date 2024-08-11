@@ -1,9 +1,8 @@
 <?php
 ob_start();
 session_start();
-require('header.php');
+require('header.php'); // Include database connection
 
-// Ensure the user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit();
@@ -18,6 +17,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 $stmt->close();
 ?>
+
 <script>
     function toggleFields() {
         var paymentMethod = document.getElementById("payment_method").value;
@@ -35,7 +35,7 @@ $stmt->close();
         } else if (paymentMethod === "Dollar") {
             addressField.style.display = "block";
             accountNumberField.style.display = "none";
-            fee = 0.03 * amount; // 1% fee for Dollar (assuming you meant USDT)
+            fee = 0.03 * amount; // 3% fee for Dollar (USDT)
             feeInfo.textContent = "Note: A 3% fee will be deducted.";
         } else {
             addressField.style.display = "none";
@@ -148,6 +148,11 @@ $stmt->close();
     <div class="mt-3">
         <p>Estimated Fee: <span id="fee_amount">0.00</span></p>
     </div>
+    <?php
+    if (isset($_GET['submitted']) && $_GET['submitted'] == 'true') {
+        echo '<div class="alert alert-success mt-3" role="alert">Your form has been submitted successfully.</div>';
+    }
+    ?>
     <div class="alert alert-info mt-3" role="alert">
         Your withdrawal request will be reviewed on working days.
     </div>
