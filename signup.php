@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Validate username
     if (!preg_match("/^[a-zA-Z0-9]+$/", $username)) {
-        $usernameError = "Username can only contain lowercase letters and numbers.";
+        $usernameError = "Username can only contain letters and numbers.";
     } else {
         // Check if the username already exists
         $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
@@ -48,6 +48,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($password != $confirmPassword) {
         $passwordError = "Passwords do not match.";
+    } else if (strlen($password) < 8 || strlen($password) > 20) {
+        $passwordError = "Password must be between 8 and 20 characters.";
     } else if (empty($usernameError)) {
         // Check if the email already exists
         $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
@@ -204,7 +206,6 @@ function rewardReferrer($referrer_id, $points, $level)
     }
 </style>
 
-
 <div class="container">
     <div class="centered-form">
         <div class="form-container">
@@ -225,13 +226,13 @@ function rewardReferrer($referrer_id, $points, $level)
                 </div>
                 <div class="form-group password-container">
                     <label for="password">Password *</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required autocomplete="new-password">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required autocomplete="new-password" minlength="8" maxlength="20">
                     <i class="fas fa-eye toggle-password" data-target="password"></i>
                     <span class="error"><?php echo $passwordError; ?></span>
                 </div>
                 <div class="form-group password-container">
                     <label for="confirmPassword">Confirm Password *</label>
-                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required autocomplete="new-password">
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required autocomplete="new-password" minlength="8" maxlength="20">
                     <i class="fas fa-eye toggle-password" data-target="confirmPassword"></i>
                 </div>
                 <div class="form-group">
