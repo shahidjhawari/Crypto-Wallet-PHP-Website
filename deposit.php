@@ -71,7 +71,20 @@ $latestMessage = $result->fetch_assoc(); // Fetch associative array
 $stmt->close();
 
 $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['message']) : 0.0;
+
+// Fetch deposits for the logged-in user
+$stmt = $conn->prepare("SELECT amount, transaction_id, status, payment_method, screenshot FROM deposits WHERE user_id = ? ORDER BY created_at DESC");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$deposits_result = $stmt->get_result();
+$stmt->close();
 ?>
+
+<style>
+  td {
+    color: white;
+  }
+</style>
 
 <div class="container mt-5">
   <div class="row justify-content-center">
@@ -125,6 +138,33 @@ $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['mes
   </div>
 </div>
 
+<!-- Responsive Table for Displaying Deposits -->
+<div class="container mt-5">
+  <h4 class="text-center">Your Deposits History</h4>
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered">
+      <thead class="thead-light">
+        <tr>
+          <th scope="col">Amount (USD)</th>
+          <th scope="col">Transaction ID</th>
+          <th scope="col">Status</th>
+          <th scope="col">Payment Method</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php while ($row = $deposits_result->fetch_assoc()): ?>
+          <tr>
+            <td><?php echo htmlspecialchars($row['amount']); ?></td>
+            <td><?php echo htmlspecialchars($row['transaction_id']); ?></td>
+            <td><?php echo htmlspecialchars($row['status']); ?></td>
+            <td><?php echo htmlspecialchars($row['payment_method']); ?></td>
+          </tr>
+        <?php endwhile; ?>
+      </tbody>
+    </table>
+  </div>
+</div>
+
 <script>
   document.getElementById('amount').addEventListener('input', function() {
     const exchangeRate = <?php echo $exchange_rate; ?>;
@@ -144,44 +184,34 @@ $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['mes
 
     if (paymentMethod === "Easy Paisa") {
       additionalFields.innerHTML = `
-      <div class="form-group">
-        <label for="account_number">Account Number</label>
-        <input type="text" class="form-control" id="account_number" name="account_number" value="03236645813" readonly>
-      </div>
-      <div class="form-group">
-        <label for="account_name">Account Name</label>
-        <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
-      </div>`;
+            <div class="form-group">
+                <label for="account_number">Account Number</label>
+                <input type="text" class="form-control" id="account_number" name="account_number" value="03236645813" readonly>
+            </div>
+            <div class="form-group">
+                <label for="account_name">Account Name</label>
+                <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
+            </div>`;
     } else if (paymentMethod === "Valid Cash") {
       additionalFields.innerHTML = `
-      <div class="form-group">
-        <label for="account_number">Account Number</label>
-        <input type="text" class="form-control" id="account_number" name="account_number" value="03046978556" readonly>
-      </div>
-      <div class="form-group">
-        <label for="account_name">Account Name</label>
-        <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
-      </div>`;
-    } else if (paymentMethod === "USDT") {
-      additionalFields.innerHTML = `
-      <div class="form-group">
-        <label for="network">Network</label>
-        <input type="text" class="form-control" id="network" name="network" value="TRC 20" readonly>
-      </div>
-      <div class="form-group">
-        <label for="address">Address</label>
-        <input type="text" class="form-control" id="address" name="address" value="TChLhd7z7vPRT79dq1oCoiDPrWDG3tRA96" readonly>
-      </div>`;
+            <div class="form-group">
+                <label for="account_number">Account Number</label>
+                <input type="text" class="form-control" id="account_number" name="account_number" value="03046978556" readonly>
+            </div>
+            <div class="form-group">
+                <label for="account_name">Account Name</label>
+                <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
+            </div>`;
     } else if (paymentMethod === "Simple PA") {
       additionalFields.innerHTML = `
-      <div class="form-group">
-        <label for="account_number">Account Number</label>
-        <input type="text" class="form-control" id="account_number" name="account_number" value="03046978556" readonly>
-      </div>
-      <div class="form-group">
-        <label for="account_name">Account Name</label>
-        <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
-      </div>`;
+            <div class="form-group">
+                <label for="account_number">Account Number</label>
+                <input type="text" class="form-control" id="account_number" name="account_number" value="029675456" readonly>
+            </div>
+            <div class="form-group">
+                <label for="account_name">Account Name</label>
+                <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
+            </div>`;
     }
   }
 </script>
