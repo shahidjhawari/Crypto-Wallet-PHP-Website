@@ -1,6 +1,7 @@
 <?php
 ob_start();
 require('header.php');
+require('db_connection.php'); // Ensure this is included to access the $conn variable
 
 function test_input($data)
 {
@@ -15,6 +16,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($new_password !== $confirm_password) {
         $error_message = "Passwords do not match.";
+    } else if (strlen($new_password) < 8 || strlen($new_password) > 20) {
+        $error_message = "Password must be between 8 and 20 characters.";
     } else {
         // Validate the reset token
         $stmt = $conn->prepare("SELECT username FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()");
@@ -44,7 +47,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<div class="container mt-5">
+<style>
+    body {
+        background: #f8f9fa;
+        color: #333;
+    }
+
+    .container {
+        margin-top: 50px;
+    }
+
+    .alert {
+        margin-top: 20px;
+    }
+</style>
+
+<div class="container">
     <h2 class="text-center">Reset Password</h2>
     <div class="row justify-content-center">
         <div class="col-md-6">
@@ -61,11 +79,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <form action="reset_password.php?token=<?php echo urlencode($token); ?>" method="POST">
                 <div class="form-group">
                     <label for="new_password">New Password:</label>
-                    <input type="password" class="form-control" id="new_password" name="new_password" required>
+                    <input type="password" class="form-control" id="new_password" name="new_password" required minlength="8" maxlength="20">
                 </div>
                 <div class="form-group">
                     <label for="confirm_password">Confirm Password:</label>
-                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required minlength="8" maxlength="20">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Reset Password</button>
             </form>
