@@ -3,8 +3,14 @@ ob_start();
 session_start();
 require('header.php'); // Include database connection
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_id = $_SESSION['user_id']; // Assuming the user is logged in and user_id is stored in the session
     $name = $_POST['name'];
     $payment_method = $_POST['payment_method'];
     $address = isset($_POST['address']) ? $_POST['address'] : null;
@@ -43,14 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $wallet_balance = $stmt->get_result()->fetch_assoc()['wallet_balance'] ?? 0;
     $stmt->close();
 
-    // Calculate fee based on payment method
-    if ($payment_method === "Dollar") {
-        $fee = 0.01 * $amount; // 1% fee for Dollar (USDT)
-    } elseif ($payment_method === "USDTP") {
-        $fee = 0.03 * $amount; // 3% fee for USDTP
-    } else {
-        $fee = 0.05 * $amount; // 5% fee for other payment methods
-    }
+    // Calculate fee
+    $fee = $payment_method === "Dollar" ? 0.03 * $amount : 0.05 * $amount; // 3% for Dollar, 5% for others
     $total_amount = $amount + $fee;
 
     if ($total_amount > $wallet_balance) {
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
 
     $_SESSION['success'] = "Payment request submitted successfully.";
-    header("Location: user_payment.php");
+    header("Location: user_payment.php?submitted=true");
     exit();
 } else {
     echo "Invalid request.";
