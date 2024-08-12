@@ -56,6 +56,7 @@ $stmt->close();
                 <input type="hidden" name="deposit_id" value="<?php echo htmlspecialchars($deposit['id']); ?>">
                 <input type="submit" name="action" value="Accept" class="btn btn-success">
                 <input type="submit" name="action" value="Reject" class="btn btn-danger">
+                <textarea name="rejection_reason" placeholder="Enter rejection reason"></textarea>
               </form>
             </td>
           </tr>

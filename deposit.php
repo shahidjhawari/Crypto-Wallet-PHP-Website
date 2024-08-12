@@ -78,6 +78,16 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $deposits_result = $stmt->get_result();
 $stmt->close();
+
+
+
+
+// Fetch deposits for the logged-in user
+$stmt = $conn->prepare("SELECT amount, transaction_id, status, payment_method, rejection_reason FROM deposits WHERE user_id = ? ORDER BY created_at DESC");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$deposits_result = $stmt->get_result();
+$stmt->close();
 ?>
 
 <style>
@@ -149,6 +159,7 @@ $stmt->close();
           <th scope="col">Transaction ID</th>
           <th scope="col">Status</th>
           <th scope="col">Payment Method</th>
+          <th scope="col">Rejection Reason</th>
         </tr>
       </thead>
       <tbody>
@@ -158,6 +169,7 @@ $stmt->close();
             <td><?php echo htmlspecialchars($row['transaction_id']); ?></td>
             <td><?php echo htmlspecialchars($row['status']); ?></td>
             <td><?php echo htmlspecialchars($row['payment_method']); ?></td>
+            <td><?php echo htmlspecialchars($row['status'] == 'Rejected' ? $row['rejection_reason'] : ''); ?></td>
           </tr>
         <?php endwhile; ?>
       </tbody>
