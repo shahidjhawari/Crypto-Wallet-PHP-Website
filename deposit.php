@@ -83,7 +83,7 @@ $stmt->close();
 
 
 // Fetch deposits for the logged-in user
-$stmt = $conn->prepare("SELECT amount, transaction_id, status, payment_method, rejection_reason FROM deposits WHERE user_id = ? ORDER BY created_at DESC");
+$stmt = $conn->prepare("SELECT amount, transaction_id, created_at, status, payment_method, rejection_reason FROM deposits WHERE user_id = ? ORDER BY created_at DESC");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $deposits_result = $stmt->get_result();
@@ -155,6 +155,7 @@ $stmt->close();
     <table class="table table-striped table-bordered">
       <thead class="thead-light">
         <tr>
+        <th scope="col">Date</th>
           <th scope="col">Amount (USD)</th>
           <th scope="col">Transaction ID</th>
           <th scope="col">Status</th>
@@ -165,6 +166,7 @@ $stmt->close();
       <tbody>
         <?php while ($row = $deposits_result->fetch_assoc()): ?>
           <tr>
+            <td><?php echo htmlspecialchars($row['created_at']); ?></td>
             <td><?php echo htmlspecialchars($row['amount']); ?></td>
             <td><?php echo htmlspecialchars($row['transaction_id']); ?></td>
             <td><?php echo htmlspecialchars($row['status']); ?></td>
