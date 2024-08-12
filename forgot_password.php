@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="text" class="form-control" id="username" name="username" required>
                 </div>
                 <div class="form-group">
-                    <label for="random_string">Random String:</label>
+                    <label for="random_string">Private Key:</label>
                     <input type="text" class="form-control" id="random_string" name="random_string" required>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Verify</button>
