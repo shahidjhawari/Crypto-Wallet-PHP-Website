@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 04, 2024 at 05:17 AM
+-- Generation Time: Aug 12, 2024 at 06:58 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -129,7 +129,8 @@ CREATE TABLE `deposits` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `payment_method` enum('Easy Paisa','Valid Cash','Simple PA','USDT') NOT NULL,
   `bonus_claimed_amount` decimal(10,2) DEFAULT 0.00,
-  `referral_daily_reward` decimal(10,2) DEFAULT 0.00
+  `referral_daily_reward` decimal(10,2) DEFAULT 0.00,
+  `rejection_reason` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -276,7 +277,9 @@ CREATE TABLE `users` (
   `referrer_id` int(11) DEFAULT NULL,
   `referral_code` varchar(50) DEFAULT NULL,
   `referred_bonus_received` tinyint(1) NOT NULL DEFAULT 0,
-  `username` varchar(255) NOT NULL
+  `username` varchar(255) NOT NULL,
+  `reset_token` varchar(64) DEFAULT NULL,
+  `reset_token_expiry` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -294,7 +297,8 @@ CREATE TABLE `user_payments` (
   `address` varchar(255) DEFAULT NULL,
   `amount` decimal(10,2) NOT NULL,
   `status` enum('Pending','Accepted','Rejected') DEFAULT 'Pending',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `rejection_reason` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -491,7 +495,7 @@ ALTER TABLE `reward_logs`
 -- AUTO_INCREMENT for table `stakings`
 --
 ALTER TABLE `stakings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=148;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=162;
 
 --
 -- AUTO_INCREMENT for table `staking_requests`
@@ -509,7 +513,7 @@ ALTER TABLE `transactions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=202;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=216;
 
 --
 -- AUTO_INCREMENT for table `user_payments`
