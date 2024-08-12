@@ -16,6 +16,15 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $stmt->close();
+
+
+
+$stmt = $conn->prepare("SELECT id, amount, payment_method, status, created_at, rejection_reason FROM user_payments WHERE user_id = ? ORDER BY created_at DESC");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$stmt->close();
+
 ?>
 
 <script>
@@ -168,6 +177,7 @@ $stmt->close();
                     <th>Amount</th>
                     <th>Payment Method</th>
                     <th>Status</th>
+                    <th>Reason Rejection</th>
                     <th>Date</th>
                 </tr>
             </thead>
@@ -178,6 +188,7 @@ $stmt->close();
                         <td><?php echo $row['amount']; ?></td>
                         <td><?php echo $row['payment_method']; ?></td>
                         <td><?php echo $row['status']; ?></td>
+                        <td><?php echo $row['rejection_reason']; ?></td>
                         <td><?php echo $row['created_at']; ?></td>
                     </tr>
                 <?php } ?>
