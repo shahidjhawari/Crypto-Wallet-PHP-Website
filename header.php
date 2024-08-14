@@ -71,6 +71,36 @@ $stmt->close();
         .navbar-nav .nav-link:hover {
             color: inherit;
         }
+
+        .telegram-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            transform: translate(0, 0);
+            /* Initially no translation */
+            z-index: 1000;
+            /* Ensure it is above other elements */
+            background-color: #0088cc;
+            /* Telegram blue */
+            color: white;
+            padding: 15px;
+            border-radius: 50%;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out;
+            /* Smooth animation */
+        }
+
+        .telegram-icon:hover {
+            transform: translate(-10px, -10px);
+            /* Move it up and left slightly on hover */
+            background-color: #006bb3;
+            /* Darker blue on hover */
+        }
+
+        .telegram-icon i {
+            font-size: 20px;
+        }
     </style>
 </head>
 
