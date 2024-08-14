@@ -53,7 +53,10 @@ $stmt->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>StakingHUB</title>
+    <link rel="icon" href="img/logo2.png" type="image/x-icon">
+    <meta name="description" content="Invest your money on staking and get 3x & get user join with referral reward and get lots of rewards">
+    <meta name="keywords" content="stakinghub, stackinghub, staking hub, stacking hub, staking, stacking, stake hub, stack hub, jhawarian website, sargodha website, investment website, online earning, reward website, staking hub website, stakinghub website, shahid iqbal, nawab academy, nawab">
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     <!-- Bootstrap CSS -->
