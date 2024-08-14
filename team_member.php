@@ -117,23 +117,7 @@ $level_three_locked = $total_deposited < 50;
 
 // Fetch referral rewards for the logged-in user
 // Pagination logic
-$records_per_page = 10;
-$total_records_stmt = $conn->prepare("
-    SELECT COUNT(*) AS total_records
-    FROM referral_rewards rr
-    WHERE rr.referrer_id = ?
-");
-$total_records_stmt->bind_param("i", $user_id);
-$total_records_stmt->execute();
-$total_records_row = $total_records_stmt->get_result()->fetch_assoc();
-$total_records = $total_records_row['total_records'];
-$total_records_stmt->close();
 
-$total_pages = ceil($total_records / $records_per_page);
-$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-if ($current_page < 1) $current_page = 1;
-if ($current_page > $total_pages) $current_page = $total_pages;
-$offset = ($current_page - 1) * $records_per_page;
 
 $referral_rewards_stmt = $conn->prepare("
     SELECT rr.*, u.name AS referred_user,
