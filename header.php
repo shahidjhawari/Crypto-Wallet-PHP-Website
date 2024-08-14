@@ -77,8 +77,8 @@ $stmt->close();
 
         .telegram-icon {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 5px;
+            right: 10px;
             transform: translate(0, 0);
             /* Initially no translation */
             z-index: 1000;
@@ -86,7 +86,7 @@ $stmt->close();
             background-color: #0088cc;
             /* Telegram blue */
             color: white;
-            padding: 15px;
+            padding: 10px;
             border-radius: 50%;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
