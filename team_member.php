@@ -92,6 +92,91 @@ $stmt->close();
 $level_two_locked = !$level_two_unlocked;
 $level_three_locked = !$level_three_unlocked;
 
+
+// Calculate the claimable amount from reward points
+$claimable_amount = floatval($user_rewards['reward_points']);
+
+// Fetch the user's transaction status
+$stmt = $conn->prepare("SELECT status FROM transactions WHERE user_id = ? ORDER BY id DESC LIMIT 1");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$transaction_status_row = $stmt->get_result()->fetch_assoc();
+$transaction_status = $transaction_status_row['status'] ?? null;
+$stmt->close();
+
+// Check total deposits
+$stmt = $conn->prepare("SELECT SUM(amount) AS total_deposited FROM deposits WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$total_deposited = $stmt->get_result()->fetch_assoc()['total_deposited'] ?? 0;
+$stmt->close();
+
+$level_one_locked = false; // Assuming level one is always unlocked
+$level_two_locked = $total_deposited < 30;
+$level_three_locked = $total_deposited < 50;
+
+// Fetch referral rewards for the logged-in user
+// Pagination logic
+$records_per_page = 10;
+$total_records_stmt = $conn->prepare("
+    SELECT COUNT(*) AS total_records
+    FROM referral_rewards rr
+    WHERE rr.referrer_id = ?
+");
+$total_records_stmt->bind_param("i", $user_id);
+$total_records_stmt->execute();
+$total_records_row = $total_records_stmt->get_result()->fetch_assoc();
+$total_records = $total_records_row['total_records'];
+$total_records_stmt->close();
+
+$total_pages = ceil($total_records / $records_per_page);
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($current_page < 1) $current_page = 1;
+if ($current_page > $total_pages) $current_page = $total_pages;
+$offset = ($current_page - 1) * $records_per_page;
+
+$referral_rewards_stmt = $conn->prepare("
+    SELECT rr.*, u.name AS referred_user,
+           CASE
+               WHEN rr.reward_percentage = 10 THEN 'Level 1'
+               WHEN rr.reward_percentage = 5 THEN 'Level 2'
+               WHEN rr.reward_percentage = 2 THEN 'Level 3'
+           END AS reward_level
+    FROM referral_rewards rr
+    JOIN users u ON rr.referred_user_id = u.id
+    WHERE rr.referrer_id = ?
+    ORDER BY rr.reward_date DESC
+    LIMIT ? OFFSET ?
+");
+$referral_rewards_stmt->bind_param("iii", $user_id, $records_per_page, $offset);
+$referral_rewards_stmt->execute();
+$result = $referral_rewards_stmt->get_result();
+$referral_rewards_stmt->close();
+
+// Fetch total referral earnings from ClaimedEarning table
+$stmt = $conn->prepare("SELECT SUM(amount) AS total_referral_earnings FROM ClaimedEarning WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$total_referral_earnings_row = $stmt->get_result()->fetch_assoc();
+$total_referral_earnings = $total_referral_earnings_row['total_referral_earnings'] ?? 0;
+$stmt->close();
+
+// Check if the user has at least one accepted staking request
+$stmt = $conn->prepare("SELECT COUNT(*) AS accepted_requests FROM staking_requests WHERE user_id = ? AND status = 'accepted'");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$accepted_requests_row = $stmt->get_result()->fetch_assoc();
+$accepted_requests = $accepted_requests_row['accepted_requests'] > 0;
+$stmt->close();
+
+// Check total remaining earnings
+$stmt = $conn->prepare("SELECT SUM(remaining_earning) AS total_remaining_earning FROM stakings WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$total_remaining_earning_row = $stmt->get_result()->fetch_assoc();
+$total_remaining_earning = $total_remaining_earning_row['total_remaining_earning'] ?? 0;
+$stmt->close();
+
 ?>
 
 <style>
@@ -122,6 +207,27 @@ $level_three_locked = !$level_three_unlocked;
 <div class="container mt-4">
     <div class="col-12 mb-4">
         <div class="card">
+            <div class="card-body p-3">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="fs-5 mb-4">Reward</h5>
+                        <h2 class="display-5 mb-4" style="margin-top: -15px;">
+                            $<?php echo htmlspecialchars($user_rewards['reward_points']) ?>.00
+                        </h2>
+                    </div>
+                    <div class="col text-end">
+                        <?php if ($claimable_amount > 0 && $accepted_requests && $total_remaining_earning >= $claimable_amount) : ?>
+                            <form action="claim_refer_rewards.php" method="post">
+                                <input type="hidden" name="claim_amount" value="<?php echo htmlspecialchars($claimable_amount); ?>">
+                                <button type="submit" class="btn btn-primary">Claim</button>
+                            </form>
+                        <?php else : ?>
+                            <button type="submit" class="btn btn-primary" disabled>Claim</button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
             <div class="card-body p-3">
                 <div class="row">
                     <div class="col-12">
