@@ -11,6 +11,10 @@ $stmt->close();
 
 <div class="container">
     <h2>Accepted Account Activation</h2>
+
+    <!-- Search input field -->
+    <input type="text" id="searchUserId" placeholder="Search by User ID" class="form-control mb-3">
+
     <table class="table">
         <thead>
             <tr>
@@ -21,7 +25,7 @@ $stmt->close();
                 <th>Image</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="transactionTableBody">
             <?php while ($transaction = $rejected_transactions->fetch_assoc()) : ?>
                 <tr>
                     <td><?php echo htmlspecialchars($transaction['id']); ?></td>
@@ -36,5 +40,24 @@ $stmt->close();
         </tbody>
     </table>
 </div>
+
+<script>
+    document.getElementById('searchUserId').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#transactionTableBody tr');
+
+        rows.forEach(function(row) {
+            const userId = row.cells[1].textContent.toLowerCase();
+
+            if (userId.indexOf(searchValue) > -1) {
+                row.style.display = '';
+                // Move the matched row to the top of the table
+                row.parentNode.prepend(row);
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
 
 <?php require('footer.inc.php'); ?>
