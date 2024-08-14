@@ -89,7 +89,7 @@ $result = $referral_rewards_stmt->get_result();
 $referral_rewards_stmt->close();
 
 // Fetch total referral earnings from ClaimedEarning table
-$stmt = $conn->prepare("SELECT SUM(amount) AS total_referral_earnings FROM ClaimedEarning WHERE user_id = ?");
+$stmt = $conn->prepare("SELECT SUM(amount) AS total_referral_earnings FROM claimedearning WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $total_referral_earnings_row = $stmt->get_result()->fetch_assoc();
