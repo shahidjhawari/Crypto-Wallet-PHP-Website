@@ -404,7 +404,7 @@ $stmt->close();
                             <!-- Wallet Balance -->
                             <p class="fs-5 mb-3">Wallet Balance</p>
                             <!-- Wallet Balance Amount (in larger size) -->
-                            <h1 class="display-5 mb-4" style="margin-top: -15px;">$<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></h1>
+                            <h2 class="display-5 mb-4" style="margin-top: -15px;">$<?php echo htmlspecialchars(number_format($wallet_balance, 2)); ?></h2>
                             <!-- Your Account Has Been Activated message -->
                             <!-- <?php if ($transaction_status === 'accepted') : ?>
                                 <p>Your account has been <span style="color: green;">Activated</span></p>
@@ -449,9 +449,9 @@ $stmt->close();
                                 }
                             }
                             ?>
-                            <h1 class="display-5 mb-4" style="margin-top: -15px;">
+                            <h2 class="display-5 mb-4" style="margin-top: -15px;">
                                 $<?php echo htmlspecialchars(number_format($total_daily_earnings, 2)); ?>
-                            </h1>
+                            </h2>
                         </div>
                     </div>
                 </div>
@@ -465,7 +465,7 @@ $stmt->close();
                     <div class="row">
                         <div class="col-12">
                             <p class="fs-5 mb-3">Total Team Earning</p>
-                            <h1 class="display-5 mb-4" style="margin-top: -15px;">$<?php echo number_format($total_referral_earnings, 2); ?>
+                            <h2 class="display-5 mb-4" style="margin-top: -15px;">$<?php echo number_format($total_referral_earnings, 2); ?>
                                 <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
                         </div>
                     </div>
@@ -489,9 +489,9 @@ $stmt->close();
                                 }
                             }
                             ?>
-                            <h1 class="display-5 mb-4" style="margin-top: -15px;">
+                            <h2 class="display-5 mb-4" style="margin-top: -15px;">
                                 <?php echo '$' . htmlspecialchars(number_format($total_staking_amount, 2)); ?>
-                            </h1>
+                            </h2>
                             <!-- Remove the loop as we are only showing the total -->
                             <!-- <p><a href="#" class="btn btn-info">Stacking</a></p> -->
                         </div>
@@ -507,7 +507,7 @@ $stmt->close();
                     <div class="row">
                         <div class="col-12">
                             <p class="fs-5 mb-3">Total Team Member</p>
-                            <h1 class="display-5 mb-4" style="margin-top: -15px;"><?php echo htmlspecialchars($user_rewards['referral_count']) +  $user_rewards['level_two_count'] + $user_rewards['level_three_count'] ?></h1>
+                            <h2 class="display-5 mb-4" style="margin-top: -15px;"><?php echo htmlspecialchars($user_rewards['referral_count']) +  $user_rewards['level_two_count'] + $user_rewards['level_three_count'] ?></h2>
                             <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
                         </div>
                     </div>
@@ -522,9 +522,9 @@ $stmt->close();
                     <div class="row">
                         <div class="col-12">
                             <p class="fs-5 mb-3">Withdraw</p>
-                            <h1 class="display-5 mb-4" style="margin-top: -15px;">
+                            <h2 class="display-5 mb-4" style="margin-top: -15px;">
                                 $<?php echo number_format(isset($total_accepted_amount) ? $total_accepted_amount : 0, 2); ?>
-                            </h1>
+                            </h2>
                             <!-- <p><a href="team.php" class="btn btn-info">Team Building</a></p> -->
                         </div>
                     </div>

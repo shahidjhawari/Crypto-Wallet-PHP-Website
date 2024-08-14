@@ -251,9 +251,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$daily_earnings_disabled) {
                             }
                         }
                         ?>
-                        <h2 class="display-5 mb-4" style="margin-top: -15px;">
+                        <h3 class="display-5 mb-4" style="margin-top: -15px;">
                             <?php echo '$' . htmlspecialchars(number_format($total_staking_amount, 2)); ?>
-                        </h2>
+                        </h3>
                     </div>
                 </div>
             </div>
@@ -272,9 +272,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$daily_earnings_disabled) {
                             $total_estimated_earning += $record['estimated_earning'];
                         }
                         ?>
-                        <h1 class="display-5 mb-4" style="margin-top: -15px;">
+                        <h3 class="display-5 mb-4" style="margin-top: -15px;">
                             $<?php echo htmlspecialchars(number_format($total_estimated_earning, 2)); ?>
-                        </h1>
+                        </h3>
                     </div>
                 </div>
             </div>
@@ -287,9 +287,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$daily_earnings_disabled) {
                 <div class="row">
                     <div class="col-12">
                         <h3 class="fs-5 mb-3">Remaining Earning</h3>
-                        <h1 class="display-5 mb-4" style="margin-top: -15px;">
+                        <h3 class="display-5 mb-4" style="margin-top: -15px;">
                             $<?php echo htmlspecialchars(number_format($total_remaining_earning, 2)); ?>
-                        </h1>
+                        </h3>
                     </div>
                 </div>
             </div>
