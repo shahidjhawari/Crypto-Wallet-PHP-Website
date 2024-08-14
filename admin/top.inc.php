@@ -87,6 +87,9 @@ if (isset($_SESSION['ADMIN_LOGIN']) && $_SESSION['ADMIN_LOGIN'] != '') {
                         <li class="nav-item">
                             <a class="nav-link" href="manage_announcements.php">Edit & Delete Announcement</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin_view_contacts.php">Contact Us</a>
+                        </li>
                     </ul>
                 </div>
             </nav>
