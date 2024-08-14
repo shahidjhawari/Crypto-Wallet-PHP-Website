@@ -79,16 +79,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->close();
 
             $_SESSION['message'] = "Earnings successfully claimed and added to your deposit.";
-            header("Location: team_earning.php");
+            header("Location: team_member.php");
             exit();
         } else {
             $_SESSION['error'] = "Insufficient remaining earnings to claim the reward.";
-            header("Location: team_design.php");
+            header("Location: team_member.php");
             exit();
         }
     } else {
         $_SESSION['error'] = "Invalid claim amount.";
-        header("Location: team_design.php");
+        header("Location: team_member.php");
         exit();
     }
 }
