@@ -92,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="centered-form">
         <div class="form-container">
             <div class="text-center mb-4">
-                <img src="img/logo.png" alt="Logo" class="img-fluid" width="300">
+                <img src="img/logo2.png" alt="Logo" class="img-fluid" width="70">
             </div>
             <?php
             if (!empty($emailError)) {
