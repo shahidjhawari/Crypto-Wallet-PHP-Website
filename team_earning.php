@@ -166,6 +166,28 @@ $stmt->close();
     }
 </style>
 
+<div class="col-12 mb-4">
+    <div class="card">
+        <div class="card-body p-3">
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="fs-5 mb-3">Registration Reward</h3>
+                    <h2 class="display-5 mb-4" style="margin-top: -15px;">
+                        $<?php echo htmlspecialchars($user_rewards['reward_points']) ?>.00
+                    </h2>
+                    <?php if ($claimable_amount > 0 && $accepted_requests && $total_remaining_earning >= $claimable_amount) : ?>
+                        <form action="claim_refer_rewards.php" method="post">
+                            <input type="hidden" name="claim_amount" value="<?php echo htmlspecialchars($claimable_amount); ?>">
+                            <button type="submit" class="btn btn-primary">Claim</button>
+                        </form>
+                    <?php else : ?>
+                        <button type="submit" class="btn btn-primary" disabled>Claim</button>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="col-12 mb-4">
     <div class="card">
