@@ -76,6 +76,12 @@ if (isset($_SESSION['ADMIN_LOGIN']) && $_SESSION['ADMIN_LOGIN'] != '') {
                             <a class="nav-link" href="admin_manage_payments.php">Withdraw Request</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="accepted_payments.php">Withdraw Request Accepted</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="rejected_payments.php">Withdraw Request Rejected</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="add_announcement.php">Add Announcement</a>
                         </li>
                         <li class="nav-item">
