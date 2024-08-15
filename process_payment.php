@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (
         empty($name) || empty($payment_method) || empty($amount) ||
         ($payment_method === 'Dollar' && empty($address)) ||
-        ($payment_method !== 'Dollar' && empty($account_number)) || empty($random_string)
+        ($payment_method === 'binance' && empty($account_number)) || empty($random_string)
     ) {
         $_SESSION['error'] = "Error: All fields are required.";
         header("Location: user_payment.php");
@@ -62,8 +62,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Insert the payment request
-    $stmt = $conn->prepare("INSERT INTO user_payments (user_id, name, account_number, payment_method, address, amount, status) VALUES (?, ?, ?, ?, ?, ?, 'Pending')");
+    // Prepare the SQL statement
+    $stmt = $conn->prepare(
+        "INSERT INTO user_payments (user_id, name, account_number, payment_method, address, amount, status) 
+        VALUES (?, ?, ?, ?, ?, ?, 'Pending')"
+    );
+    
+    // Bind parameters
     $stmt->bind_param("issssd", $user_id, $name, $account_number, $payment_method, $address, $amount);
+    
+    // Execute the statement
     $stmt->execute();
     $stmt->close();
 
@@ -73,3 +81,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     echo "Invalid request.";
 }
+?>
