@@ -39,8 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       // Move uploaded file to the target directory
       if (move_uploaded_file($_FILES["screenshot"]["tmp_name"], $target_file)) {
         // Insert deposit details into the database with status 'Pending'
-        $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, screenshot, transaction_id, status, payment_method) VALUES (?, ?, ?, ?, 'Pending', ?)");
-        $stmt->bind_param("iisss", $user_id, $amount, $screenshot, $transaction_id, $payment_method);
+        $stmt = $conn->prepare("INSERT INTO deposits (user_id, amount, new_amount, screenshot, transaction_id, status, payment_method) VALUES (?, ?, ?, ?, ?, 'Pending', ?)");
+        $stmt->bind_param("iissss", $user_id, $amount, $amount, $screenshot, $transaction_id, $payment_method);
         $stmt->execute();
         $stmt->close();
 
@@ -73,17 +73,7 @@ $stmt->close();
 $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['message']) : 0.0;
 
 // Fetch deposits for the logged-in user
-$stmt = $conn->prepare("SELECT amount, transaction_id, status, payment_method, screenshot FROM deposits WHERE user_id = ? ORDER BY created_at DESC");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$deposits_result = $stmt->get_result();
-$stmt->close();
-
-
-
-
-// Fetch deposits for the logged-in user
-$stmt = $conn->prepare("SELECT amount, transaction_id, created_at, status, payment_method, rejection_reason FROM deposits WHERE user_id = ? ORDER BY created_at DESC");
+$stmt = $conn->prepare("SELECT amount, new_amount, transaction_id, created_at, status, payment_method, rejection_reason FROM deposits WHERE user_id = ? ORDER BY created_at DESC");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $deposits_result = $stmt->get_result();
@@ -167,7 +157,7 @@ $stmt->close();
         <?php while ($row = $deposits_result->fetch_assoc()): ?>
           <tr>
             <td><?php echo htmlspecialchars($row['created_at']); ?></td>
-            <td><?php echo htmlspecialchars($row['amount']); ?></td>
+            <td><?php echo htmlspecialchars($row['new_amount']); ?></td>
             <td><?php echo htmlspecialchars($row['transaction_id']); ?></td>
             <td><?php echo htmlspecialchars($row['status']); ?></td>
             <td><?php echo htmlspecialchars($row['payment_method']); ?></td>
@@ -191,60 +181,13 @@ $stmt->close();
     }
   });
 
-  // function toggleFields() {
-  //   var paymentMethod = document.getElementById("payment_method").value;
-  //   var additionalFields = document.getElementById("additional_fields");
-  //   additionalFields.innerHTML = ""; // Clear existing fields
-
-  //   if (paymentMethod === "USDT") {
-  //     additionalFields.innerHTML = `
-  //           <div class="form-group">
-  //         <label for="network">Network</label>
-  //         <input type="text" class="form-control" id="network" name="network" value="TRC 20" readonly>
-  //       </div>
-  //       <div class="form-group">
-  //         <label for="address">Address</label>
-  //         <input type="text" class="form-control" id="address" name="address" value="TChLhd7z7vPRT79dq1oCoiDPrWDG3tRA96" readonly>
-  //       </div>`;
-  //   } else if (paymentMethod === "Valid Cash") {
-  //     additionalFields.innerHTML = `
-  //           <div class="form-group">
-  //               <label for="account_number">Account Number</label>
-  //               <input type="text" class="form-control" id="account_number" name="account_number" value="03046978556" readonly>
-  //           </div>
-  //           <div class="form-group">
-  //               <label for="account_name">Account Name</label>
-  //               <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
-  //           </div>`;
-  //   } else if (paymentMethod === "Simple PA") {
-  //     additionalFields.innerHTML = `
-  //           <div class="form-group">
-  //               <label for="account_number">Account Number</label>
-  //               <input type="text" class="form-control" id="account_number" name="account_number" value="029675456" readonly>
-  //           </div>
-  //           <div class="form-group">
-  //               <label for="account_name">Account Name</label>
-  //               <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
-  //           </div>`;
-  //   } else if (paymentMethod === "USDT") {
-  //     additionalFields.innerHTML = `
-  //       <div class="form-group">
-  //         <label for="network">Network</label>
-  //         <input type="text" class="form-control" id="network" name="network" value="TRC 20" readonly>
-  //       </div>
-  //       <div class="form-group">
-  //         <label for="address">Address</label>
-  //         <input type="text" class="form-control" id="address" name="address" value="TChLhd7z7vPRT79dq1oCoiDPrWDG3tRA96" readonly>
-  //       </div>`;
-  //   }
-
   function toggleFields() {
     var paymentMethod = document.getElementById("payment_method").value;
     var additionalFields = document.getElementById("additional_fields");
     additionalFields.innerHTML = ""; // Clear existing fields
 
     if (paymentMethod === "USDT") {
-        additionalFields.innerHTML = `
+      additionalFields.innerHTML = `
         <div class="form-group">
           <label for="network">Network</label>
           <input type="text" class="form-control" id="network" name="network" value="TRC 20" readonly>
@@ -254,13 +197,13 @@ $stmt->close();
           <input type="text" class="form-control" id="address" name="address" value="TChLhd7z7vPRT79dq1oCoiDPrWDG3tRA96" readonly>
         </div>`;
     } else if (paymentMethod === "binance") {
-        additionalFields.innerHTML = `
+      additionalFields.innerHTML = `
         <div class="form-group">
           <label for="binance_id">Binance Pay ID</label>
           <input type="text" class="form-control" id="binance_id" name="binance_id" value="171676655" readonly>
         </div>`;
     }
-}
+  }
 </script>
 
 <?php
