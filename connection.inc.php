@@ -1,6 +1,6 @@
 <?php
 $conn = mysqli_connect("localhost", "root", "", "coin");
-define('SERVER_PATH', $_SERVER['DOCUMENT_ROOT'] . '/coin/');
+define('SERVER_PATH', $_SERVER['DOCUMENT_ROOT'] . 'coin');
 define('SITE_PATH', 'http://localhost/coin/');
 
 // Online Code Here

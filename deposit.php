@@ -120,11 +120,11 @@ $stmt->close();
             <div class="form-group">
               <label for="payment_method">Payment Method</label>
               <select class="form-control" id="payment_method" name="payment_method" onchange="toggleFields()" required>
-                <option value="" disabled selected>Select a payment method</option>
-                <!-- <option value="Easy Paisa">Easy Paisa</option>
+                <!-- <option value="" disabled selected>Select a payment method</option>
+                <option value="Easy Paisa">Easy Paisa</option>
                 <option value="Valid Cash">Jazz Cash</option>
                 <option value="Simple PA">Sada Pay</option> -->
-                <option value="USDT">USDT</option>
+                <option selected value="USDT">USDT</option>
               </select>
             </div>
             <div id="additional_fields"></div>
