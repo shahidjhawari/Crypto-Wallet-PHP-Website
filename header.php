@@ -75,33 +75,60 @@ $stmt->close();
             color: inherit;
         }
 
-        .telegram-icon {
+        .telegram-container {
             position: fixed;
             bottom: 5px;
             right: 10px;
             transform: translate(0, 0);
-            /* Initially no translation */
             z-index: 1000;
-            /* Ensure it is above other elements */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .telegram-icon {
+            position: relative;
             background-color: #0088cc;
-            /* Telegram blue */
             color: white;
             padding: 10px;
             border-radius: 50%;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease-in-out;
-            /* Smooth animation */
+            cursor: pointer;
         }
 
-        .telegram-icon:hover {
-            transform: translate(-10px, -10px);
-            /* Move it up and left slightly on hover */
-            background-color: #006bb3;
-            /* Darker blue on hover */
-        }
 
         .telegram-icon i {
+            font-size: 20px;
+        }
+
+        .extra-icons {
+            display: none;
+            position: absolute;
+            bottom: 50px;
+            /* Position above the main icon */
+            right: 5;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .extra-icons a {
+            background-color: #0088cc;
+            /* Same blue color as the Telegram icon */
+            color: white;
+            border-radius: 50%;
+            margin: 5px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .extra-icons a:hover {
+            background-color: #006bb3;
+        }
+
+        .extra-icons a i {
             font-size: 20px;
         }
     </style>
@@ -184,6 +211,33 @@ $stmt->close();
         </div>
     </nav>
 
-    <a href="https://t.me/Staking_HUB" target="_blank" class="telegram-icon">
-        <i class="fab fa-telegram-plane"></i>
-    </a>
+    <div class="telegram-container">
+        <a href="#" class="telegram-icon" id="telegramIcon">
+            <i class="fab fa-telegram-plane"></i>
+        </a>
+        <div class="extra-icons" id="extraIcons">
+            <a href="your-telegram-link" class="telegram-icon" target="_blank">
+                <i class="fab fa-telegram-plane"></i>
+            </a>
+            <a href="your-profile-link" class="profile-icon" target="_blank">
+                <i class="fas fa-user"></i>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('telegramIcon').addEventListener('click', function() {
+            var extraIcons = document.getElementById('extraIcons');
+            if (extraIcons.style.display === 'none' || extraIcons.style.display === '') {
+                extraIcons.style.display = 'flex';
+                setTimeout(function() {
+                    extraIcons.style.display = 'none';
+                }, 3000); // Hide after 3 seconds
+            } else {
+                extraIcons.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
