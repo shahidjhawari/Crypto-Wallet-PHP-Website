@@ -139,9 +139,9 @@ $stmt->close();
             <button type="submit" class="btn btn-info btn-block">Submit</button>
           </form>
           <p id="converted-amount" class="mt-3"></p>
-          <div class="alert alert-info mt-3">
+          <!-- <div class="alert alert-info mt-3">
             By selecting USDT, you will receive a 5% bonus on your deposit!
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
