@@ -49,8 +49,8 @@ $stmt->close();
         } else {
             addressField.style.display = "none";
             accountNumberField.style.display = "block";
-            fee = 0.05 * amount; // 5% fee for other payment methods
-            feeInfo.textContent = "Note: A 5% fee will be deducted.";
+            fee = 0.02 * amount; // 5% fee for other payment methods
+            feeInfo.textContent = "Note: A 2% fee will be deducted.";
         }
 
         document.getElementById("fee_amount").textContent = fee.toFixed(2);
@@ -118,11 +118,11 @@ $stmt->close();
         <div class="form-group">
             <label for="payment_method">Payment Method:</label>
             <select class="form-control" id="payment_method" name="payment_method" onchange="toggleFields()" required>
-                <!-- <option value="" disabled selected>Select a payment method</option>
-                <option value="Easy Paisa">Easy Paisa</option>
-                <option value="Jazz Cash">Jazz Cash</option>
-                <option value="Simple Pay">Simple Pay</option> -->
-                <option selected value="Dollar">USDT</option>
+                <option value="" disabled selected>Select a payment method</option>
+                <!-- <option value="Easy Paisa">Easy Paisa</option>
+                <option value="Jazz Cash">Jazz Cash</option> -->
+                <option value="Dollar">USDT</option>
+                <option value="binance">Binance Pay ID</option>
             </select>
             <span id="fee_info" style="color: red;"></span>
         </div>
@@ -139,8 +139,8 @@ $stmt->close();
         </div>
 
         <div id="account_number_field" class="form-group" style="display:none;">
-            <label for="account_number">Account Number:</label>
-            <input type="text" class="form-control" id="account_number" name="account_number">
+            <label for="account_number">Binance Pay ID:</label>
+            <input type="text" class="form-control" id="account_number" name="account_number" placeholder="Enter Binance Pay ID">
             <span id="account_number_error" style="color: red;"></span>
         </div>
 
