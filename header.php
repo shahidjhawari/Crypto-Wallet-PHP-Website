@@ -216,10 +216,10 @@ $stmt->close();
             <i class="fab fa-telegram-plane"></i>
         </a>
         <div class="extra-icons" id="extraIcons">
-            <a href="your-telegram-link" class="telegram-icon" target="_blank">
+            <a href="https://t.me/Staking_HUB" class="telegram-icon" target="_blank">
                 <i class="fab fa-telegram-plane"></i>
             </a>
-            <a href="your-profile-link" class="profile-icon" target="_blank">
+            <a href="https://t.me/+CANG0BzUsWM2NmFk" class="profile-icon" target="_blank">
                 <i class="fas fa-user"></i>
             </a>
         </div>
@@ -238,6 +238,3 @@ $stmt->close();
             }
         });
     </script>
-</body>
-
-</html>
