@@ -74,9 +74,9 @@ $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['mes
               <select class="form-control" id="payment_method" name="payment_method" onchange="toggleFields()" required>
                 <option value="" disabled selected>Select a payment method</option>
                 <!-- <option value="Easy Paisa">Easy Paisa</option>
-                <option value="Valid Cash">Jazz Cash</option>
-                <option value="Simple PA">Sada Pay</option> -->
+                <option value="Valid Cash">Jazz Cash</option> -->
                 <option value="USDT">USDT</option>
+                <option value="binance">Binance Pay ID</option>
               </select>
             </div>
             <div id="additional_fields"></div>
@@ -98,50 +98,74 @@ $exchange_rate = isset($latestMessage['message']) ? floatval($latestMessage['mes
 </div>
 
 <script>
+  // function toggleFields() {
+  //   var paymentMethod = document.getElementById("payment_method").value;
+  //   var additionalFields = document.getElementById("additional_fields");
+  //   additionalFields.innerHTML = ""; // Clear existing fields
+
+  //   if (paymentMethod === "Easy Paisa") {
+  //     additionalFields.innerHTML = `
+  //       <div class="form-group">
+  //         <label for="account_number">Account Number</label>
+  //         <input type="text" class="form-control" id="account_number" name="account_number" value="03236645813" readonly>
+  //       </div>
+  //       <div class="form-group">
+  //         <label for="account_name">Account Name</label>
+  //         <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
+  //       </div>`;
+  //   } else if (paymentMethod === "Valid Cash") {
+  //     additionalFields.innerHTML = `
+  //       <div class="form-group">
+  //         <label for="account_number">Account Number</label>
+  //         <input type="text" class="form-control" id="account_number" name="account_number" value="03046978556" readonly>
+  //       </div>
+  //       <div class="form-group">
+  //         <label for="account_name">Account Name</label>
+  //         <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
+  //       </div>`;
+  //   } else if (paymentMethod === "USDT") {
+  //     additionalFields.innerHTML = `
+  //       <div class="form-group">
+  //         <label for="network">Network</label>
+  //         <input type="text" class="form-control" id="network" name="network" value="TRC 20" readonly>
+  //       </div>
+  //       <div class="form-group">
+  //         <label for="address">Address</label>
+  //         <input type="text" class="form-control" id="address" name="address" value="TChLhd7z7vPRT79dq1oCoiDPrWDG3tRA96" readonly>
+  //       </div>`;
+  //   } else if (paymentMethod === "Simple PA") {
+  //     additionalFields.innerHTML = `
+  //       <div class="form-group">
+  //         <label for="account_number">Account Number</label>
+  //         <input type="text" class="form-control" id="account_number" name="account_number" value="03046978556" readonly>
+  //       </div>
+  //       <div class="form-group">
+  //         <label for="account_name">Account Name</label>
+  //         <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
+  //       </div>`;
+  //   }
+  // }
+
   function toggleFields() {
     var paymentMethod = document.getElementById("payment_method").value;
     var additionalFields = document.getElementById("additional_fields");
     additionalFields.innerHTML = ""; // Clear existing fields
 
-    if (paymentMethod === "Easy Paisa") {
+    if (paymentMethod === "USDT") {
       additionalFields.innerHTML = `
-        <div class="form-group">
-          <label for="account_number">Account Number</label>
-          <input type="text" class="form-control" id="account_number" name="account_number" value="03236645813" readonly>
-        </div>
-        <div class="form-group">
-          <label for="account_name">Account Name</label>
-          <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
-        </div>`;
-    } else if (paymentMethod === "Valid Cash") {
+            <div class="form-group">
+                <label for="network">Network</label>
+                <input type="text" class="form-control" id="network" name="network" value="TRC 20" readonly>
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" class="form-control" id="address" name="address" value="TChLhd7z7vPRT79dq1oCoiDPrWDG3tRA96" readonly>
+            </div>`;
+    } else if (paymentMethod === "binance") {
       additionalFields.innerHTML = `
-        <div class="form-group">
-          <label for="account_number">Account Number</label>
-          <input type="text" class="form-control" id="account_number" name="account_number" value="03046978556" readonly>
-        </div>
-        <div class="form-group">
-          <label for="account_name">Account Name</label>
-          <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
-        </div>`;
-    } else if (paymentMethod === "USDT") {
-      additionalFields.innerHTML = `
-        <div class="form-group">
-          <label for="network">Network</label>
-          <input type="text" class="form-control" id="network" name="network" value="TRC 20" readonly>
-        </div>
-        <div class="form-group">
-          <label for="address">Address</label>
-          <input type="text" class="form-control" id="address" name="address" value="TChLhd7z7vPRT79dq1oCoiDPrWDG3tRA96" readonly>
-        </div>`;
-    } else if (paymentMethod === "Simple PA") {
-      additionalFields.innerHTML = `
-        <div class="form-group">
-          <label for="account_number">Account Number</label>
-          <input type="text" class="form-control" id="account_number" name="account_number" value="03046978556" readonly>
-        </div>
-        <div class="form-group">
-          <label for="account_name">Account Name</label>
-          <input type="text" class="form-control" id="account_name" name="account_name" value="Aman Ullah" readonly>
+            <div class="form-group">
+          <label for="binance_id">Binance Pay ID</label>
+          <input type="text" class="form-control" id="binance_id" name="binance_id" value="171676655" readonly>
         </div>`;
     }
   }
