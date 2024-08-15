@@ -170,9 +170,9 @@ $stmt->close();
                             <li><a class="dropdown-item" href="team_earning.php">Team Building Earning</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="bonus_rewards.php">Bonus Reward</a>
-                    </li>
+                    </li> -->
                     <li class="nav-item">
                         <a class="nav-link" href="contact.php">Contact Us</a>
                     </li>
