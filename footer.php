@@ -1,9 +1,3 @@
-<a href="https://t.me/Staking_HUB" target="_blank" class="telegram-icon">
-    <i class="fab fa-telegram-plane"></i>
-</a>
-
-
-
 <!-- Footer Scripts -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>

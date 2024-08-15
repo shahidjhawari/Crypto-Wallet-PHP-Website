@@ -180,6 +180,9 @@ $stmt->close();
                         <a class="nav-link" href="logout.php">Logout</a>
                     </li>
                 </ul>
+                <a href="https://t.me/Staking_HUB" target="_blank" class="telegram-icon">
+                    <i class="fab fa-telegram-plane"></i>
+                </a>
             </div>
         </div>
     </nav>
