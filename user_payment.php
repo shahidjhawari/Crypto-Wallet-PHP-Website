@@ -10,6 +10,16 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+// Display error or success messages
+if (isset($_SESSION['error'])) {
+    echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error'] . '</div>';
+    unset($_SESSION['error']);
+}
+
+if (isset($_GET['submitted']) && $_GET['submitted'] == 'true') {
+    echo '<div class="alert alert-success" role="alert">Your form has been submitted successfully.</div>';
+}
+
 // Fetch the user's withdrawal requests
 $stmt = $conn->prepare("SELECT id, amount, payment_method, status, created_at FROM user_payments WHERE user_id = ? ORDER BY created_at DESC");
 $stmt->bind_param("i", $user_id);
@@ -77,7 +87,7 @@ $stmt->close();
         }
 
         if (parseFloat(amount) < 10) {
-            amountError.textContent = "Minimum draw balance should be 10.";
+            amountError.textContent = "Minimum withdrawal amount should be 10.";
             amountError.style.color = "red";
             return false;
         }
@@ -91,7 +101,7 @@ $stmt->close();
         }
 
         if (randomString.length === 0) {
-            randomStringError.textContent = "Random string is required.";
+            randomStringError.textContent = "Private key is required.";
             randomStringError.style.color = "red";
             return false;
         }

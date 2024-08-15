@@ -33,11 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $conn->prepare("SELECT random_string FROM users WHERE id = ?");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
-    $stored_random_string = $stmt->get_result()->fetch_assoc()['random_string'] ?? '';
+    $result = $stmt->get_result();
+    $stored_random_string = $result->fetch_assoc()['random_string'] ?? '';
     $stmt->close();
 
     if ($random_string !== $stored_random_string) {
-        $_SESSION['error'] = "Error: Invalid random string.";
+        $_SESSION['error'] = "Error: Your Private Key is incorrect.";
         header("Location: user_payment.php");
         exit();
     }
@@ -46,7 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $conn->prepare("SELECT SUM(amount) AS wallet_balance FROM deposits WHERE user_id = ? AND status = 'Accepted'");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
-    $wallet_balance = $stmt->get_result()->fetch_assoc()['wallet_balance'] ?? 0;
+    $result = $stmt->get_result();
+    $wallet_balance = $result->fetch_assoc()['wallet_balance'] ?? 0;
     $stmt->close();
 
     // Calculate fee
