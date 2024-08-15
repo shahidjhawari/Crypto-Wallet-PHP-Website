@@ -93,8 +93,8 @@ $stmt->close();
         }
 
         if (document.getElementById("account_number_field").style.display === "block") {
-            if (accountNumber.length !== 11) {
-                accountNumberError.textContent = "Account number must be exactly 11 characters long.";
+            if (accountNumber.length !== 9) {
+                accountNumberError.textContent = "Account number must be exactly 9 characters long.";
                 accountNumberError.style.color = "red";
                 return false;
             }
