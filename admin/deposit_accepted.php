@@ -30,7 +30,7 @@ $stmt->close();
                 <tr>
                     <td><?php echo htmlspecialchars($transaction['id']); ?></td>
                     <td><?php echo htmlspecialchars($transaction['user_id']); ?></td>
-                    <td><?php echo htmlspecialchars($transaction['amount']); ?></td>
+                    <td><?php echo htmlspecialchars($transaction['new_amount']); ?></td>
                     <td><?php echo htmlspecialchars($transaction['status']); ?></td>
                     <td>
                         <img src="<?php echo PRODUCT_IMAGE_SITE_PATH . $transaction['screenshot']; ?>" class="img-fluid" alt="Screenshot" width="100">
