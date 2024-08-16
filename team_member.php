@@ -28,7 +28,7 @@ $stmt->execute();
 $total_deposited = $stmt->get_result()->fetch_assoc()['total_deposited'] ?? 0;
 $stmt->close();
 
-// Unlock levels based on total deposit
+// Unlock levels based on total deposit, ensuring levels remain unlocked
 if ($total_deposited >= 30 && !$level_two_unlocked) {
     $stmt = $conn->prepare("UPDATE rewards SET level_two_unlocked = 1 WHERE user_id = ?");
     $stmt->bind_param("i", $user_id);
@@ -92,7 +92,6 @@ $stmt->close();
 $level_two_locked = !$level_two_unlocked;
 $level_three_locked = !$level_three_unlocked;
 
-
 // Calculate the claimable amount from reward points
 $claimable_amount = floatval($user_rewards['reward_points']);
 
@@ -111,13 +110,8 @@ $stmt->execute();
 $total_deposited = $stmt->get_result()->fetch_assoc()['total_deposited'] ?? 0;
 $stmt->close();
 
-$level_one_locked = false; // Assuming level one is always unlocked
-$level_two_locked = $total_deposited < 30;
-$level_three_locked = $total_deposited < 50;
-
 // Fetch referral rewards for the logged-in user
 // Pagination logic
-
 
 $referral_rewards_stmt = $conn->prepare("
     SELECT rr.*, u.name AS referred_user,
