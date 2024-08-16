@@ -126,6 +126,52 @@ $stmt->close();
         .extra-icons a i {
             font-size: 20px;
         }
+
+        .telegram-container {
+            position: fixed;
+            bottom: 5px;
+            right: 10px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .telegram-icon,
+        .profile-icon {
+            position: relative;
+            background-color: #0088cc;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-label {
+            position: absolute;
+            left: -100px;
+            /* Adjust this value to move the text further or closer to the button */
+            color: white;
+            font-size: 12px;
+            white-space: nowrap;
+            display: inline-block;
+            margin-left: 0px;
+        }
+
+        .extra-icons {
+            display: none;
+            position: absolute;
+            bottom: 50px;
+            /* Position above the main icon */
+            right: 5px;
+            flex-direction: column;
+            align-items: center;
+        }
     </style>
 </head>
 
@@ -214,9 +260,11 @@ $stmt->close();
             <div class="extra-icons" id="extraIcons">
                 <a href="https://t.me/Staking_HUB" class="telegram-icon" target="_blank">
                     <i class="fab fa-telegram-plane"></i>
+                    <span class="icon-label" style="margin-left: 40px;">Support</span>
                 </a>
                 <a href="https://t.me/+CANG0BzUsWM2NmFk" class="profile-icon" target="_blank">
                     <i class="fas fa-user"></i>
+                    <span class="icon-label">Community Group</span>
                 </a>
             </div>
         </div>
