@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 14, 2024 at 01:06 PM
+-- Generation Time: Aug 16, 2024 at 06:51 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -146,7 +146,8 @@ CREATE TABLE `deposits` (
   `payment_method` enum('Easy Paisa','Valid Cash','Simple PA','USDT') NOT NULL,
   `bonus_claimed_amount` decimal(10,2) DEFAULT 0.00,
   `referral_daily_reward` decimal(10,2) DEFAULT 0.00,
-  `rejection_reason` varchar(255) DEFAULT NULL
+  `rejection_reason` varchar(255) DEFAULT NULL,
+  `new_amount` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -197,7 +198,8 @@ CREATE TABLE `rewards` (
   `level_two_count` int(11) DEFAULT 0,
   `level_three_count` int(11) DEFAULT 0,
   `level_two_unlocked` tinyint(1) DEFAULT 0,
-  `level_three_unlocked` tinyint(1) DEFAULT 0
+  `level_three_unlocked` tinyint(1) DEFAULT 0,
+  `level_unlocked` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -309,7 +311,7 @@ CREATE TABLE `user_payments` (
   `user_id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `account_number` varchar(255) DEFAULT NULL,
-  `payment_method` enum('Easy Paisa','Jazz Cash','Simple Pay','Dollar') NOT NULL,
+  `payment_method` varchar(255) NOT NULL,
   `address` varchar(255) DEFAULT NULL,
   `amount` decimal(10,2) NOT NULL,
   `status` enum('Pending','Accepted','Rejected') DEFAULT 'Pending',
@@ -523,7 +525,7 @@ ALTER TABLE `reward_logs`
 -- AUTO_INCREMENT for table `stakings`
 --
 ALTER TABLE `stakings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=163;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=166;
 
 --
 -- AUTO_INCREMENT for table `staking_requests`
@@ -541,7 +543,7 @@ ALTER TABLE `transactions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=219;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=225;
 
 --
 -- AUTO_INCREMENT for table `user_payments`
